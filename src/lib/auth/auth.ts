@@ -8,52 +8,51 @@
  */
 
 import { betterAuth } from "better-auth";
+import { LibsqlDialect } from "@libsql/kysely-libsql";
 import Database from "better-sqlite3";
-import { createClient } from "@libsql/client";
-import { initAuthDb } from "./init-auth-db";
-
-// Database path for local SQLite
-const SQLITE_DB_PATH = "./data/auth.db";
-
-// Check if using Turso (production/Vercel) or local SQLite (development)
-const tursoUrl = import.meta.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL;
-const tursoToken = import.meta.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN;
-const usingTurso = !!(tursoUrl && tursoToken);
-
-// Initialize auth.db schema ONLY for local SQLite
-// Turso database schema is set up via migration (init_auth_schema.sql)
-if (!usingTurso) {
-  initAuthDb();
-}
 
 /**
- * Get the appropriate database connection based on environment
- * - If TURSO_DATABASE_URL is set, use Turso (production/Vercel)
+ * Build database connection based on environment
+ * - If TURSO_DATABASE_URL is set, use Turso with LibsqlDialect
  * - Otherwise, use local SQLite (development)
  */
-function getDatabase() {
+function buildDatabase() {
   const tursoUrl = import.meta.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL;
   const tursoToken = import.meta.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN;
 
   if (tursoUrl && tursoToken) {
-    console.log("Using Turso database");
-    return createClient({
-      url: tursoUrl,
-      authToken: tursoToken,
-    });
+    console.log("[Auth] Using Turso database (LibsqlDialect)");
+    // Better Auth accepts { dialect, type } directly for Turso
+    return {
+      dialect: new LibsqlDialect({
+        url: tursoUrl,
+        authToken: tursoToken,
+      }),
+      type: "sqlite" as const,
+    };
   }
 
-  console.log("Using local SQLite database");
-  return new Database(SQLITE_DB_PATH);
+  console.log("[Auth] Using local SQLite database");
+  // Local development: local SQLite file
+  return new Database("./data/auth.db");
 }
 
 export const auth = betterAuth({
-  database: getDatabase(),
+  database: buildDatabase(),
 
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set true for production
     minPasswordLength: 8,
+    // sendResetPassword: async ({ user, url }) => {
+    //   // TODO: Implement password reset email
+    //   // await resend.emails.send({
+    //   //   from: 'noreply@yourdomain.com',
+    //   //   to: user.email,
+    //   //   subject: 'Reset your password',
+    //   //   html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+    //   // });
+    // },
   },
 
   session: {
@@ -89,6 +88,22 @@ export const auth = betterAuth({
   // Secret for signing tokens
   secret: import.meta.env.BETTER_AUTH_SECRET || process.env.BETTER_AUTH_SECRET,
 });
+
+// ============================================================================
+// Run migrations on first import
+// ============================================================================
+// Better Auth will create tables automatically on first connection
+// runMigrations is idempotent (CREATE TABLE IF NOT EXISTS)
+// ============================================================================
+(async () => {
+  try {
+    const ctx = await auth.$context;
+    await ctx.runMigrations();
+    console.log("[Auth] ✅ Migrations run successfully");
+  } catch (error) {
+    console.error("[Auth] ❌ Migration error:", error);
+  }
+})();
 
 // Export types for use elsewhere
 export type Session = typeof auth.$Infer.Session;
