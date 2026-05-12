@@ -37,7 +37,8 @@ function buildDatabase() {
   return new Database("./data/auth.db");
 }
 
-export const auth = betterAuth({
+// Create auth instance
+const authInstance = betterAuth({
   database: buildDatabase(),
 
   emailAndPassword: {
@@ -90,24 +91,38 @@ export const auth = betterAuth({
 });
 
 // ============================================================================
-// Run migrations on first import
+// Run migrations synchronously before exporting
 // ============================================================================
 // Better Auth will create tables automatically on first connection
 // runMigrations is idempotent (CREATE TABLE IF NOT EXISTS)
 // ============================================================================
-(async () => {
+let migrationsRan = false;
+async function ensureMigrations() {
+  if (migrationsRan) return;
+
   try {
-    const ctx = await auth.$context;
+    const ctx = await authInstance.$context;
     await ctx.runMigrations();
+    migrationsRan = true;
     console.log("[Auth] ✅ Migrations run successfully");
   } catch (error) {
     console.error("[Auth] ❌ Migration error:", error);
+    throw error;
   }
-})();
+}
+
+// Run migrations immediately when module loads
+const migrationPromise = ensureMigrations();
+
+// Export a promise that resolves to auth after migrations
+export const auth = authInstance;
 
 // Export types for use elsewhere
-export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.Session.user;
+export type Session = typeof authInstance.$Infer.Session;
+export type User = typeof authInstance.$Infer.Session.user;
+
+// Export migration promise for awaiting in entry points
+export { migrationPromise };
 
 // ============================================================================
 // Helper Functions
