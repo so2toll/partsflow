@@ -392,4 +392,4 @@ Should be sufficient for MVP and early production usage.
 5. ✅ Monitor Turso dashboard for usage
 6. ✅ Set up alerts for database errors
 
-Done!! Your app is now running on Turso cloud databases. 🚀
+Done! Your app is now running on Turso cloud databases. 🚀
