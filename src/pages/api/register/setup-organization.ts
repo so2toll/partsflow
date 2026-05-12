@@ -7,7 +7,7 @@
  * - OWNS relationship between user and organization
  * - First project "My First Project"
  * - HAS_PROJECT relationship between organization and project
- * - Updates Better Auth user with organizationId and role
+ * - Updates Better Auth user with organizationId, role, and global_id
  *
  * POST /api/register/setup-organization
  * Body: { email: string, name: string, organizationName: string }
@@ -17,7 +17,7 @@ import type { APIRoute } from "astro";
 import { graph } from "../../../lib/db/graph";
 import { organizationRepository } from "../../../lib/db/repositories/OrganizationRepository";
 import { projectRepository } from "../../../lib/db/repositories/ProjectRepository";
-import { auth } from "../../../lib/auth/auth";
+import { authQuery, authExecute } from "../../../lib/db/auth-db";
 import { ulid } from "ulid";
 
 export const POST: APIRoute = async ({ request }) => {
@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Step 1: Generate global_id (ULID) that will be used in both databases
     const global_id = `user_${ulid()}`;
 
-    // Step 2: Create Organization node
+    // Step 2: Create Organization node (do this first so we have org.id)
     const organization = await organizationRepository.create({
       name: organizationName,
       settings: {
@@ -66,26 +66,25 @@ export const POST: APIRoute = async ({ request }) => {
 
     console.log(`[OrgSetup] Created organization: ${organization.id}`);
 
-    // Step 3: Get the Better Auth user and update with organizationId, role, and global_id
+    // Step 3: Find the Better Auth user by email and update with org info
     let betterAuthUserId: string | null = null;
     try {
-      // Get all users and find the one matching the email
-      const usersResult = await auth.api.listUsers();
-      const users = (usersResult as any)?.users || [];
-      const betterAuthUser = users.find((u: any) => u.email === email);
+      const users = await authQuery<any>(
+        `SELECT id, email, role, organizationId, global_id FROM user WHERE email = ? LIMIT 1`,
+        [email]
+      );
 
-      if (betterAuthUser) {
-        betterAuthUserId = betterAuthUser.id;
-        const db = (auth as any).database;
-        const tableName = (auth as any).user?.tableName || "user";
+      if (users.length > 0) {
+        betterAuthUserId = users[0].id;
+        console.log(`[OrgSetup] Found Better Auth user: ${betterAuthUserId}`);
 
         // Update the Better Auth user with organizationId, role, and global_id
-        await db
-          .prepare(`UPDATE ${tableName} SET organizationId = ?, role = ?, global_id = ? WHERE id = ?`)
-          .bind(organization.id, "Admin", global_id, betterAuthUserId)
-          .execute();
+        await authExecute(
+          `UPDATE user SET organizationId = ?, role = ?, global_id = ? WHERE id = ?`,
+          [organization.id, "Admin", global_id, betterAuthUserId]
+        );
 
-        console.log(`[OrgSetup] Updated Better Auth user ${betterAuthUserId} with organizationId, Admin role, and global_id ${global_id}`);
+        console.log(`[OrgSetup] Updated Better Auth user with organizationId, Admin role, and global_id ${global_id}`);
       } else {
         console.warn(`[OrgSetup] Better Auth user not found for email: ${email}`);
       }
@@ -93,6 +92,31 @@ export const POST: APIRoute = async ({ request }) => {
       console.error("[OrgSetup] Error updating Better Auth user:", error);
       // Continue anyway - organization is created
     }
+
+    // Step 4: Create User node in graph using the same global_id
+    const organization = await organizationRepository.create({
+      name: organizationName,
+      settings: {
+        branding: {
+          colors: {
+            primary: "#667eea",
+            secondary: "#7cd1f9",
+          },
+        },
+        limits: {
+          maxVideos: 100,
+          maxStorageGB: 50,
+          maxUsers: 10,
+        },
+        features: {
+          autoHighlights: true,
+          customAIModels: false,
+          advancedAnalytics: false,
+        },
+      },
+    });
+
+    console.log(`[OrgSetup] Created organization: ${organization.id}`);
 
     // Step 4: Create User node in graph using the same global_id
     const now = new Date().toISOString();
