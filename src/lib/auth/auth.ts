@@ -12,11 +12,19 @@ import Database from "better-sqlite3";
 import { createClient } from "@libsql/client";
 import { initAuthDb } from "./init-auth-db";
 
-// Initialize auth.db schema (ensures global_id and organizationId columns exist)
-initAuthDb();
-
 // Database path for local SQLite
 const SQLITE_DB_PATH = "./data/auth.db";
+
+// Check if using Turso (production/Vercel) or local SQLite (development)
+const tursoUrl = import.meta.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL;
+const tursoToken = import.meta.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN;
+const usingTurso = !!(tursoUrl && tursoToken);
+
+// Initialize auth.db schema ONLY for local SQLite
+// Turso database schema is set up via migration (init_auth_schema.sql)
+if (!usingTurso) {
+  initAuthDb();
+}
 
 /**
  * Get the appropriate database connection based on environment
