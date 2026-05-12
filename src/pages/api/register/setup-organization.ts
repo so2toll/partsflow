@@ -81,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
         // Update the Better Auth user with organizationId, role, and global_id
         await authExecute(
           `UPDATE user SET organizationId = ?, role = ?, global_id = ? WHERE id = ?`,
-          [organization.id, "Admin", global_id, betterAuthUserId]
+          [organization.id, "User", global_id, betterAuthUserId]
         );
 
         console.log(`[OrgSetup] Updated Better Auth user with organizationId, Admin role, and global_id ${global_id}`);
@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request }) => {
         id: global_id, // Use the same ULID as global_id in auth.db
         email,
         name,
-        role: "Admin",
+        role: "User",
         organizationId: organization.id,
         now,
       }
@@ -121,7 +121,7 @@ export const POST: APIRoute = async ({ request }) => {
     console.log(`[OrgSetup] Created user node with global_id: ${global_id}`);
 
     // Step 5: Create OWNS relationship from user to organization
-    await organizationRepository.addUser(global_id, organization.id, "Admin");
+    await organizationRepository.addUser(global_id, organization.id, "User");
 
     console.log(`[OrgSetup] Created OWNS relationship: ${global_id} -> ${organization.id}`);
 
