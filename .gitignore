@@ -42,7 +42,7 @@ addemotest.txt
 
 /data/sessions/*
 /data/auth.db
-data/
+/data/
 
 !/data/sessions/.gitkeep
 !/data/.gitkeep

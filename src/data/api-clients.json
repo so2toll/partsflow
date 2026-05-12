@@ -1,0 +1,165 @@
+{
+  "clients": [
+    {
+      "clientId": "demo-client",
+      "internalId": "proj_d3m0_a1b2c3d4e5f6",
+      "clientSecret": "sk_demo_123456",
+      "name": "Demo Client",
+      "allowedDomains": [
+        "localhost:3000",
+        "localhost:3000",
+        "127.0.0.1"
+      ],
+      "status": "active",
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "lastUsed": "2026-04-27T22:31:14.136Z",
+      "usageCount": 219,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2"
+        }
+      }
+    },
+    {
+      "clientId": "test-client",
+      "internalId": "proj_t3st_b2c3d4e5f6g7",
+      "clientSecret": "sk_test_abcdef123456",
+      "name": "Test Client",
+      "allowedDomains": [
+        "localhost:3000",
+        "localhost:3000"
+      ],
+      "status": "active",
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "lastUsed": "2026-04-27T22:32:40.415Z",
+      "usageCount": 68,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2"
+        }
+      }
+    },
+    {
+      "clientId": "sandbox-client",
+      "internalId": "proj_sndb_c3d4e5f6g7h8",
+      "clientSecret": "sk_sandbox_xyz789",
+      "name": "Sandbox Client",
+      "allowedDomains": [
+        "localhost:3000"
+      ],
+      "status": "active",
+      "createdAt": "2024-01-15T11:00:00.000Z",
+      "lastUsed": null,
+      "usageCount": 0,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2"
+        }
+      }
+    },
+    {
+      "clientId": "acme-corp",
+      "internalId": "proj_acm3_d4e5f6g7h8i9",
+      "clientSecret": "sk_test_acme_corporat1on_2024",
+      "name": "Acme Corporation",
+      "allowedDomains": [
+        "acme-portal.com",
+        "localhost:4000",
+        "localhost:3000"
+      ],
+      "status": "active",
+      "createdAt": "2024-01-20T14:30:00.000Z",
+      "lastUsed": "2026-01-16T03:40:50.877Z",
+      "usageCount": 106,
+      "settings": {
+        "webhookUrl": "https://acme-portal.com/webhooks/signature-complete",
+        "branding": {
+          "primaryColor": "#2563eb",
+          "logo": "https://acme-portal.com/logo.png"
+        }
+      }
+    },
+    {
+      "clientId": "asdfasdf",
+      "internalId": "proj_asdf_e5f6g7h8i9j0",
+      "clientSecret": "sk_test_02ac0a382e06c87b211fad5a55538259",
+      "name": "ASDFASDF",
+      "allowedDomains": [],
+      "status": "active",
+      "createdAt": "2025-09-17T16:10:41.778Z",
+      "lastUsed": null,
+      "usageCount": 0,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2",
+          "logo": null
+        }
+      }
+    },
+    {
+      "clientId": "new-comp",
+      "internalId": "proj_nwcp_f6g7h8i9j0k1",
+      "clientSecret": "sk_test_225988bdbc529ae852c584f9af63319d",
+      "name": "new comp",
+      "allowedDomains": [],
+      "status": "active",
+      "createdAt": "2025-09-17T18:45:25.828Z",
+      "lastUsed": null,
+      "usageCount": 0,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2",
+          "logo": null
+        }
+      }
+    },
+    {
+      "clientId": "victimcomp-corp",
+      "internalId": "proj_vcmp_7f8a9b2c4d5e",
+      "clientSecret": "sk_test_victimcomp_c0rp_2025_a7b8c9d0e1f2",
+      "name": "VictimComp Corporation",
+      "allowedDomains": [
+        "portal.victimcomp.org",
+        "staging.victimcomp.org",
+        "localhost:3000",
+        "localhost:8080"
+      ],
+      "status": "active",
+      "createdAt": "2025-09-17T20:00:00.000Z",
+      "lastUsed": null,
+      "usageCount": 0,
+      "settings": {
+        "webhookUrl": "https://portal.victimcomp.org/api/webhooks/signature-complete",
+        "branding": {
+          "primaryColor": "#2d5aa0",
+          "logo": "https://portal.victimcomp.org/assets/logo.png"
+        }
+      }
+    },
+    {
+      "clientId": "newdata3dcompanya",
+      "internalId": "proj_d3da_g7h8i9j0k1l2",
+      "clientSecret": "sk_test_9033fe13a4f684983ae84bc24fa461ab",
+      "name": "newdata3dcompanyA",
+      "allowedDomains": [
+        "data3d.io"
+      ],
+      "status": "active",
+      "createdAt": "2025-09-18T16:56:38.620Z",
+      "lastUsed": null,
+      "usageCount": 0,
+      "settings": {
+        "webhookUrl": null,
+        "branding": {
+          "primaryColor": "#1976d2",
+          "logo": null
+        }
+      }
+    }
+  ]
+}
