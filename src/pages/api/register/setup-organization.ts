@@ -94,31 +94,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Step 4: Create User node in graph using the same global_id
-    const organization = await organizationRepository.create({
-      name: organizationName,
-      settings: {
-        branding: {
-          colors: {
-            primary: "#667eea",
-            secondary: "#7cd1f9",
-          },
-        },
-        limits: {
-          maxVideos: 100,
-          maxStorageGB: 50,
-          maxUsers: 10,
-        },
-        features: {
-          autoHighlights: true,
-          customAIModels: false,
-          advancedAnalytics: false,
-        },
-      },
-    });
-
-    console.log(`[OrgSetup] Created organization: ${organization.id}`);
-
-    // Step 4: Create User node in graph using the same global_id
     const now = new Date().toISOString();
 
     await graph.mutate(
