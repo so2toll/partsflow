@@ -1,0 +1,138 @@
+---
+/**
+ * Video Progress Content Component
+ *
+ * Displays real-time video generation progress using ProgressTracker.
+ * Polls job status and updates progress automatically.
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import ProgressTracker from '../../components/video/ProgressTracker';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+const projectId = data.projectId;
+---
+
+<Layout title="Video Generation Progress">
+  <div class="progress-page-content">
+    <div class="container max-w-4xl mx-auto px-6 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-heading-lg mb-2">Generating Your Video</h1>
+        <p class="text-body-md text-neutral-600">
+          Please wait while we create your video. This may take a few minutes.
+        </p>
+      </div>
+
+      <!-- Progress Tracker Component -->
+      <div class="progress-container bg-white rounded-lg shadow-card p-8">
+        <ProgressTracker 
+          projectId={projectId}
+          client:load
+        />
+      </div>
+
+      <!-- Info Cards -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="info-card">
+          <div class="info-icon">⏱️</div>
+          <div class="info-content">
+            <h3 class="info-title">Processing Time</h3>
+            <p class="info-text">Videos typically complete in 2-5 minutes</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🎬</div>
+          <div class="info-content">
+            <h3 class="info-title">AI Generation</h3>
+            <p class="info-text">Creating scenes with advanced AI models</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">✨</div>
+          <div class="info-content">
+            <h3 class="info-title">High Quality</h3>
+            <p class="info-text">Professional video output guaranteed</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back to Dashboard Link -->
+      <div class="mt-8 text-center">
+        <a href="/app/dashboard" class="text-primary-300 hover:underline text-body-sm">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .progress-page-content {
+    min-height: 100vh;
+    background-color: var(--color-surface-50);
+  }
+
+  .container {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .progress-container {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 2rem;
+  }
+
+  .info-card {
+    background-color: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .info-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .info-content {
+    flex: 1;
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-neutral-700);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .info-text {
+    font-size: var(--text-xs);
+    color: var(--color-neutral-500);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .info-card {
+      padding: 1rem;
+    }
+
+    .info-icon {
+      font-size: 1.5rem;
+    }
+  }
+</style>

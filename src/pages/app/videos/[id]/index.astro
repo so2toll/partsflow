@@ -1,0 +1,98 @@
+---
+/**
+ * Video Detail/Player Page
+ *
+ * Shows completed video with player, metadata, and download button.
+ * Standard RBAC pattern.
+ */
+
+import { getSession } from "@/lib/auth/session-adapter";
+import { getLoginUrl } from "@/lib/auth/feature-flag";
+import { RBAC_CONFIG } from "@/lib/configs/rbacConfig.js";
+import RBACComponent from "@/components/RBAC/RBACComponent.astro";
+import { getPageData } from "@/lib/data/appPageData";
+import { projectRepository } from "@/lib/db/repositories/ProjectRepository";
+
+// ========================================================================
+// PAGE CONFIGURATION
+// ========================================================================
+const currentPage = 'appVideoDetail';
+
+// ========================================================================
+// STANDARD PAGE LOGIC
+// ========================================================================
+
+// Get session
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+  return Astro.redirect(getLoginUrl());
+}
+
+// Get user info
+const user = session.user;
+const userId = user?.id;
+const userRole = user?.role;
+const organizationId = user?.organizationId;
+
+// ========================================================================
+// GET PROJECT ID FROM URL
+// ========================================================================
+const { id: projectId } = Astro.params;
+
+if (!projectId) {
+  return Astro.redirect('/app/dashboard?error=missing_project_id');
+}
+
+// ========================================================================
+// FETCH PROJECT DATA
+// ========================================================================
+
+const project = await projectRepository.findById(projectId);
+
+if (!project) {
+  return Astro.redirect('/app/dashboard?error=project_not_found');
+}
+
+// Check if video is complete
+if (project.videoStatus !== 'completed') {
+  // Redirect to progress page if still generating
+  return Astro.redirect(`/app/videos/${projectId}/progress`);
+}
+
+// ========================================================================
+// DATA FETCHING
+// ========================================================================
+
+const data = await getPageData(currentPage, userId, userRole, organizationId);
+
+// Add project data
+data.project = project;
+
+// ========================================================================
+// ROLE VALIDATION
+// ========================================================================
+
+if (!userRole) {
+  console.log('[VideoDetail] No role found for user:', userId);
+  return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+  console.log('[VideoDetail] Invalid role:', userRole);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+// Fallback to appDashboard if appVideoDetail not in RBAC
+const pageConfig = RBAC_CONFIG[userRole][currentPage] || RBAC_CONFIG[userRole]['appDashboard'];
+
+// ========================================================================
+// RENDER RBAC COMPONENT
+// ========================================================================
+---
+<RBACComponent
+  userRole={userRole}
+  userId={userId}
+  data={data}
+  currentPage={currentPage}
+/>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="350" height="100" viewBox="0 0 350 100" role="img" aria-labelledby="title desc">
+  <title id="title">DispatchMD Rideshare Service Logo</title>
+  <desc id="desc">Yellow location pin icon to the left of centered “MdDispatch” with “Rideshare Service” tagline</desc>
+
+  <!-- Yellow pin icon, vertically centered -->
+  <g transform="translate(30,50)">
+    <path d="M0,-30 A30,30 0 1,1 0,30 L0,0 Z" fill="#FFD700"/>
+    <circle cx="0" cy="-10" r="10" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Main logo text, left of pin -->
+  <text x="70" y="40" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#333333" dominant-baseline="middle" text-anchor="start">
+    DispatchMD
+  </text>
+
+  <!-- Tagline, below main text, aligned center on same vertical midline -->
+  <text x="70" y="60" font-family="Arial, sans-serif" font-size="14" fill="#666666" dominant-baseline="middle" text-anchor="start">
+    Rideshare Service
+  </text>
+</svg>

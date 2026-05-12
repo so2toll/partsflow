@@ -1,0 +1,110 @@
+---
+import { RBAC_CONFIG } from '../../lib/configs/rbacConfig.js';
+
+let {userRole, userId, data, currentPage} = Astro.props;
+
+// Initialize component variables
+let ContentComponent, FooterComponent, title, description;
+let useStitchDesign = false;
+
+// Safety check - this should never happen if validation is done in parent pages
+// but adding as an extra safety net
+try {
+    if (!RBAC_CONFIG[userRole] || !RBAC_CONFIG[userRole][currentPage]) {
+        console.error('RBAC Component Error: Invalid role or page configuration', {userRole, currentPage});
+        // Redirect to access denied page as a fallback
+        return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+    }
+
+    ContentComponent = RBAC_CONFIG[userRole][currentPage].content;
+    FooterComponent = RBAC_CONFIG[userRole][currentPage].footer;
+    title = RBAC_CONFIG[userRole][currentPage].title;
+    description = RBAC_CONFIG[userRole][currentPage].description;
+
+    // Check if this page uses Stitch design system
+    const config = RBAC_CONFIG[userRole][currentPage];
+    useStitchDesign = config.topNav.name === 'StitchTopNav';
+} catch (error) {
+    console.error('RBAC Component Configuration Error:', error);
+    return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+// Import navigation components based on configuration
+import StitchTopNav from '../../layouts/Dashboard/StitchTopNav.astro';
+import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
+
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <link rel="icon" href="/images/data3DLogoBlack.svg">
+  <meta name="keywords" content="dashboard, projects, teams, analytics">
+  <meta name="theme-color" content="#121212">
+</head>
+
+<body>
+  {useStitchDesign ? (
+    <>
+      {/* Fixed Top Navigation Bar */}
+      <StitchTopNav
+        userRole={userRole}
+        userId={userId}
+        title={title}
+        organization={data?.organization}
+      />
+
+      {/* Fixed Sidebar */}
+      <StitchSideNav
+        userRole={userRole}
+        userId={userId}
+        currentPage={currentPage}
+      />
+
+      {/* Main Content Area - with margins for fixed nav */}
+      <div class="mt-16 ml-64 min-h-[calc(100vh-64px)] bg-[#f9f9f9] transition-all duration-300 max-lg:ml-0">
+        <ContentComponent data={data} userRole={userRole} userId={userId} />
+        <FooterComponent />
+      </div>
+    </>
+  ) : (
+    <>
+      {/* Legacy layout for non-Stitch pages */}
+      <div class="main-content">
+        <div class="flex flex-col min-h-screen">
+          <ContentComponent data={data} userRole={userRole} userId={userId} />
+          <FooterComponent />
+        </div>
+      </div>
+    </>
+  )}
+</body>
+
+<style>
+  /* Legacy styles for non-Stitch pages */
+  .main-content {
+    width: 100%;
+  }
+</style>
+
+<script is:inline>
+  // Sidebar toggle for mobile
+  (function() {
+    let sidebarOpen = false;
+    const sidebar = document.querySelector('.stitch-sidebar');
+    const mainContent = document.querySelector('.stitch-main-content');
+
+    if (window.innerWidth <= 1024) {
+      // Add mobile toggle button functionality if needed
+      window.toggleSidebar = function() {
+        sidebarOpen = !sidebarOpen;
+        if (sidebar) {
+          sidebar.classList.toggle('mobile-open', sidebarOpen);
+        }
+      };
+    }
+  })();
+</script>

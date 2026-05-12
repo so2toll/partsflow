@@ -1,0 +1,87 @@
+---
+/**
+ * App Layout Wrapper
+ *
+ * Provides global styling and structure for app pages.
+ * Wraps the main content area with consistent styling.
+ */
+
+interface Props {
+  userRole: string;
+  userId: string;
+}
+
+const { userRole, userId } = Astro.props;
+---
+
+<div class="app-layout-wrapper">
+  <div class="app-content-container">
+    <slot />
+  </div>
+</div>
+
+<style>
+  /* Global styles for app pages */
+  .app-layout-wrapper {
+    min-height: 100vh;
+    background-color: #080808;
+  }
+
+  .app-content-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Remove sidebar margins for app pages */
+  .app-layout-wrapper :global(div.ltr\\:ml-64),
+  .app-layout-wrapper :global(div.rtl\\:mr-64) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .app-content-container {
+      padding: 16px;
+    }
+  }
+
+  /* Card base styles */
+  .app-content-container :global(.card) {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Button base styles */
+  .app-content-container :global(.btn-primary) {
+    padding: 8px 16px;
+    background-color: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .app-content-container :global(.btn-primary:hover) {
+    background-color: #5a67d8;
+  }
+
+  .app-content-container :global(.btn-secondary) {
+    padding: 8px 16px;
+    background-color: #edf2f7;
+    color: #4a5568;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .app-content-container :global(.btn-secondary:hover) {
+    background-color: #e2e8f0;
+  }
+</style>

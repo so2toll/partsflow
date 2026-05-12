@@ -1,0 +1,477 @@
+---
+---
+<!-- Main Content -->
+<div class="container-fluid py-4">
+    <!-- Statistics Cards Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Total Vehicles</h6>
+                            <h2 class="card-title mb-0">78</h2>
+                        </div>
+                        <div class="stat-icon bg-primary">
+                            <i class="ri-car-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Active Vehicles</h6>
+                            <h2 class="card-title mb-0">36</h2>
+                        </div>
+                        <div class="stat-icon bg-success">
+                            <i class="ri-roadster-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Maintenance Due</h6>
+                            <h2 class="card-title mb-0">32</h2>
+                        </div>
+                        <div class="stat-icon bg-warning">
+                            <i class="ri-tools-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Out of Service</h6>
+                            <h2 class="card-title mb-0">14</h2>
+                        </div>
+                        <div class="stat-icon bg-danger">
+                            <i class="ri-error-warning-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fleet Management Tabs -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="fleetTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="vehicles-tab" data-bs-toggle="tab" data-bs-target="#vehicles" type="button" role="tab" aria-controls="vehicles" aria-selected="true">All Vehicles</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="maintenance-tab" data-bs-toggle="tab" data-bs-target="#maintenance" type="button" role="tab" aria-controls="maintenance" aria-selected="false">Maintenance</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="inspection-tab" data-bs-toggle="tab" data-bs-target="#inspection" type="button" role="tab" aria-controls="inspection" aria-selected="false">Inspection Schedule</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">Documents</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="fleetTabsContent">
+                <!-- All Vehicles Tab -->
+                <div class="tab-pane fade show active" id="vehicles" role="tabpanel" aria-labelledby="vehicles-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="input-group me-3" style="width: 300px;">
+                                <span class="input-group-text"><i class="ri-search-line"></i></span>
+                                <input type="text" class="form-control" placeholder="Search vehicles...">
+                            </div>
+                            <select class="form-select me-3" style="width: 150px;">
+                                <option selected>All Types</option>
+                                <option>Sedan</option>
+                                <option>SUV</option>
+                                <option>Van</option>
+                                <option>Luxury</option>
+                            </select>
+                            <select class="form-select" style="width: 150px;">
+                                <option selected>All Status</option>
+                                <option>Active</option>
+                                <option>Maintenance</option>
+                                <option>Out of Service</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> Add Vehicle
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle ID</th>
+                                    <th>Image</th>
+                                    <th>Make/Model</th>
+                                    <th>Type</th>
+                                    <th>License Plate</th>
+                                    <th>Year</th>
+                                    <th>Status</th>
+                                    <th>Last Maintenance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#VH1001</td>
+                                    <td>
+                                        <img src="/assets/img/economic-car.webp" alt="Vehicle" width="60" height="40" class="rounded">
+                                    </td>
+                                    <td>Toyota Camry</td>
+                                    <td>Sedan</td>
+                                    <td>ABC-1234</td>
+                                    <td>2022</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>May 15, 2023</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#"><i class="ri-eye-line me-2"></i>View Details</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-tools-line me-2"></i>Schedule Maintenance</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Remove</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#VH1002</td>
+                                    <td>
+                                        <img src="/assets/img/electric-car.webp" alt="Vehicle" width="60" height="40" class="rounded">
+                                    </td>
+                                    <td>Honda CR-V</td>
+                                    <td>SUV</td>
+                                    <td>XYZ-5678</td>
+                                    <td>2021</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>Jun 02, 2023</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#"><i class="ri-eye-line me-2"></i>View Details</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-tools-line me-2"></i>Schedule Maintenance</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Remove</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#VH1003</td>
+                                    <td>
+                                        <img src="/assets/img/luxury-car.webp" alt="Vehicle" width="60" height="40" class="rounded">
+                                    </td>
+                                    <td>BMW 5 Series</td>
+                                    <td>Luxury</td>
+                                    <td>LMN-9012</td>
+                                    <td>2023</td>
+                                    <td><span class="badge bg-warning">Maintenance</span></td>
+                                    <td>Jun 10, 2023</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#"><i class="ri-eye-line me-2"></i>View Details</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-tools-line me-2"></i>Schedule Maintenance</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Remove</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#VH1004</td>
+                                    <td>
+                                        <img src="/assets/img/economic-car.webp" alt="Vehicle" width="60" height="40" class="rounded">
+                                    </td>
+                                    <td>Ford Transit</td>
+                                    <td>Van</td>
+                                    <td>PQR-3456</td>
+                                    <td>2020</td>
+                                    <td><span class="badge bg-danger">Out of Service</span></td>
+                                    <td>May 28, 2023</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#"><i class="ri-eye-line me-2"></i>View Details</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-edit-line me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="ri-tools-line me-2"></i>Schedule Maintenance</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="ri-delete-bin-line me-2"></i>Remove</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Maintenance Tab -->
+                <div class="tab-pane fade" id="maintenance" role="tabpanel" aria-labelledby="maintenance-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Maintenance Schedule</h5>
+                        <button class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> Schedule Maintenance
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Service Type</th>
+                                    <th>Due Date</th>
+                                    <th>Assigned To</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/electric-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Toyota Camry</span>
+                                                <small class="text-muted">#VH1001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Oil Change</td>
+                                    <td>Jun 20, 2023</td>
+                                    <td>Service Center A</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-edit-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/luxury-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">BMW 5 Series</span>
+                                                <small class="text-muted">#VH1003</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Brake Inspection</td>
+                                    <td>Jun 18, 2023</td>
+                                    <td>Service Center B</td>
+                                    <td><span class="badge bg-info">In Progress</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-edit-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/economic-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Ford Transit</span>
+                                                <small class="text-muted">#VH1004</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Engine Repair</td>
+                                    <td>Jun 15, 2023</td>
+                                    <td>Service Center A</td>
+                                    <td><span class="badge bg-danger">Overdue</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-edit-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Inspection Schedule Tab -->
+                <div class="tab-pane fade" id="inspection" role="tabpanel" aria-labelledby="inspection-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Inspection Schedule</h5>
+                        <button class="btn btn-primary">
+                            <i class="ri-add-line me-1"></i> Schedule Inspection
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Inspection Type</th>
+                                    <th>Due Date</th>
+                                    <th>Inspector</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/economic-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Toyota Camry</span>
+                                                <small class="text-muted">#VH1001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Annual Safety</td>
+                                    <td>Jul 15, 2023</td>
+                                    <td>John Williams</td>
+                                    <td><span class="badge bg-secondary">Scheduled</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-edit-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/electric-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Honda CR-V</span>
+                                                <small class="text-muted">#VH1002</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Emissions Test</td>
+                                    <td>Jun 25, 2023</td>
+                                    <td>Robert Johnson</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-edit-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Documents Tab -->
+                <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Vehicle Documents</h5>
+                        <button class="btn btn-primary">
+                            <i class="ri-upload-line me-1"></i> Upload Document
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Document Type</th>
+                                    <th>Expiry Date</th>
+                                    <th>Uploaded By</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/economic-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Toyota Camry</span>
+                                                <small class="text-muted">#VH1001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Insurance</td>
+                                    <td>Dec 31, 2023</td>
+                                    <td>Admin</td>
+                                    <td><span class="badge bg-success">Valid</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-eye-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1"><i class="ri-download-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/electric-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">Honda CR-V</span>
+                                                <small class="text-muted">#VH1002</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Registration</td>
+                                    <td>Aug 15, 2023</td>
+                                    <td>Admin</td>
+                                    <td><span class="badge bg-warning">Expiring Soon</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-eye-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1"><i class="ri-download-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/assets/img/luxury-car.webp" alt="Vehicle" width="50" height="35" class="rounded me-2">
+                                            <div>
+                                                <span class="d-block">BMW 5 Series</span>
+                                                <small class="text-muted">#VH1003</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Maintenance Log</td>
+                                    <td>N/A</td>
+                                    <td>Service Manager</td>
+                                    <td><span class="badge bg-info">Updated</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"><i class="ri-eye-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1"><i class="ri-download-line"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="ri-delete-bin-line"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+     

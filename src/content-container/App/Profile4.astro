@@ -1,0 +1,477 @@
+---
+/**
+ * App Profile4 Content Component
+ *
+ * PRACTICE PAGE - Demonstrates the feature workflow pattern
+ * Shows different content for SuperAdmin vs regular User (RBAC view switching)
+ *
+ * @component App/Profile4
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const user = data.user || {};
+const organization = data.organization;
+const stats = data.stats || {};
+const isSuperAdmin = userRole === 'SuperAdmin';
+const isAdmin = data.isAdmin || false;
+---
+
+<Layout title="Profile4">
+  <div class="profile4-content">
+    <div class="container">
+      <!-- Header with RBAC-specific badge -->
+      <div class="page-header">
+        <div class="header-badge">
+          {isSuperAdmin ? '🔐 SuperAdmin View' : '👤 User View'}
+        </div>
+        <h1>Profile4 - Practice Page</h1>
+        <p class="page-description">
+          This page demonstrates the feature workflow pattern and RBAC view switching.
+        </p>
+      </div>
+
+      <!-- Dynamic date display -->
+      <div class="card info-card">
+        <h2 class="card-title">Current Time</h2>
+        <div class="time-display">
+          <div class="date">{data.displayDate}</div>
+          <div class="time">{data.currentTime}</div>
+        </div>
+      </div>
+
+      <!-- RBAC-specific content -->
+      {isSuperAdmin ? (
+        <>
+          <!-- SuperAdmin only content -->
+          <div class="card admin-card">
+            <div class="admin-header">
+              <span class="admin-icon">⚡</span>
+              <h2 class="card-title">SuperAdmin Dashboard</h2>
+            </div>
+            <p class="admin-message">{data.adminMessage}</p>
+
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value stat-purple">{stats.userCount || 0}</div>
+                <div class="stat-label">Total Users</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value stat-blue">{stats.orgCount || 0}</div>
+                <div class="stat-label">Organizations</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value stat-green">{stats.projectCount || 0}</div>
+                <div class="stat-label">Projects</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value stat-orange">{stats.teamCount || 0}</div>
+                <div class="stat-label">Teams</div>
+              </div>
+            </div>
+
+            {data.organizations && data.organizations.length > 0 && (
+              <div class="org-list">
+                <h3 class="section-title">All Organizations</h3>
+                {data.organizations.map((org: any) => (
+                  <div class="org-item">
+                    <strong>{org.name}</strong>
+                    <span class="org-id">{org.id}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <!-- Regular User content -->
+          <div class="card user-card">
+            <div class="user-header">
+              <span class="user-icon">👤</span>
+              <h2 class="card-title">User Profile</h2>
+            </div>
+            <p class="user-message">{data.userMessage}</p>
+
+            <div class="info-group">
+              <label class="info-label">Name</label>
+              <div class="info-value">{user.name || 'Not set'}</div>
+            </div>
+
+            <div class="info-group">
+              <label class="info-label">Email</label>
+              <div class="info-value">{user.email || 'Not set'}</div>
+            </div>
+
+            <div class="info-group">
+              <label class="info-label">Role</label>
+              <div class="info-value">
+                <span class={`role-badge role-${user.role?.toLowerCase()}`}>
+                  {user.role || 'Unknown'}
+                </span>
+              </div>
+            </div>
+
+            {organization && (
+              <div class="info-group">
+                <label class="info-label">Organization</label>
+                <div class="info-value">{organization.name || 'Not set'}</div>
+              </div>
+            )}
+
+            {stats && (
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-value stat-green">{stats.projectCount || 0}</div>
+                  <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value stat-blue">{stats.teamCount || 0}</div>
+                  <div class="stat-label">Teams</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value stat-purple">{stats.videoCount || 0}</div>
+                  <div class="stat-label">Videos</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      <!-- Feature workflow explanation (visible to all) -->
+      <div class="card workflow-card">
+        <h2 class="card-title">🎯 Feature Workflow Demonstrated</h2>
+        <p class="workflow-description">
+          This page was created using the established feature workflow pattern:
+        </p>
+        <ol class="workflow-steps">
+          <li><strong>Data fetching:</strong> Added <code>getProfile4PageData()</code> to <code>appPageData.ts</code></li>
+          <li><strong>Content component:</strong> Created <code>Profile4.astro</code> in <code>/content-container/App/</code></li>
+          <li><strong>Page wrapper:</strong> Created <code>profile4.astro</code> with only <code>currentPage</code> changed</li>
+          <li><strong>RBAC config:</strong> Added entries in <code>rbacConfig.js</code> for User and SuperAdmin</li>
+          <li><strong>Navigation:</strong> Added button to dashboard</li>
+        </ol>
+        <div class="workflow-note">
+          <strong>✅ RBAC View Switching:</strong> Notice how SuperAdmins see the purple admin dashboard with system stats,
+          while regular Users see their personal profile. This is controlled by the <code>isSuperAdmin</code> check.
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 1200px;
+  }
+
+  /* Header */
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: #DFFF00;
+    color: #000000;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px 0;
+    color: #1a1c1c;
+  }
+
+  .page-description {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #666666;
+    max-width: 600px;
+    margin: 0;
+  }
+
+  /* Cards */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
+  }
+
+  .card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1a1c1c;
+  }
+
+  /* Info Card */
+  .info-card {
+    border-left: 4px solid #DFFF00;
+  }
+
+  .time-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .time-display .date {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1c1c;
+  }
+
+  .time-display .time {
+    font-size: 14px;
+    color: #666666;
+    font-family: monospace;
+  }
+
+  /* Admin Card */
+  .admin-card {
+    border-left: 4px solid #f687b3;
+  }
+
+  .admin-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .admin-icon {
+    font-size: 32px;
+  }
+
+  .admin-message {
+    font-size: 16px;
+    color: #666666;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #fff5f7;
+    border-radius: 8px;
+  }
+
+  /* User Card */
+  .user-card {
+    border-left: 4px solid #48bb78;
+  }
+
+  .user-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .user-icon {
+    font-size: 32px;
+  }
+
+  .user-message {
+    font-size: 16px;
+    color: #666666;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f0fff4;
+    border-radius: 8px;
+  }
+
+  /* Info Groups */
+  .info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .info-group:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-size: 16px;
+    color: #1a1c1c;
+  }
+
+  /* Role Badges */
+  .role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .role-superadmin {
+    background-color: #f687b3;
+    color: white;
+  }
+
+  .role-studioadmin {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .role-user {
+    background-color: #48bb78;
+    color: white;
+  }
+
+  .role-studioviewer {
+    background-color: #a0aec0;
+    color: white;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 16px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .stat-purple { color: #805ad5; }
+  .stat-blue { color: #667eea; }
+  .stat-green { color: #48bb78; }
+  .stat-orange { color: #ed8936; }
+
+  .stat-label {
+    font-size: 13px;
+    color: #666666;
+    font-weight: 500;
+  }
+
+  /* Organization List */
+  .org-list {
+    margin-top: 24px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1a1c1c;
+  }
+
+  .org-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .org-id {
+    font-size: 12px;
+    color: #666666;
+    font-family: monospace;
+  }
+
+  /* Workflow Card */
+  .workflow-card {
+    border-left: 4px solid #DFFF00;
+  }
+
+  .workflow-description {
+    font-size: 16px;
+    color: #666666;
+    margin-bottom: 16px;
+  }
+
+  .workflow-steps {
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+
+  .workflow-steps li {
+    margin-bottom: 8px;
+    color: #1a1c1c;
+  }
+
+  .workflow-steps code {
+    background: #f7fafc;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+    color: #667eea;
+  }
+
+  .workflow-note {
+    padding: 16px;
+    background: #fffff0;
+    border-radius: 8px;
+    border-left: 3px solid #DFFF00;
+  }
+
+  .workflow-note strong {
+    color: #1a1c1c;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 32px;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      padding: 16px;
+    }
+  }
+</style>

@@ -1,0 +1,15 @@
+---
+/**
+ * Blank Layout - No wrapper, just renders content as-is
+ * Used for pages that don't need layout wrapping
+ */
+
+interface Props {
+  userRole?: string;
+  userId?: string;
+}
+
+const { userRole, userId } = Astro.props;
+---
+
+<slot />

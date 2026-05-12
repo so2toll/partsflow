@@ -1,0 +1,407 @@
+---
+/**
+ * App Teams Content Component
+ *
+ * Displays the team management interface including:
+ * - Team list with member counts
+ * - Create new team form (via TeamForm widget)
+ * - Team member management (via TeamMemberForm widget)
+ * - Team member removal
+ *
+ * @component App/Teams
+ */
+
+import TeamForm from "../../components/widgets/TeamForm";
+import TeamMemberForm from "../../components/widgets/TeamMemberForm";
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const organization = data.organization;
+const teams = data.teams || [];
+const projects = data.projects || [];
+const organizationId = organization?.id || "";
+---
+
+<Layout title="Teams">
+  <div class="teams-content">
+    <div class="container">
+    <div class="grid">
+      <!-- Teams List -->
+      <div class="teams-section">
+        <h2 class="section-title">Your Teams</h2>
+
+        {teams.length === 0 ? (
+          <div class="empty-state">
+            <p>No teams yet. Create your first team to get started!</p>
+          </div>
+        ) : (
+          teams.map((team) => (
+            <div class="team-card" data-team-id={team.id} data-team-name={team.name}>
+              <div class="team-header">
+                <div>
+                  <div class="team-name">{team.name}</div>
+                  <div class="team-info">Created {new Date(team.createdAt).toLocaleDateString()}</div>
+                </div>
+                <button class="delete-btn" data-team-id={team.id}>Delete</button>
+              </div>
+
+              <!-- Add Member Form -->
+              <div class="member-form-section">
+                <TeamMemberForm
+                  teamId={team.id}
+                  teamName={team.name}
+                  client:load
+                />
+              </div>
+
+              <!-- Members List -->
+              <div
+                class="members-list"
+                data-team-id={team.id}
+              >
+                <p class="members-loading">Loading members...</p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Create Team Form -->
+        <div class="card">
+          <h2 class="card-title">Create Team</h2>
+          <TeamForm
+            organizationId={organizationId}
+            projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+            client:load
+          />
+        </div>
+
+        <!-- Team Info -->
+        <div class="card">
+          <h2 class="card-title">About Teams</h2>
+          <p class="card-description">
+            Teams help you organize collaborators and assign them to specific projects.
+            Team members can be assigned different roles:
+          </p>
+          <ul class="role-list">
+            <li><strong>Admin</strong>: Full team management</li>
+            <li><strong>User</strong>: Can edit and view</li>
+            <li><strong>Viewer</strong>: View only access</li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+</Layout>
+
+<script define:vars={{ organizationId }}>
+  // Delete team functionality
+  document.querySelectorAll('.delete-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const target = e.target;
+      const teamId = target.getAttribute('data-team-id');
+      const teamCard = target.closest('[data-team-id]');
+      const teamName = teamCard?.getAttribute('data-team-name');
+
+      if (confirm(`Are you sure you want to delete "${teamName}"? This action cannot be undone.`)) {
+        try {
+          const response = await fetch(`/api/teams/${teamId}`, {
+            method: 'DELETE',
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert('Failed to delete team. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error deleting team:', error);
+          alert('Failed to delete team. Please try again.');
+        }
+      }
+    });
+  });
+
+  // Load members for each team
+  document.querySelectorAll('.members-list').forEach(async (membersList) => {
+    const teamId = membersList.getAttribute('data-team-id');
+
+    if (teamId) {
+      try {
+        const response = await fetch(`/api/teams/${teamId}/members`);
+        if (response.ok) {
+          const data = await response.json();
+          const members = data.members || [];
+
+          console.log(`[Frontend] Team ${teamId} members:`, members);
+
+          if (members.length === 0) {
+            membersList.innerHTML = '<p class="members-empty">No members yet</p>';
+          } else {
+            membersList.innerHTML = `
+              <div class="members-header">Team Members (${members.length})</div>
+              ${members.map((member) => {
+                console.log(`[Frontend] Processing member:`, member);
+                console.log(`[Frontend] member.user:`, member.user);
+                // Handle both flattened user object and graph Node structure
+                const userName = member.user?.name || member.user?.properties?.name || member.user?.email || member.user?.properties?.email || 'Unknown';
+                const userId = member.user?.id || member.user?.properties?.id;
+                return `
+                <div class="member-item">
+                  <div class="member-info">
+                    <div class="member-name">${userName}</div>
+                    <div class="member-role">${member.role}</div>
+                  </div>
+                  <button
+                    class="remove-member-btn"
+                    data-team-id="${teamId}"
+                    data-user-id="${userId}"
+                  >
+                    Remove
+                  </button>
+                </div>
+              `;
+            }).join('')}
+            `;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading members:', error);
+      }
+    }
+  });
+
+  // Handle remove member buttons
+  document.addEventListener('click', async (e) => {
+    const target = e.target;
+    if (target.classList.contains('remove-member-btn')) {
+      const teamId = target.getAttribute('data-team-id');
+      const userId = target.getAttribute('data-user-id');
+
+      if (confirm('Remove this member from the team?')) {
+        try {
+          const response = await fetch(`/api/teams/${teamId}/members/remove`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId }),
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert('Failed to remove member. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error removing member:', error);
+          alert('Failed to remove member. Please try again.');
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 1200px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .teams-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+  }
+
+  /* Cards */
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #2d3748;
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.5;
+  }
+
+  /* Team Card */
+  .team-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .team-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .team-info {
+    font-size: 13px;
+    color: #718096;
+  }
+
+  .delete-btn {
+    padding: 6px 12px;
+    background-color: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .delete-btn:hover {
+    background-color: #feb2b2;
+  }
+
+  /* Member Form Section */
+  .member-form-section {
+    margin-top: 16px;
+  }
+
+  /* Members List */
+  .members-list {
+    margin-top: 16px;
+  }
+
+  .members-loading,
+  .members-empty {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+  }
+
+  .members-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+
+  .member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f7fafc;
+  }
+
+  .member-info {
+    flex: 1;
+  }
+
+  .member-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #2d3748;
+  }
+
+  .member-role {
+    font-size: 11px;
+    color: #718096;
+  }
+
+  .remove-member-btn {
+    padding: 4px 8px;
+    background-color: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .remove-member-btn:hover {
+    background-color: #feb2b2;
+  }
+
+  /* Role List */
+  .role-list {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 12px;
+    padding-left: 20px;
+    line-height: 1.6;
+  }
+
+  /* Empty State */
+  .empty-state {
+    background-color: white;
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .container {
+      padding: 16px;
+    }
+  }
+</style>

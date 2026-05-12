@@ -1,0 +1,56 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+.env.example
+.env*
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+.vercel
+
+# html templates folder
+carrgo-dashboard/
+carrgo-frontend/
+
+#Claude
+.claude/
+CLAUDE.md
+
+# docuseal test folder
+docuseal/
+
+#scratch notes
+addemotest.txt
+
+/data/sessions/*
+/data/auth.db
+data/
+
+!/data/sessions/.gitkeep
+!/data/.gitkeep
+
+services/remotion/assets/
+
+#paperbanana
+paperbanana/
+
+auth.db
+app.db

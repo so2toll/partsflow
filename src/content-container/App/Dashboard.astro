@@ -1,0 +1,399 @@
+---
+/**
+ * App Dashboard Content Component
+ *
+ * Displays the Video AI Content Studio dashboard including:
+ * - Organization context (or SuperAdmin system view)
+ * - Stats cards (projects, videos, highlights, teams)
+ * - Organizations list (SuperAdmin only)
+ * - Upload CTA
+ * - Projects list
+ *
+ * @component App/Dashboard
+ */
+
+import { graph } from "../../lib/db/graph";
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const isSuperAdmin = userRole === "SuperAdmin";
+const organization = data.organization;
+const projects = data.projects || [];
+const organizations = data.organizations || [];
+const teams = data.teams || [];
+const stats = data.stats || {
+  projectCount: 0,
+  videoCount: 0,
+  highlightCount: 0,
+  teamCount: 0,
+  orgCount: 0,
+  userCount: 0,
+};
+---
+
+<Layout title="Dashboard">
+  <div class="dashboard-content p-6">
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+    <!-- Page Navigation -->
+    <div class="flex flex-wrap items-center gap-3 mb-8">
+      <a href="/app/dashboard" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#667eea] text-white text-decoration-none hover:opacity-90 transition-opacity">Dashboard</a>
+      <a href="/app/projects" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Projects</a>
+      <a href="/app/teams" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Teams</a>
+      <a href="/app/profile" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Profile</a>
+      <a href="/app/profile2" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Profile2</a>
+       <a href="/app/profile3" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Profile3</a>
+       <a href="/app/profile4" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#DFFF00] text-[#000000] text-decoration-none hover:bg-[#c8e600] transition-colors">Profile4</a>
+      <button id="dashboard-logout-button" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#fed7d7] text-[#c53030] border-none cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed ml-auto">Logout</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      {isSuperAdmin && (
+        <>
+          <div class="stat-card stat-card-primary">
+            <div class="stat-value">{stats.orgCount || 0}</div>
+            <div class="stat-label">Organizations</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value stat-purple">{stats.userCount || 0}</div>
+            <div class="stat-label">Users</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value stat-teal">{stats.teamCount}</div>
+            <div class="stat-label">Teams</div>
+          </div>
+        </>
+      )}
+
+      <div class="stat-card">
+        <div class="stat-value">{stats.projectCount}</div>
+        <div class="stat-label">Projects</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value stat-green">{stats.videoCount}</div>
+        <div class="stat-label">Videos</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-value stat-orange">{stats.highlightCount}</div>
+        <div class="stat-label">Highlights</div>
+      </div>
+    </div>
+
+    <!-- Organizations List (SuperAdmin only) -->
+    {isSuperAdmin && organizations.length > 0 && (
+      <div class="section">
+        <h2 class="section-title">All Organizations</h2>
+
+        <div class="card-grid">
+          {organizations.map((org) => (
+            <div class="card">
+              <h3 class="card-title">{org.name}</h3>
+              <p class="card-info">ID: {org.id}</p>
+              <p class="card-meta">
+                Created {new Date(org.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Teams List (SuperAdmin only) -->
+    {isSuperAdmin && teams.length > 0 && (
+      <div class="section">
+        <h2 class="section-title">All Teams</h2>
+
+        <div class="card-grid">
+          {teams.map((team) => (
+            <div class="card" key={team.id}>
+              <h3 class="card-title">{team.name}</h3>
+              <p class="card-info">ID: {team.id}</p>
+              <p class="card-meta">
+                Created {new Date(team.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Video AI CTA -->
+    <div class="cta-card">
+      <h2 class="cta-title">Create Your First AI Video</h2>
+      <p class="cta-description">
+        Generate professional videos from text with AI-powered characters and scenes
+      </p>
+      <a href="/app/videos/new" class="cta-button">
+        Create AI Video
+      </a>
+    </div>
+
+    <!-- Edit Mode CTA -->
+    <div class="cta-card" style="background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%);">
+      <h2 class="cta-title">Edit Existing Videos</h2>
+      <p class="cta-description">
+        Upload videos and create highlights with AI-powered editing
+      </p>
+      <a href="/app/edit" class="cta-button" style="color: #48bb78;">
+        Edit Videos
+      </a>
+    </div>
+
+    <!-- Projects List -->
+    <div class="section">
+      <h2 class="section-title">
+        {isSuperAdmin ? "All Projects" : "Your Projects"}
+      </h2>
+
+      {projects.length === 0 ? (
+        <div class="empty-state">
+          <p>
+            {isSuperAdmin
+              ? "No projects in the system yet. Projects will appear here once created."
+              : "No projects yet. Your first project should appear here."}
+          </p>
+        </div>
+      ) : (
+        <div class="card-grid">
+          {projects.map((project) => (
+            <div class="card project-card">
+              <h3 class="card-title">{project.name}</h3>
+              {project.description && (
+                <p class="card-description">{project.description}</p>
+              )}
+              <a href={`/app/projects/${project.id}`} class="card-link">
+                View Project
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </main>
+</div>
+</Layout>
+
+<script>
+  // Client-side logout
+  document.getElementById('dashboard-logout-button')?.addEventListener('click', async function(e) {
+    e.preventDefault();
+
+    console.log('[Dashboard] Client-side logout initiated');
+
+    const button = e.target;
+    button.disabled = true;
+    button.textContent = 'Logging out...';
+
+    try {
+      const { logout } = await import('../../lib/auth/auth-client');
+      await logout();
+
+      localStorage.clear();
+      sessionStorage.clear();
+
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('[Dashboard] Logout error:', error);
+      window.location.href = '/auth/login';
+    }
+  });
+</script>
+
+<style>
+  /* Note: Global layout styles (background, padding, max-width) handled by AppLayout */
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-card-primary {
+    border: 2px solid #667eea;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 4px;
+  }
+
+  .stat-purple { color: #805ad5; }
+  .stat-teal { color: #38b2ac; }
+  .stat-green { color: #48bb78; }
+  .stat-orange { color: #ed8936; }
+
+  .stat-label {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #2d3748;
+  }
+
+  /* Card Grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #2d3748;
+  }
+
+  .card-description,
+  .card-info {
+    font-size: 14px;
+    color: #718096;
+    margin: 0 0 4px 0;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    color: #a0aec0;
+    margin: 0;
+  }
+
+  /* CTA Card */
+  .cta-card {
+    background: linear-gradient(135deg, #667eea 0%, #7cd1f9 100%);
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    color: white;
+    text-align: center;
+  }
+
+  .cta-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: white;
+  }
+
+  .cta-description {
+    font-size: 16px;
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+  }
+
+  .cta-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: white;
+    color: #667eea;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .cta-button:hover {
+    opacity: 0.9;
+  }
+
+  /* Project Card */
+  .project-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #edf2f7;
+    color: #4a5568;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: auto;
+  }
+
+  .card-link:hover {
+    background-color: #e2e8f0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    background-color: white;
+    padding: 48px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+    }
+
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-card {
+      padding: 24px;
+    }
+
+    .cta-title {
+      font-size: 20px;
+    }
+  }
+</style>

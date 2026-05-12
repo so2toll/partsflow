@@ -1,0 +1,1540 @@
+---
+/**
+ * Video Edit Mode Content Component (Phase 4 Demo)
+ *
+ * Interactive demo showcasing the full Edit Mode workflow:
+ * - Video upload interface
+ * - Indexing progress with real-time updates
+ * - Clip gallery with searchable/editable clips
+ * - Search interface with filters
+ * - Timeline visualization
+ * - Export options
+ *
+ * All data is mock/stub for demonstration purposes.
+ *
+ * @component App/VideoEdit
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+// Mock data for demo
+const mockVideos = [
+  {
+    id: 'vid-1',
+    name: 'Product Demo Raw Footage.mp4',
+    duration: 180,
+    thumbnail: '/placeholder-video-1.jpg',
+    uploadDate: new Date().toISOString(),
+    status: 'indexed',
+    size: '245 MB',
+    resolution: '1920x1080',
+  },
+  {
+    id: 'vid-2',
+    name: 'Interview Segment.mov',
+    duration: 300,
+    thumbnail: '/placeholder-video-2.jpg',
+    uploadDate: new Date(Date.now() - 86400000).toISOString(),
+    status: 'indexed',
+    size: '512 MB',
+    resolution: '3840x2160',
+  },
+];
+
+const mockClips = [
+  {
+    id: 'clip-1',
+    videoId: 'vid-1',
+    startTime: 0,
+    endTime: 15,
+    thumbnail: '/placeholder-clip-1.jpg',
+    transcript: 'Welcome to our product demonstration. Today we\'ll be exploring the key features.',
+    tags: ['intro', 'welcome', 'overview'],
+    confidence: 0.95,
+    selected: false,
+  },
+  {
+    id: 'clip-2',
+    videoId: 'vid-1',
+    startTime: 15,
+    endTime: 45,
+    thumbnail: '/placeholder-clip-2.jpg',
+    transcript: 'The first major feature is our intuitive interface. Notice how easy it is to navigate.',
+    tags: ['feature', 'interface', 'navigation'],
+    confidence: 0.92,
+    selected: false,
+  },
+  {
+    id: 'clip-3',
+    videoId: 'vid-1',
+    startTime: 45,
+    endTime: 75,
+    thumbnail: '/placeholder-clip-3.jpg',
+    transcript: 'Next, let\'s look at the advanced analytics dashboard. This provides real-time insights.',
+    tags: ['analytics', 'dashboard', 'insights'],
+    confidence: 0.88,
+    selected: false,
+  },
+  {
+    id: 'clip-4',
+    videoId: 'vid-1',
+    startTime: 75,
+    endTime: 105,
+    thumbnail: '/placeholder-clip-4.jpg',
+    transcript: 'Our AI-powered recommendations help you discover relevant content automatically.',
+    tags: ['ai', 'recommendations', 'automation'],
+    confidence: 0.91,
+    selected: false,
+  },
+  {
+    id: 'clip-5',
+    videoId: 'vid-1',
+    startTime: 105,
+    endTime: 135,
+    thumbnail: '/placeholder-clip-5.jpg',
+    transcript: 'Security is paramount. All data is encrypted with enterprise-grade protection.',
+    tags: ['security', 'encryption', 'protection'],
+    confidence: 0.94,
+    selected: false,
+  },
+  {
+    id: 'clip-6',
+    videoId: 'vid-2',
+    startTime: 0,
+    endTime: 30,
+    thumbnail: '/placeholder-clip-6.jpg',
+    transcript: 'Thanks for joining us today. Let\'s start with your background in the industry.',
+    tags: ['interview', 'background', 'introduction'],
+    confidence: 0.89,
+    selected: false,
+  },
+  {
+    id: 'clip-7',
+    videoId: 'vid-2',
+    startTime: 30,
+    endTime: 60,
+    thumbnail: '/placeholder-clip-7.jpg',
+    transcript: 'I\'ve been working in this field for over 15 years, starting as a developer.',
+    tags: ['experience', 'developer', 'background'],
+    confidence: 0.93,
+    selected: false,
+  },
+];
+
+// Initial state for client-side interactivity
+const initialState = JSON.stringify({
+  currentView: 'upload', // 'upload', 'indexing', 'gallery'
+  uploadedVideos: [],
+  indexingProgress: 0,
+  indexingStage: '',
+  clips: mockClips,
+  selectedClips: [],
+  searchQuery: '',
+  activeFilters: [],
+  sortBy: 'relevance',
+});
+---
+
+<Layout title="Video Edit Mode - Demo">
+  <div class="video-edit-demo">
+    <div class="container">
+      {/* Header */}
+      <div class="page-header">
+        <div class="header-top">
+          <h1 class="page-title">Video Edit Mode</h1>
+          <div class="demo-badge">
+            <span class="badge-icon">⚡</span>
+            <span class="badge-text">Interactive Demo</span>
+          </div>
+        </div>
+        <p class="page-description">
+          Upload videos, AI-index them automatically, then search and edit clips to create your perfect video.
+        </p>
+      </div>
+
+      {/* Demo Notice */}
+      <div class="demo-notice">
+        <span class="notice-icon">ℹ️</span>
+        <span class="notice-text">
+          This is an interactive demo with mock data. No actual video processing occurs.
+          Try uploading a "video" to see the full workflow!
+        </span>
+      </div>
+
+      {/* View Container */}
+      <div id="view-container">
+        {/* Upload View */}
+        <div id="upload-view" class="view active">
+          <div class="upload-section">
+            <div class="upload-zone" id="upload-zone">
+              <div class="upload-icon">📁</div>
+              <h2 class="upload-title">Drop your video here</h2>
+              <p class="upload-description">or click to browse</p>
+              <p class="upload-formats">Supports MP4, MOV, AVI, WebM (up to 2GB)</p>
+              <input type="file" id="file-input" accept="video/*" style="display: none;" />
+              <button class="browse-btn" onclick="document.getElementById('file-input').click()">
+                Browse Files
+              </button>
+            </div>
+
+            <div class="upload-features">
+              <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">AI-Powered Indexing</h3>
+                <p class="feature-description">Automatic transcription, scene detection, and content analysis</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Smart Search</h3>
+                <p class="feature-description">Find any moment by searching through transcripts and metadata</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">✂️</div>
+                <h3 class="feature-title">Easy Editing</h3>
+                <p class="feature-description">Select, trim, and arrange clips to create your final video</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Indexing View */}
+        <div id="indexing-view" class="view">
+          <div class="indexing-section">
+            <div class="indexing-header">
+              <h2 class="indexing-title">Indexing Your Video</h2>
+              <p class="indexing-subtitle">AI is analyzing your video to make it searchable</p>
+            </div>
+
+            <div class="indexing-progress-container">
+              <div class="progress-circle" id="progress-circle">
+                <svg viewBox="0 0 120 120">
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    fill="none"
+                    stroke="#e2e8f0"
+                    stroke-width="8"
+                  />
+                  <circle
+                    id="progress-ring"
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    fill="none"
+                    stroke="url(#gradient)"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                    stroke-dasharray="339.292"
+                    stroke-dashoffset="339.292"
+                    transform="rotate(-90 60 60)"
+                  />
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#DFFF00" />
+                      <stop offset="100%" stop-color="#c4e600" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="progress-text">
+                  <span class="progress-percentage" id="progress-percentage">0%</span>
+                </div>
+              </div>
+
+              <div class="indexing-stages">
+                <div class="stage" id="stage-upload">
+                  <div class="stage-icon">📤</div>
+                  <div class="stage-content">
+                    <div class="stage-title">Uploading</div>
+                    <div class="stage-status">Complete</div>
+                  </div>
+                  <div class="stage-check">✓</div>
+                </div>
+                <div class="stage" id="stage-transcribe">
+                  <div class="stage-icon">🎙️</div>
+                  <div class="stage-content">
+                    <div class="stage-title">Transcribing Audio</div>
+                    <div class="stage-status">In progress...</div>
+                  </div>
+                  <div class="stage-spinner">⟳</div>
+                </div>
+                <div class="stage" id="stage-scenes">
+                  <div class="stage-icon">🎬</div>
+                  <div class="stage-content">
+                    <div class="stage-title">Detecting Scenes</div>
+                    <div class="stage-status">Waiting...</div>
+                  </div>
+                </div>
+                <div class="stage" id="stage-analyze">
+                  <div class="stage-icon">🧠</div>
+                  <div class="stage-content">
+                    <div class="stage-title">Analyzing Content</div>
+                    <div class="stage-status">Waiting...</div>
+                  </div>
+                </div>
+                <div class="stage" id="stage-complete">
+                  <div class="stage-icon">✅</div>
+                  <div class="stage-content">
+                    <div class="stage-title">Ready to Edit</div>
+                    <div class="stage-status">Waiting...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="indexing-info">
+              <div class="info-item">
+                <span class="info-label">Video Name</span>
+                <span class="info-value" id="indexing-video-name">--</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Duration</span>
+                <span class="info-value" id="indexing-duration">--</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Clips Found</span>
+                <span class="info-value" id="indexing-clips">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Gallery View */}
+        <div id="gallery-view" class="view">
+          <div class="gallery-section">
+            {/* Search and Filter Bar */}
+            <div class="search-bar">
+              <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input
+                  type="text"
+                  id="search-input"
+                  class="search-input"
+                  placeholder="Search clips by transcript, tags, or time..."
+                />
+              </div>
+              <div class="filter-controls">
+                <select id="sort-select" class="sort-select">
+                  <option value="relevance">Sort by Relevance</option>
+                  <option value="time-asc">Time: Earliest First</option>
+                  <option value="time-desc">Time: Latest First</option>
+                  <option value="duration">Duration</option>
+                  <option value="confidence">Confidence</option>
+                </select>
+                <button class="filter-btn" id="filter-btn">
+                  <span>Filters</span>
+                  <span class="filter-count" id="filter-count">0</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Active Filters */}
+            <div class="active-filters" id="active-filters" style="display: none;">
+              <!-- Filters will be dynamically added here -->
+            </div>
+
+            {/* Results Summary */}
+            <div class="results-summary">
+              <span class="results-count" id="results-count">7 clips</span>
+              <span class="results-text">from 2 videos</span>
+              <div class="selection-info">
+                <span class="selected-count" id="selected-count">0 selected</span>
+                <button class="clear-selection-btn" id="clear-selection-btn" style="display: none;">
+                  Clear selection
+                </button>
+              </div>
+            </div>
+
+            {/* Clips Grid */}
+            <div class="clips-grid" id="clips-grid">
+              <!-- Clips will be dynamically rendered here -->
+            </div>
+
+            {/* Selection Actions */}
+            <div class="selection-actions" id="selection-actions" style="display: none;">
+              <div class="selection-summary">
+                <span class="selection-count" id="selection-count">0 clips selected</span>
+                <span class="selection-duration" id="selection-duration">Total: 0:00</span>
+              </div>
+              <div class="action-buttons">
+                <button class="action-btn secondary" id="preview-btn">
+                  <span>▶️ Preview Selection</span>
+                </button>
+                <button class="action-btn primary" id="export-btn">
+                  <span>📦 Export Clips</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Timeline Preview */}
+            <div class="timeline-section">
+              <h3 class="timeline-title">Selected Clips Timeline</h3>
+              <div class="timeline-container" id="timeline">
+                <div class="timeline-empty" id="timeline-empty">
+                  Select clips to see them on the timeline
+                </div>
+                <div class="timeline-tracks" id="timeline-tracks" style="display: none;">
+                  <!-- Timeline clips will be rendered here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<!-- Client Script for Interactive Demo -->
+<script define:vars={{ initialState, mockClips }}>
+  // State
+  let state = {
+    currentView: 'upload',
+    uploadedVideos: [],
+    indexingProgress: 0,
+    indexingStage: '',
+    clips: [...mockClips],
+    selectedClips: [],
+    searchQuery: '',
+    activeFilters: [],
+    sortBy: 'relevance',
+  };
+
+  // Demo video data
+  const demoVideos = [
+    {
+      id: 'vid-1',
+      name: 'Product Demo Raw Footage.mp4',
+      duration: 180,
+      thumbnail: '/placeholder-video-1.jpg',
+      uploadDate: new Date().toISOString(),
+      status: 'indexed',
+      size: '245 MB',
+      resolution: '1920x1080',
+    },
+    {
+      id: 'vid-2',
+      name: 'Interview Segment.mov',
+      duration: 300,
+      thumbnail: '/placeholder-video-2.jpg',
+      uploadDate: new Date(Date.now() - 86400000).toISOString(),
+      status: 'indexed',
+      size: '512 MB',
+      resolution: '3840x2160',
+    },
+  ];
+
+  // DOM Elements
+  const uploadZone = document.getElementById('upload-zone');
+  const fileInput = document.getElementById('file-input');
+  const viewContainer = document.getElementById('view-container');
+  const searchInput = document.getElementById('search-input');
+  const sortSelect = document.getElementById('sort-select');
+  const clipsGrid = document.getElementById('clips-grid');
+  const selectionActions = document.getElementById('selection-actions');
+  const timelineTracks = document.getElementById('timeline-tracks');
+  const timelineEmpty = document.getElementById('timeline-empty');
+
+  // Initialize
+  function init() {
+    setupFileUpload();
+    setupSearchAndFilters();
+    renderClips();
+  }
+
+  // File Upload Handlers
+  function setupFileUpload() {
+    // Drag and drop
+    uploadZone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone?.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      handleFileUpload(e.dataTransfer.files[0]);
+    });
+
+    // File input
+    fileInput?.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+  }
+
+  async function handleFileUpload(file) {
+    if (!file) return;
+
+    // Simulate upload
+    const videoName = file.name;
+    const fileSize = formatFileSize(file.size);
+
+    // Switch to indexing view
+    switchView('indexing');
+
+    // Update indexing info
+    document.getElementById('indexing-video-name').textContent = videoName;
+    document.getElementById('indexing-duration').textContent = 'Processing...';
+    document.getElementById('indexing-clips').textContent = '0';
+
+    // Simulate indexing progress
+    await simulateIndexing(videoName);
+  }
+
+  async function simulateIndexing(videoName) {
+    const stages = [
+      { id: 'stage-upload', duration: 500 },
+      { id: 'stage-transcribe', duration: 2000 },
+      { id: 'stage-scenes', duration: 1500 },
+      { id: 'stage-analyze', duration: 1000 },
+      { id: 'stage-complete', duration: 500 },
+    ];
+
+    let progress = 0;
+    const progressPerStage = 100 / stages.length;
+
+    for (let i = 0; i < stages.length; i++) {
+      const stage = stages[i];
+      const stageEl = document.getElementById(stage.id);
+
+      // Activate stage
+      if (stageEl) {
+        stageEl.classList.add('active');
+        const statusEl = stageEl.querySelector('.stage-status');
+        if (statusEl) {
+          statusEl.textContent = i === stages.length - 1 ? 'Complete' : 'In progress...';
+        }
+      }
+
+      // Animate progress
+      const startProgress = progress;
+      const endProgress = progress + progressPerStage;
+      await animateProgress(startProgress, endProgress, stage.duration);
+
+      // Mark stage complete
+      if (stageEl) {
+        stageEl.classList.add('complete');
+        stageEl.classList.remove('active');
+        const statusEl = stageEl.querySelector('.stage-status');
+        if (statusEl) {
+          statusEl.textContent = 'Complete';
+        }
+        const checkEl = stageEl.querySelector('.stage-check');
+        const spinnerEl = stageEl.querySelector('.stage-spinner');
+        if (checkEl) checkEl.style.display = 'block';
+        if (spinnerEl) spinnerEl.style.display = 'none';
+      }
+
+      progress = endProgress;
+
+      // Update clip count
+      if (i === 3) {
+        document.getElementById('indexing-clips').textContent = '7';
+        document.getElementById('indexing-duration').textContent = '3:00';
+      }
+    }
+
+    // Complete - switch to gallery
+    setTimeout(() => {
+      switchView('gallery');
+    }, 500);
+  }
+
+  function animateProgress(start, end, duration) {
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const ring = document.getElementById('progress-ring');
+      const percentage = document.getElementById('progress-percentage');
+      const circumference = 339.292;
+
+      function update() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const current = start + (end - start) * progress;
+
+        // Update ring
+        if (ring) {
+          const offset = circumference - (current / 100) * circumference;
+          ring.style.strokeDashoffset = offset;
+        }
+
+        // Update text
+        if (percentage) {
+          percentage.textContent = Math.round(current) + '%';
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          resolve();
+        }
+      }
+
+      update();
+    });
+  }
+
+  function switchView(view) {
+    state.currentView = view;
+
+    // Hide all views
+    document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+
+    // Show selected view
+    const viewEl = document.getElementById(`${view}-view`);
+    if (viewEl) {
+      viewEl.classList.add('active');
+    }
+  }
+
+  // Search and Filter Handlers
+  function setupSearchAndFilters() {
+    searchInput?.addEventListener('input', (e) => {
+      state.searchQuery = e.target.value;
+      renderClips();
+    });
+
+    sortSelect?.addEventListener('change', (e) => {
+      state.sortBy = e.target.value;
+      renderClips();
+    });
+
+    document.getElementById('clear-selection-btn')?.addEventListener('click', () => {
+      state.selectedClips = [];
+      renderClips();
+      updateSelectionUI();
+    });
+
+    document.getElementById('preview-btn')?.addEventListener('click', () => {
+      alert('Preview functionality would play selected clips in sequence');
+    });
+
+    document.getElementById('export-btn')?.addEventListener('click', () => {
+      const selected = state.clips.filter((c) => c.selected);
+      alert(`Exporting ${selected.length} clips...\n\nIn production, this would:\n1. Render selected clips\n2. Apply transitions\n3. Generate final video\n4. Provide download link`);
+    });
+  }
+
+  function renderClips() {
+    if (!clipsGrid) return;
+
+    // Filter and sort clips
+    let filteredClips = [...state.clips];
+
+    // Apply search filter
+    if (state.searchQuery) {
+      const query = state.searchQuery.toLowerCase();
+      filteredClips = filteredClips.filter((clip) =>
+        clip.transcript.toLowerCase().includes(query) ||
+        clip.tags.some((tag) => tag.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply sorting
+    filteredClips.sort((a, b) => {
+      switch (state.sortBy) {
+        case 'time-asc':
+          return a.startTime - b.startTime;
+        case 'time-desc':
+          return b.startTime - a.startTime;
+        case 'duration':
+          return b.endTime - b.startTime - (a.endTime - a.startTime);
+        case 'confidence':
+          return b.confidence - a.confidence;
+        default: // relevance
+          return 0;
+      }
+    });
+
+    // Update results count
+    const resultsCount = document.getElementById('results-count');
+    if (resultsCount) {
+      resultsCount.textContent = `${filteredClips.length} clips`;
+    }
+
+    // Render clips
+    clipsGrid.innerHTML = filteredClips.map((clip) => renderClip(clip)).join('');
+
+    // Add click handlers
+    document.querySelectorAll('.clip-card').forEach((card) => {
+      card.addEventListener('click', () => toggleClipSelection(card.dataset.clipId));
+    });
+  }
+
+  function renderClip(clip) {
+    const duration = clip.endTime - clip.startTime;
+    const isSelected = clip.selected;
+
+    return `
+      <div class="clip-card ${isSelected ? 'selected' : ''}" data-clip-id="${clip.id}">
+        <div class="clip-thumbnail">
+          <div class="thumbnail-placeholder">🎬</div>
+          <div class="clip-duration">${formatTime(duration)}</div>
+          <div class="clip-confidence">${Math.round(clip.confidence * 100)}% match</div>
+        </div>
+        <div class="clip-content">
+          <div class="clip-transcript">${clip.transcript}</div>
+          <div class="clip-meta">
+            <span class="clip-time">${formatTime(clip.startTime)} - ${formatTime(clip.endTime)}</span>
+          </div>
+          <div class="clip-tags">
+            ${clip.tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </div>
+        <div class="clip-checkbox">
+          ${isSelected ? '✓' : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function toggleClipSelection(clipId) {
+    const clip = state.clips.find((c) => c.id === clipId);
+    if (clip) {
+      clip.selected = !clip.selected;
+      renderClips();
+      updateSelectionUI();
+    }
+  }
+
+  function updateSelectionUI() {
+    const selected = state.clips.filter((c) => c.selected);
+    const count = selected.length;
+
+    // Update selected count
+    const selectedCount = document.getElementById('selected-count');
+    if (selectedCount) {
+      selectedCount.textContent = `${count} selected`;
+    }
+
+    // Show/hide clear button
+    const clearBtn = document.getElementById('clear-selection-btn');
+    if (clearBtn) {
+      clearBtn.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+
+    // Show/hide selection actions
+    if (selectionActions) {
+      selectionActions.style.display = count > 0 ? 'flex' : 'none';
+    }
+
+    // Update selection summary
+    const selectionCount = document.getElementById('selection-count');
+    const totalDuration = selected.reduce((acc, clip) => acc + (clip.endTime - clip.startTime), 0);
+
+    if (selectionCount) {
+      selectionCount.textContent = `${count} clip${count !== 1 ? 's' : ''} selected`;
+    }
+
+    const selectionDuration = document.getElementById('selection-duration');
+    if (selectionDuration) {
+      selectionDuration.textContent = `Total: ${formatTime(totalDuration)}`;
+    }
+
+    // Update timeline
+    renderTimeline(selected);
+  }
+
+  function renderTimeline(selectedClips) {
+    if (!timelineTracks || !timelineEmpty) return;
+
+    if (selectedClips.length === 0) {
+      timelineTracks.style.display = 'none';
+      timelineEmpty.style.display = 'block';
+      return;
+    }
+
+    timelineTracks.style.display = 'flex';
+    timelineEmpty.style.display = 'none';
+
+    // Sort by start time
+    const sorted = [...selectedClips].sort((a, b) => a.startTime - b.startTime);
+
+    timelineTracks.innerHTML = sorted.map((clip) => {
+      const duration = clip.endTime - clip.startTime;
+      const width = Math.max(duration * 2, 60); // Scale for visibility
+
+      return `
+        <div class="timeline-clip" style="width: ${width}px;">
+          <div class="timeline-clip-content">
+            <span class="timeline-clip-time">${formatTime(clip.startTime)}</span>
+            <span class="timeline-clip-duration">${formatTime(duration)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Utility functions
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024 * 1024) {
+      return Math.round(bytes / 1024) + ' KB';
+    }
+    return Math.round(bytes / (1024 * 1024)) + ' MB';
+  }
+
+  // Start the demo
+  init();
+</script>
+
+<style>
+  .video-edit-demo {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Page Header */
+  .page-header {
+    text-align: center;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+  }
+
+  .demo-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .badge-icon {
+    font-size: 14px;
+  }
+
+  .page-description {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Demo Notice */
+  .demo-notice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: #ebf8ff;
+    border: 1px solid #bee3f8;
+    border-radius: 8px;
+    color: #2c5282;
+    font-size: 14px;
+  }
+
+  .notice-icon {
+    font-size: 18px;
+  }
+
+  /* Views */
+  .view {
+    display: none;
+  }
+
+  .view.active {
+    display: block;
+  }
+
+  /* Upload Section */
+  .upload-zone {
+    padding: 60px 40px;
+    border: 3px dashed #cbd5e0;
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  .upload-zone:hover,
+  .upload-zone.drag-over {
+    border-color: #DFFF00;
+    background-color: #fffff0;
+  }
+
+  .upload-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .upload-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+  }
+
+  .upload-description {
+    font-size: 16px;
+    color: #718096;
+    margin: 0 0 8px 0;
+  }
+
+  .upload-formats {
+    font-size: 13px;
+    color: #a0aec0;
+    margin: 0 0 24px 0;
+  }
+
+  .browse-btn {
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #DFFF00 0%, #c4e600 100%);
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d3748;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .browse-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(223, 255, 0, 0.4);
+  }
+
+  .upload-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .feature-card {
+    padding: 24px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  .feature-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+  }
+
+  .feature-description {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Indexing Section */
+  .indexing-section {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .indexing-header {
+    margin-bottom: 40px;
+  }
+
+  .indexing-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+  }
+
+  .indexing-subtitle {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  .indexing-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  .progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+  }
+
+  .progress-circle svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .progress-percentage {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .indexing-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .stage {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .stage.active {
+    border-color: #DFFF00;
+    background-color: #fffff0;
+  }
+
+  .stage.complete {
+    border-color: #48bb78;
+    background-color: #f0fff4;
+  }
+
+  .stage-icon {
+    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7fafc;
+    border-radius: 8px;
+  }
+
+  .stage-content {
+    flex: 1;
+  }
+
+  .stage-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 4px 0;
+  }
+
+  .stage-status {
+    font-size: 12px;
+    color: #718096;
+  }
+
+  .stage-check,
+  .stage-spinner {
+    font-size: 20px;
+    color: #48bb78;
+    display: none;
+  }
+
+  .stage.complete .stage-check {
+    display: block;
+  }
+
+  .stage.active .stage-spinner {
+    display: block;
+    animation: spin 1s linear infinite;
+    color: #DFFF00;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .indexing-info {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+  }
+
+  .info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  /* Gallery Section */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 18px;
+    color: #a0aec0;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 48px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #DFFF00;
+    box-shadow: 0 0 0 3px rgba(223, 255, 0, 0.2);
+  }
+
+  .filter-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .sort-select {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover {
+    background-color: #f7fafc;
+  }
+
+  .filter-count {
+    padding: 2px 8px;
+    background-color: #DFFF00;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .results-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .results-count {
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .results-text {
+    color: #718096;
+    font-size: 14px;
+  }
+
+  .selection-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .selected-count {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  .clear-selection-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #edf2f7;
+    color: #4a5568;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .clear-selection-btn:hover {
+    background-color: #e2e8f0;
+  }
+
+  /* Clips Grid */
+  .clips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .clip-card {
+    position: relative;
+    background-color: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .clip-card:hover {
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .clip-card.selected {
+    border-color: #DFFF00;
+    background-color: #fffff0;
+  }
+
+  .clip-thumbnail {
+    position: relative;
+    height: 160px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .thumbnail-placeholder {
+    font-size: 48px;
+  }
+
+  .clip-duration {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .clip-confidence {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    background-color: rgba(223, 255, 0, 0.9);
+    color: #2d3748;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .clip-content {
+    padding: 16px;
+  }
+
+  .clip-transcript {
+    font-size: 14px;
+    color: #2d3748;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .clip-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .clip-time {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 600;
+  }
+
+  .clip-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    padding: 4px 10px;
+    background-color: #edf2f7;
+    color: #4a5568;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .clip-checkbox {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .clip-card.selected .clip-checkbox {
+    background-color: #DFFF00;
+    border-color: #DFFF00;
+  }
+
+  /* Selection Actions */
+  .selection-actions {
+    position: sticky;
+    bottom: 24px;
+    z-index: 100;
+    padding: 16px 24px;
+    background-color: white;
+    border: 2px solid #DFFF00;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .selection-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .selection-count {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .selection-duration {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, #DFFF00 0%, #c4e600 100%);
+    color: #2d3748;
+  }
+
+  .action-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(223, 255, 0, 0.4);
+  }
+
+  .action-btn.secondary {
+    background-color: #edf2f7;
+    color: #4a5568;
+  }
+
+  .action-btn.secondary:hover {
+    background-color: #e2e8f0;
+  }
+
+  /* Timeline */
+  .timeline-section {
+    margin-top: 32px;
+  }
+
+  .timeline-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 16px 0;
+  }
+
+  .timeline-container {
+    padding: 24px;
+    background-color: #1a202c;
+    border-radius: 12px;
+    min-height: 120px;
+  }
+
+  .timeline-empty {
+    color: #718096;
+    text-align: center;
+    padding: 40px;
+    font-size: 14px;
+  }
+
+  .timeline-tracks {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+  }
+
+  .timeline-clip {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
+    min-width: 100px;
+  }
+
+  .timeline-clip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .timeline-clip-time {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .timeline-clip-duration {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .video-edit-demo {
+      padding: 16px;
+    }
+
+    .page-title {
+      font-size: 24px;
+    }
+
+    .search-bar {
+      flex-direction: column;
+    }
+
+    .clips-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .selection-actions {
+      flex-direction: column;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .upload-features {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

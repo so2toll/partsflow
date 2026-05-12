@@ -1,0 +1,545 @@
+---
+
+---
+<html lang="en" dir="ltr">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title  -->
+  <title>Data3D | Dashboard</title>
+  <meta name="description" content="Insight3d Dashboard">
+
+  <!-- Development css (used in all pages) -->
+  <link rel="stylesheet" id="stylesheet" href="/css/style.css">
+  <!-- Production css (used in all pages) -->
+  <!-- <link rel="stylesheet" href="../dist/css/style.css"> -->
+
+  <!--start::Vendor Stylesheets (only on this page)-->
+  <link rel="stylesheet" href="/css/customizer.css">
+  <link rel="stylesheet" href="/css/prism.css">
+  <!--end::Vendor Stylesheets (only on this page)-->
+
+  <!-- google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+
+  <!-- Favicon  -->
+  <link rel="icon" href="/images/data3DLogoBlack.svg">
+</head>
+<body class="font-sans text-base font-normal text-gray-600 dark:text-gray-400 dark:bg-gray-900">
+  <!-- wrapper -->
+  <div x-data="{ open: false }" class="wrapper overflow-x-hidden " style="background-color:#f8f8f8">
+    
+
+    <div x-bind:aria-expanded="open" :class="{ 'ltr:ml-64 ltr:-mr-64 md:ltr:ml-0 md:ltr:mr-0 rtl:mr-64 rtl:-ml-64 md:rtl:mr-0 md:rtl:ml-0': open, 'ltr:ml-0 ltr:mr-0 md:ltr:ml-64 rtl:mr-0 rtl:ml-0 md:rtl:mr-64': !(open) }" class="flex flex-col ltr:ml-64 rtl:mr-64 min-h-screen transition-all duration-500 ease-in-out">
+ 
+
+  <main class="pt-20 -mt-2">
+    <div class="mx-auto p-2">
+      <!-- row -->
+      <div class="flex flex-wrap flex-row">
+        <div class="flex-shrink max-w-full px-4 w-full">   
+          <p class="text-xl font-bold mt-3 mb-5">Inmate Dashboard</p>
+        </div>
+      
+      </div>
+      <!-- row -->
+    <div class ="flex flex-wrap flex-row" style="display:flex; justify-content:space-evenly">
+        <div class="flex-shrink max-w-full px-4 w-full lg:w-1/3">
+          <div class="bg-black text-white rounded-lg shadow-lg p-6 mb-6 relative overflow-hidden">
+            <!-- circle -->
+            <div class="absolute ltr:-right-10 rtl:-left-10 -top-10">
+              <div class="bg-white opacity-10 w-36 h-36 rounded-full"></div>
+            </div>
+            <div class="absolute ltr:-right-8 rtl:-left-8 -top-8">
+              <div class="bg-white opacity-20 w-24 h-24 rounded-full"></div>
+            </div>
+          <a href="/documents/">
+          <div class="flex flex-row justify-between pb-3">
+              <div class="flex flex-col">
+                <h3 class="text-base font-bold">My Files</h3>
+              </div>
+            </div>
+            <div class="relative text-center">5  Total </h4>
+              <p class="text-sm mb-3">All Documents</p>
+            </div>
+          </a>
+          </div>
+
+          <!-- <a class="text-sm py-2 px-4 block text-center mb-6 rounded leading-5 text-gray-100 bg-indigo-500 border border-indigo-500 hover:text-white hover:bg-indigo-600 hover:ring-0 hover:border-indigo-600 focus:bg-indigo-600 focus:border-indigo-600 focus:outline-none focus:ring-0">Top up</a> -->
+
+          <div class="bg-black text-white rounded-lg shadow-lg p-6 mb-6 relative overflow-hidden">
+            <!-- circle -->
+            <div class="absolute ltr:-right-10 rtl:-left-10 -top-10">
+              <div class="bg-white opacity-10 w-36 h-36 rounded-full"></div>
+            </div>
+            <div class="absolute ltr:-right-8 rtl:-left-8 -top-8">
+              <div class="bg-white opacity-20 w-24 h-24 rounded-full"></div>
+            </div>
+          <a href="/notifications/">
+            <div class="flex flex-row justify-between pb-3">
+              <div class="flex flex-col">
+                <h3 class="text-base font-bold">Notifications</h3>
+              </div>
+            </div>
+            <div class="relative text-center">
+              <h4 class="font-bold text-2xl text-white mb-3">3 Pending</h4>
+              <p class="text-sm mb-3" style="un">All Notifications</p>
+            </div>
+          </a>
+          </div>
+        </div>
+        <div class="flex-shrink max-w-full px-4 w-full lg:w-1/3 mb-6">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-full p-6">
+            <div class="flex flex-col pb-6">
+              <h3 class="text-base font-bold">Recent Activity</h3>
+            </div> 
+            <div class="relative">
+              <ol class="h-72 overflow-y-auto scrollbars show mb-6">
+                <li class="flex mb-2">
+                  <div class="relative flex-shrink-0 w-12 text-center">
+                    <span class="absolute ltr:left-1/2 ltr:-ml-1 rtl:right-1/2 rtl:-mr-1 top-10 -bottom-4 ltr:border-l-2 rtl:border-r-2 border-dashed border-gray-200 dark:border-gray-700"></span>
+                    <div class="ltr:mr-auto rtl:ml-auto">
+                      <div class="flex items-center justify-center text-indigo-500 h-10 w-10 rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-40">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 0 1 .597-.933A7.01 7.01 0 0 0 3.051 3.05c.362.184.763.349 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 0 1-1.565-.667A6.964 6.964 0 0 0 1.018 7.5h2.49zm1.4-2.741a12.344 12.344 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332zM8.5 5.09V7.5h2.99a12.342 12.342 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.612 13.612 0 0 1 7.5 10.91V8.5H4.51zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741H8.5zm-3.282 3.696c.12.312.252.604.395.872.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a6.696 6.696 0 0 1-.598-.933 8.853 8.853 0 0 1-.481-1.079 8.38 8.38 0 0 0-1.198.49 7.01 7.01 0 0 0 2.276 1.522zm-1.383-2.964A13.36 13.36 0 0 1 3.508 8.5h-2.49a6.963 6.963 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667zm6.728 2.964a7.009 7.009 0 0 0 2.275-1.521 8.376 8.376 0 0 0-1.197-.49 8.853 8.853 0 0 1-.481 1.078 6.688 6.688 0 0 1-.597.933zM8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.963 6.963 0 0 0 14.982 8.5h-2.49a13.36 13.36 0 0 1-.437 3.008zM14.982 7.5a6.963 6.963 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008h2.49zM11.27 2.461c.177.334.339.694.482 1.078a8.368 8.368 0 0 0 1.196-.49 7.01 7.01 0 0 0-2.275-1.52c.218.283.418.597.597.932zm-.488 1.343a7.765 7.765 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ltr:ml-4 rtl:mr-4 mb-4">
+                    <div class="flex flex-row justify-between pb-2">
+                      <div class="text-xs text-gray-500 self-center mr-3">
+                        Aug 27, 2023 02.21 am
+                      </div>
+                    </div>
+                    <p class="text-sm">Sent document request to<span class="font-semibold"> "Agent James Williams"</span></p>
+                  </div>
+                </li>
+                <li class="flex mb-2">
+                  <div class="relative flex-shrink-0 w-12 text-center">
+                    <span class="absolute ltr:left-1/2 ltr:-ml-1 rtl:right-1/2 rtl:-mr-1 top-10 -bottom-4 ltr:border-l-2 rtl:border-r-2 border-dashed border-gray-200 dark:border-gray-700"></span>
+                    <div class="ltr:mr-auto rtl:ml-auto">
+                      <div class="flex items-center justify-center text-indigo-500 h-10 w-10 rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-40">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 0 1 .597-.933A7.01 7.01 0 0 0 3.051 3.05c.362.184.763.349 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 0 1-1.565-.667A6.964 6.964 0 0 0 1.018 7.5h2.49zm1.4-2.741a12.344 12.344 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332zM8.5 5.09V7.5h2.99a12.342 12.342 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.612 13.612 0 0 1 7.5 10.91V8.5H4.51zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741H8.5zm-3.282 3.696c.12.312.252.604.395.872.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a6.696 6.696 0 0 1-.598-.933 8.853 8.853 0 0 1-.481-1.079 8.38 8.38 0 0 0-1.198.49 7.01 7.01 0 0 0 2.276 1.522zm-1.383-2.964A13.36 13.36 0 0 1 3.508 8.5h-2.49a6.963 6.963 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667zm6.728 2.964a7.009 7.009 0 0 0 2.275-1.521 8.376 8.376 0 0 0-1.197-.49 8.853 8.853 0 0 1-.481 1.078 6.688 6.688 0 0 1-.597.933zM8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.963 6.963 0 0 0 14.982 8.5h-2.49a13.36 13.36 0 0 1-.437 3.008zM14.982 7.5a6.963 6.963 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008h2.49zM11.27 2.461c.177.334.339.694.482 1.078a8.368 8.368 0 0 0 1.196-.49 7.01 7.01 0 0 0-2.275-1.52c.218.283.418.597.597.932zm-.488 1.343a7.765 7.765 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"></path>
+                    </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ltr:ml-4 rtl:mr-4 mb-4">
+                    <div class="flex flex-row justify-between pb-2">
+                      <div class="text-xs text-gray-500 self-center mr-3">
+                        Aug 26, 2023 02.21 am
+                      </div>
+                    </div>
+                    <p class="text-sm">Access permissions updated for  <span class="font-semibold">"LegalDocs2023"</span></p>
+                  </div>
+                </li>
+                <li class="flex mb-2">
+                  <div class="relative flex-shrink-0 w-12 text-center">
+                    <span class="absolute ltr:left-1/2 ltr:-ml-1 rtl:right-1/2 rtl:-mr-1 top-10 -bottom-4 ltr:border-l-2 rtl:border-r-2 border-dashed border-gray-200 dark:border-gray-700"></span>
+                    <div class="ltr:mr-auto rtl:ml-auto">
+                      <div class="flex items-center justify-center text-indigo-500 h-10 w-10 rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-40">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 0 1 .597-.933A7.01 7.01 0 0 0 3.051 3.05c.362.184.763.349 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 0 1-1.565-.667A6.964 6.964 0 0 0 1.018 7.5h2.49zm1.4-2.741a12.344 12.344 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332zM8.5 5.09V7.5h2.99a12.342 12.342 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.612 13.612 0 0 1 7.5 10.91V8.5H4.51zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741H8.5zm-3.282 3.696c.12.312.252.604.395.872.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a6.696 6.696 0 0 1-.598-.933 8.853 8.853 0 0 1-.481-1.079 8.38 8.38 0 0 0-1.198.49 7.01 7.01 0 0 0 2.276 1.522zm-1.383-2.964A13.36 13.36 0 0 1 3.508 8.5h-2.49a6.963 6.963 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667zm6.728 2.964a7.009 7.009 0 0 0 2.275-1.521 8.376 8.376 0 0 0-1.197-.49 8.853 8.853 0 0 1-.481 1.078 6.688 6.688 0 0 1-.597.933zM8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.963 6.963 0 0 0 14.982 8.5h-2.49a13.36 13.36 0 0 1-.437 3.008zM14.982 7.5a6.963 6.963 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008h2.49zM11.27 2.461c.177.334.339.694.482 1.078a8.368 8.368 0 0 0 1.196-.49 7.01 7.01 0 0 0-2.275-1.52c.218.283.418.597.597.932zm-.488 1.343a7.765 7.765 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"></path>
+                    </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ltr:ml-4 rtl:mr-4 mb-4">
+                    <div class="flex flex-row justify-between pb-2">
+                      <div class="text-xs text-gray-500 self-center mr-3">
+                        Aug 21, 2023 20.10 pm
+                      </div>
+                    </div>
+                    <p class="text-sm"> New document uploaded  <span class="font-semibold">"Case #45782"</span></p>
+                  </div>
+                </li>
+                <li class="flex mb-2">
+                  <div class="relative flex-shrink-0 w-12 text-center">
+                    <span class="absolute ltr:left-1/2 ltr:-ml-1 rtl:right-1/2 rtl:-mr-1 top-10 -bottom-4 ltr:border-l-2 rtl:border-r-2 border-dashed border-gray-200 dark:border-gray-700"></span>
+                    <div class="ltr:mr-auto rtl:ml-auto">
+                      <div class="flex items-center justify-center text-indigo-500 h-10 w-10 rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-40">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 0 1 .597-.933A7.01 7.01 0 0 0 3.051 3.05c.362.184.763.349 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 0 1-1.565-.667A6.964 6.964 0 0 0 1.018 7.5h2.49zm1.4-2.741a12.344 12.344 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332zM8.5 5.09V7.5h2.99a12.342 12.342 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.612 13.612 0 0 1 7.5 10.91V8.5H4.51zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741H8.5zm-3.282 3.696c.12.312.252.604.395.872.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a6.696 6.696 0 0 1-.598-.933 8.853 8.853 0 0 1-.481-1.079 8.38 8.38 0 0 0-1.198.49 7.01 7.01 0 0 0 2.276 1.522zm-1.383-2.964A13.36 13.36 0 0 1 3.508 8.5h-2.49a6.963 6.963 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667zm6.728 2.964a7.009 7.009 0 0 0 2.275-1.521 8.376 8.376 0 0 0-1.197-.49 8.853 8.853 0 0 1-.481 1.078 6.688 6.688 0 0 1-.597.933zM8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.963 6.963 0 0 0 14.982 8.5h-2.49a13.36 13.36 0 0 1-.437 3.008zM14.982 7.5a6.963 6.963 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008h2.49zM11.27 2.461c.177.334.339.694.482 1.078a8.368 8.368 0 0 0 1.196-.49 7.01 7.01 0 0 0-2.275-1.52c.218.283.418.597.597.932zm-.488 1.343a7.765 7.765 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ltr:ml-4 rtl:mr-4 mb-4">
+                    <div class="flex flex-row justify-between pb-2">
+                      <div class="text-xs text-gray-500 self-center mr-3">
+                        Aug 18, 2023 18.34 pm
+                      </div>
+                    </div>
+                    <p class="text-sm">Archived old documents from  <span class="font-semibold">"2019 Cases"</span></p>
+                  </div>
+                </li>
+                <li class="flex mb-2">
+                  <div class="relative flex-shrink-0 w-12 text-center">
+                    <span class="absolute ltr:left-1/2 ltr:-ml-1 rtl:right-1/2 rtl:-mr-1 top-10 -bottom-4 ltr:border-l-2 rtl:border-r-2 border-dashed border-gray-200 dark:border-gray-700"></span>
+                    <div class="ltr:mr-auto rtl:ml-auto">
+                      <div class="flex items-center justify-center text-indigo-500 h-10 w-10 rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-40">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe2" viewBox="0 0 16 16">
+                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855-.143.268-.276.56-.395.872.705.157 1.472.257 2.282.287V1.077zM4.249 3.539c.142-.384.304-.744.481-1.078a6.7 6.7 0 0 1 .597-.933A7.01 7.01 0 0 0 3.051 3.05c.362.184.763.349 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9.124 9.124 0 0 1-1.565-.667A6.964 6.964 0 0 0 1.018 7.5h2.49zm1.4-2.741a12.344 12.344 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332zM8.5 5.09V7.5h2.99a12.342 12.342 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.612 13.612 0 0 1 7.5 10.91V8.5H4.51zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741H8.5zm-3.282 3.696c.12.312.252.604.395.872.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a6.696 6.696 0 0 1-.598-.933 8.853 8.853 0 0 1-.481-1.079 8.38 8.38 0 0 0-1.198.49 7.01 7.01 0 0 0 2.276 1.522zm-1.383-2.964A13.36 13.36 0 0 1 3.508 8.5h-2.49a6.963 6.963 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667zm6.728 2.964a7.009 7.009 0 0 0 2.275-1.521 8.376 8.376 0 0 0-1.197-.49 8.853 8.853 0 0 1-.481 1.078 6.688 6.688 0 0 1-.597.933zM8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855.143-.268.276-.56.395-.872A12.63 12.63 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.963 6.963 0 0 0 14.982 8.5h-2.49a13.36 13.36 0 0 1-.437 3.008zM14.982 7.5a6.963 6.963 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008h2.49zM11.27 2.461c.177.334.339.694.482 1.078a8.368 8.368 0 0 0 1.196-.49 7.01 7.01 0 0 0-2.275-1.52c.218.283.418.597.597.932zm-.488 1.343a7.765 7.765 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="ltr:ml-4 rtl:mr-4 mb-4">
+                    <div class="flex flex-row justify-between pb-2">
+                      <div class="text-xs text-gray-500 self-center mr-3">
+                        Aug 16, 2023 03.21 am
+                      </div>
+                    </div>
+                    <p class="text-sm">New Document Uploaded <span class="font-semibold">"Case #4782"</span></p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+
+      
+      <!-- row -->
+      <div class="flex flex-wrap flex-row" style="justify-content: space-evenly;
+      padding-bottom: 2%;">
+        <div class="flex-shrink max-w-full px-4 w-full mb-6">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-full p-6">
+            <div class="relative">
+              <div class="overflow-auto">
+                <table class="table-sorter table-bordered-bottom w-full">
+                  <h4 class="font-bold text-gray-800 dark:text-gray-200 text-2xl mb-3">Assigned Documents</h4>
+                  <thead>
+                    <tr class="bg-black text-white">
+                      <th>
+                        Document Name
+                      </th>
+                      <th class="hidden lg:table-cell">
+                        Assigned Inmates
+                      </th>
+                      <th class="hidden md:table-cell">
+                        Upload Date
+                      </th>
+                      <th>
+                        Category
+                      </th>
+                    
+                    </tr>
+                  </thead>
+                  <tbody class="text-sm leading-5">
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Rehabilitation Program 87A 
+                          </div>
+                          <div class="italic">
+                            <!-- Hosting package -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Jennifer Wilson
+                      </td>
+                      <td class="hidden md:table-cell">
+                        June 7, 2022
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3 dark:bg-opacity-80 rounded-full">Educational</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                          Case Appeal Form 442 
+                          </div>
+                          <div class="italic">
+                            <!-- Domain name -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Kevin Rodriguez
+                      </td>
+                      <td class="hidden md:table-cell">
+                        June 3, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3 dark:bg-opacity-80 rounded-full">Legal</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Confiscated Items List 78X
+                          </div>
+                          <div class="italic">
+                            <!-- Domain name -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        David Anderson
+                      </td>
+                      <td class="hidden md:table-cell">
+                        May 22, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3 dark:bg-opacity-80 rounded-full">Security</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Work Assignment Sheet R11
+                          </div>
+                          <div class="italic">
+                            <!-- Hosting package -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Maria Hernandez
+                      </td>
+                      <td class="hidden md:table-cell">
+                        May 18, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3 dark:bg-opacity-80 rounded-full">Administrative</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Inmate Health Report 567
+                          </div>
+                          <div class="italic">
+                            <!-- Domain name -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Emily Davis
+                      </td>
+                      <td class="hidden md:table-cell">
+                        April 24, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3  dark:bg-opacity-80 rounded-full">Medical</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Cell Inspection Report Q45
+                          </div>
+                          <div class="italic">
+                            <!-- Domain name -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Angela Martin 
+                      </td>
+                      <td class="hidden md:table-cell">
+                        April 2, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3  dark:bg-opacity-80 rounded-full">Security</div>
+                      </td>
+                    
+                    </tr>
+                    <tr>
+                      <td>
+                        <div>
+                          <div class="font-semibold">
+                            Parole Hearing Notes 
+                          </div>
+                          <div class="italic">
+                            <!-- Domain name -->
+                          </div>
+                        </div>
+                      </td>
+                      <td class="hidden lg:table-cell">
+                        Robert Garcia
+                      </td>
+                      <td class="hidden md:table-cell">
+                        May 10, 2023
+                      </td>
+                      <td>
+                        <div class="inline-block leading-tight text-center text-sm font-semibold py-1 px-3 dark:bg-opacity-80 rounded-full">Legal</div>
+                      </td>
+                    
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+       
+        </div>
+        
+      </div>
+
+    </div>
+  </main>
+
+     
+    </div>
+  </div>
+
+ 
+
+</body>
+</html>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+<script>
+  // ApexCharts options and config
+  window.addEventListener("load", function() {
+    const getChartOptions = () => {
+        return {
+          series: [35.1, 23.5],
+          colors: ["#1C64F2", "#16BDCA"],
+          chart: {
+            height: 320,
+            width: "100%",
+            type: "donut",
+          },
+          stroke: {
+            colors: ["transparent"],
+            lineCap: "",
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                labels: {
+                  show: true,
+                  name: {
+                    show: true,
+                    fontFamily: "Inter, sans-serif",
+                    offsetY: 20,
+                  },
+                  total: {
+                    showAlways: true,
+                    show: true,
+                    label: "Used Storage",
+                    fontFamily: "Inter, sans-serif",
+                    formatter: function (w) {
+                      const sum = w.globals.seriesTotals.reduce((a, b) => {
+                        return a + b
+                      }, 0)
+                      // return `${sum}k`
+                      return `63%`
+                    },
+                  },
+                  value: {
+                    show: true,
+                    fontFamily: "Inter, sans-serif",
+                    offsetY: -20,
+                    formatter: function (value) {
+                      return value + "k"
+                    },
+                  },
+                },
+                size: "80%",
+              },
+            },
+          },
+          grid: {
+            padding: {
+              top: -2,
+            },
+          },
+          labels: ["Used", "Free", ],
+          dataLabels: {
+            enabled: false,
+          },
+          legend: {
+            position: "bottom",
+            fontFamily: "Inter, sans-serif",
+          },
+          yaxis: {
+            labels: {
+              formatter: function (value) {
+                return value + "k"
+              },
+            },
+          },
+          xaxis: {
+            labels: {
+              formatter: function (value) {
+                return value  + "k"
+              },
+            },
+            axisTicks: {
+              show: false,
+            },
+            axisBorder: {
+              show: false,
+            },
+          },
+        }
+      }
+
+      if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
+        const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
+        chart.render();
+
+        // Get all the checkboxes by their class name
+        const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]');
+
+        // Function to handle the checkbox change event
+        function handleCheckboxChange(event, chart) {
+            const checkbox = event.target;
+            if (checkbox.checked) {
+                switch(checkbox.value) {
+                  case 'desktop':
+                    chart.updateSeries([15.1, 22.5, 4.4, 8.4]);
+                    break;
+                  case 'tablet':
+                    chart.updateSeries([25.1, 26.5, 1.4, 3.4]);
+                    break;
+                  case 'mobile':
+                    chart.updateSeries([45.1, 27.5, 8.4, 2.4]);
+                    break;
+                  default:
+                    chart.updateSeries([55.1, 28.5, 1.4, 5.4]);
+                }
+
+            } else {
+                chart.updateSeries([35.1, 23.5, 2.4, 5.4]);
+            }
+        }
+
+        // Attach the event listener to each checkbox
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', (event) => handleCheckboxChange(event, chart));
+        });
+      }
+  });
+</script>

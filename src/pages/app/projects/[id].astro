@@ -1,0 +1,93 @@
+---
+/**
+ * App Project Detail Page
+ *
+ * Standard page template following the support/index.astro pattern:
+ * 1. Get session
+ * 2. Set currentPage
+ * 3. Fetch data via unified getProjectDetailPageData()
+ * 4. Validate role access
+ * 5. Render RBACComponent
+ */
+
+import { getSession } from "../../../lib/auth/session-adapter";
+import { getLoginUrl } from "../../../lib/auth/feature-flag";
+import { RBAC_CONFIG } from "../../../lib/configs/rbacConfig.js";
+import RBACComponent from "../../../components/RBAC/RBACComponent.astro";
+import { getProjectDetailPageData } from "../../../lib/data/appPageData";
+import { canViewProject } from "../../../lib/services/ProjectPermissionService";
+
+// ========================================================================
+// PAGE CONFIGURATION - Only this changes per page!
+// ========================================================================
+const currentPage = 'appProjectDetail';
+const projectId = Astro.params.id;
+
+// ========================================================================
+// STANDARD PAGE LOGIC - Copy-paste for all app pages
+// ========================================================================
+
+// Get session
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+  return Astro.redirect(getLoginUrl());
+}
+
+// Get user info from session
+const userId = session?.user?.global_id || session?.user?.id;
+const userRole = session?.user?.role;
+
+// ========================================================================
+// ACCESS VALIDATION (project-specific)
+// ========================================================================
+
+// Check if user can view this project
+const hasAccess = await canViewProject(userId, projectId);
+
+// Redirect if no access (unless SuperAdmin)
+const isSuperAdmin = userRole === "SuperAdmin";
+
+if (!hasAccess && !isSuperAdmin) {
+  return new Response("You don't have access to this project", { status: 403 });
+}
+
+// ========================================================================
+// DATA FETCHING - Uses unified getProjectDetailPageData() function
+// ========================================================================
+
+const data = await getProjectDetailPageData(projectId, userId);
+
+if (!data) {
+  return new Response("Project not found", { status: 404 });
+}
+
+// ========================================================================
+// ROLE VALIDATION
+// ========================================================================
+
+if (!userRole) {
+  console.log('No role found for user:', userId);
+  return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+  console.log('Invalid role:', userRole, 'for user:', userId);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+  console.log('Role', userRole, 'does not have access to page:', currentPage);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+// ========================================================================
+// RENDER RBAC COMPONENT
+// ========================================================================
+---
+<RBACComponent
+  userRole={userRole}
+  userId={userId}
+  data={data}
+  currentPage={currentPage}
+/>

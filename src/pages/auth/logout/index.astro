@@ -1,0 +1,43 @@
+---
+/**
+ * Better Auth Logout Handler
+ * Handles logout for Better Auth system
+ * Redirects to Xano logout if Xano is the active provider
+ */
+
+import { auth } from '../../../lib/auth/auth';
+import { isBetterAuth, isXanoAuth, getLoginUrl } from '../../../lib/auth/feature-flag';
+import { COOKIE_NAME } from '../../../lib/constants/constants.js';
+
+// If Xano is active, redirect to Xano logout
+if (isXanoAuth()) {
+    return Astro.redirect('/logout/');
+}
+
+// For Better Auth, sign out via the API
+try {
+    // Call Better Auth sign out
+    await auth.api.signOut({
+        headers: Astro.request.headers,
+    });
+} catch (error) {
+    console.error('Error during Better Auth logout:', error);
+}
+
+// Also clear the Better Auth cookie manually as a fallback
+const headers = new Headers();
+
+// Clear Better Auth session cookie
+headers.append('Set-Cookie', 'better-auth.session_token=; Path=/; HttpOnly; Max-Age=0');
+
+// Also clear Xano cookie in case both are present (edge case during migration)
+headers.append('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0`);
+
+// Redirect to login
+headers.append('Location', getLoginUrl());
+
+return new Response('', {
+    status: 302,
+    headers,
+});
+---

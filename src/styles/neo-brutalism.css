@@ -1,0 +1,698 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM GLOBAL DESIGN SYSTEM
+   Monochromatic Cream + Black Palette
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CSS VARIABLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Base Colors */
+  --neo-white: white;      /* formerly Cream background #FFFEF0, defaulting to white */
+  --neo-cream: #f0eee6;      /* formerly Lighter cream FFF9E6, defaulting to white for now */
+  --neo-black: #000000;      /* Pure black for borders/text */
+
+  /* Primary Accent - Amber/Gold */
+  --neo-primary: #FFB800;         /* Main amber - buttons, active states */
+  --neo-primary-light: #FFCE47;   /* Lighter amber - hover states */
+  --neo-primary-dark: #E5A600;    /* Darker amber - pressed states */
+
+  /* Status Colors (muted versions) */
+  --neo-success: #78A55A;    /* Muted sage green */
+  --neo-warning: #E89B3C;    /* Warm orange (amber-adjacent) */
+  --neo-info: #5B8FB9;       /* Muted steel blue */
+  --neo-danger: #C75B5B;     /* Muted rose/red */
+
+  /* Legacy color mappings for compatibility */
+  --neo-yellow: var(--neo-primary);
+  --neo-pink: var(--neo-danger);
+  --neo-blue: var(--neo-info);
+  --neo-green: var(--neo-success);
+  --neo-orange: var(--neo-warning);
+
+  /* Typography */
+  --font-display: 'Archivo Black', Impact, sans-serif;
+  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, sans-serif;
+
+  /* Dark Theme Colors */
+  --color-bg-primary: #0f1117;
+  --color-bg-secondary: #161922;
+  --color-bg-elevated: #1c1f2a;
+  --color-bg-card: rgba(28, 31, 42, 0.7);
+  --color-border-dark: rgba(255, 255, 255, 0.06);
+  --color-border-subtle: rgba(255, 255, 255, 0.03);
+  --color-text-light: #f4f4f5;
+  --color-text-secondary-dark: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  --color-accent-glow: rgba(255, 184, 0, 0.3);
+  --color-accent-dim: rgba(255, 184, 0, 0.15);
+
+  /* Neo-Brutalism Shadows */
+  --shadow-sm: 2px 2px 0 var(--neo-black);
+  --shadow-md: 4px 4px 0 var(--neo-black);
+  --shadow-lg: 6px 6px 0 var(--neo-black);
+  --shadow-xl: 8px 8px 0 var(--neo-black);
+
+  /* Borders */
+  --border: 3px solid var(--neo-black);
+  --border-thick: 4px solid var(--neo-black);
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 100px;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 80px;
+
+  /* Transitions */
+  --transition-fast: 0.1s ease;
+  --transition-base: 0.15s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CSS RESET & BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--neo-cream);
+  color: var(--neo-black);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM BUTTONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--neo-white);
+  background: var(--neo-black);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+  background: #222222;
+}
+
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Button Variants */
+.neo-btn--primary {
+  background: var(--neo-black);
+  color: var(--neo-white);
+}
+
+.neo-btn--primary:hover {
+  background: #222222;
+}
+
+.neo-btn--success {
+  background: var(--neo-success);
+}
+
+.neo-btn--warning {
+  background: var(--neo-warning);
+}
+
+.neo-btn--danger {
+  background: var(--neo-danger);
+}
+
+.neo-btn--info {
+  background: var(--neo-info);
+}
+
+.neo-btn--outline {
+  background: var(--neo-white);
+  color: var(--neo-black);
+}
+
+.neo-btn--outline:hover {
+  background: var(--neo-cream);
+  color: var(--neo-black);
+}
+
+/* Secondary Button - light colored */
+.neo-btn--secondary {
+  background: var(--neo-cream);
+  color: var(--neo-black);
+}
+
+.neo-btn--secondary:hover {
+  background: var(--neo-white);
+  color: var(--neo-black);
+}
+
+/* Small Button */
+.neo-btn--sm {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-btn--sm:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Icon Button */
+.neo-btn--icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.neo-btn--icon.neo-btn--sm {
+  width: 32px;
+  height: 32px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM CARDS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-card {
+  background: var(--neo-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.neo-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.neo-card--primary {
+  background: var(--neo-primary);
+}
+
+.neo-card--success {
+  background: var(--neo-success);
+}
+
+.neo-card--warning {
+  background: var(--neo-warning);
+}
+
+.neo-card--info {
+  background: var(--neo-info);
+}
+
+.neo-card--danger {
+  background: var(--neo-danger);
+}
+
+/* Dark Card - Black bg with white text */
+.neo-card--dark {
+  background: var(--neo-black);
+  color: var(--neo-white);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM STAT CARDS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--neo-black);
+  color: var(--neo-white);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-stat__num {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.neo-stat__txt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM BADGES
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--neo-black);
+  background: var(--neo-cream);
+  border: var(--border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-badge--primary {
+  background: var(--neo-primary);
+}
+
+.neo-badge--success {
+  background: var(--neo-success);
+}
+
+.neo-badge--warning {
+  background: var(--neo-warning);
+}
+
+.neo-badge--info {
+  background: var(--neo-info);
+}
+
+.neo-badge--danger {
+  background: var(--neo-danger);
+}
+
+/* Status badges with dot indicator */
+.neo-badge--status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM FORM ELEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-input {
+  width: 100%;
+  padding: var(--space-md);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--neo-black);
+  background: var(--neo-cream);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: all var(--transition-base);
+}
+
+.neo-input::placeholder {
+  color: var(--neo-black);
+  opacity: 0.5;
+}
+
+.neo-input:focus {
+  background: var(--neo-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
+}
+
+.neo-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Search box */
+.neo-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--neo-white);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+}
+
+.neo-search input::placeholder {
+  color: var(--neo-black);
+  opacity: 0.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM CHIPS/PILLS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-chip {
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--neo-white);
+  border: var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.neo-chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.neo-chip.active,
+.neo-chip--active {
+  background: var(--neo-black);
+  color: var(--neo-white);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM TABLE
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-table-wrapper {
+  background: var(--neo-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.neo-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.neo-table thead {
+  background: var(--neo-black);
+  color: var(--neo-white);
+}
+
+.neo-table th {
+  padding: var(--space-md) var(--space-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-align: left;
+}
+
+.neo-table td {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 2px solid var(--neo-black);
+  vertical-align: middle;
+}
+
+.neo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.neo-table tbody tr:hover {
+  background: var(--neo-cream);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM AVATAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--neo-black);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--neo-white);
+}
+
+.neo-avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+.neo-avatar--lg {
+  width: 56px;
+  height: 56px;
+  font-size: 1.25rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM MODAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+.neo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+}
+
+.neo-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.neo-modal {
+  width: 100%;
+  max-width: 520px;
+  background: var(--neo-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.2s;
+}
+
+.neo-modal-overlay.active .neo-modal {
+  transform: translateY(0) scale(1);
+}
+
+.neo-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  background: var(--neo-black);
+  color: var(--neo-white);
+  border-bottom: var(--border-thick);
+}
+
+.neo-modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.neo-modal-body {
+  padding: var(--space-lg);
+}
+
+.neo-modal-footer {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  padding: var(--space-lg);
+  padding-top: 0;
+  border-top: 2px dashed var(--neo-black);
+  margin-top: var(--space-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Background Colors */
+.bg-primary { background: var(--neo-primary) !important; }
+.bg-success { background: var(--neo-success) !important; }
+.bg-warning { background: var(--neo-warning) !important; }
+.bg-info { background: var(--neo-info) !important; }
+.bg-danger { background: var(--neo-danger) !important; }
+.bg-white { background: var(--neo-white) !important; }
+.bg-cream { background: var(--neo-cream) !important; }
+.bg-black { background: var(--neo-black) !important; }
+
+/* Text Colors */
+.text-primary { color: var(--neo-primary) !important; }
+.text-success { color: var(--neo-success) !important; }
+.text-warning { color: var(--neo-warning) !important; }
+.text-info { color: var(--neo-info) !important; }
+.text-danger { color: var(--neo-danger) !important; }
+.text-white { color: var(--neo-white) !important; }
+.text-black { color: var(--neo-black) !important; }
+
+/* Font Families */
+.font-display { font-family: var(--font-display) !important; }
+.font-body { font-family: var(--font-body) !important; }
+
+/* Font Weights */
+.font-normal { font-weight: 400 !important; }
+.font-medium { font-weight: 500 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-bold { font-weight: 700 !important; }
+
+/* Text Transform */
+.uppercase { text-transform: uppercase !important; }
+.capitalize { text-transform: capitalize !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes neo-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes neo-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes neo-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes neo-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes neo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Animation Classes */
+.animate-pop-in {
+  animation: neo-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.animate-slide-in {
+  animation: neo-slide-in 0.3s ease-out backwards;
+}
+
+.animate-slide-up {
+  animation: neo-slide-up 0.5s ease-out backwards;
+}
+
+/* Loader */
+.neo-loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--neo-cream);
+  border-top-color: var(--neo-black);
+  border-radius: 50%;
+  animation: neo-spin 0.8s linear infinite;
+}
+
+.neo-loader--sm {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}

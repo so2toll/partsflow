@@ -1,0 +1,51 @@
+---
+
+const { title } = Astro.props;
+---
+<header class="header">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="d-flex align-items-center">
+                <button class="btn sidebar-toggle me-3" id="sidebar-toggle" type="button" aria-label="Toggle Sidebar" aria-expanded="true" aria-controls="sidebar">
+                    <i class="ri-menu-line" aria-hidden="true"></i>
+                </button>
+                <h1 class="header-title mb-0">{title}</h1>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- Theme Toggle -->
+                
+                <div class="me-3">
+                    <span style="font-size: smaller;font-weight: 600;">Demo Mode: </span>
+                </div>
+                <div class="me-3">
+                    <a href="/dashboard/dispatcher"><button class="btn btn-sm "style="background: #e1e1e061;" >Dispatcher View</button></a>
+                </div>
+                <div class="me-3">
+                    <a href="/dashboard"><button class="btn btn-sm "style="background: #e1e1e061;">Passenger View</button></a>
+                </div>
+                <div class="me-3">
+                    <a href="/dashboard/driver"><button class="btn btn-sm "style="background: #e1e1e061;">Driver View</button></a>
+                </div>
+
+               
+                <!-- User Profile Dropdown -->
+                <div class="dropdown user-dropdown">
+                    <button class="d-flex align-items-center text-decoration-none dropdown-toggle border-0 bg-transparent" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+                        <div class="avatar avatar-sm avatar-with-badge me-2">
+                            <img src="/assets/img/user-4.png" alt="User profile" class="avatar-image">
+                            <span class="avatar-status avatar-status-online"></span>
+                        </div>
+                        <span class="d-none d-md-inline">John Admin</span>
+                        
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/settings/profile"><i class="ri-user-line me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings/settings"><i class="ri-settings-line me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/auth/login"><i class="ri-logout-box-line me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

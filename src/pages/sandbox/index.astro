@@ -1,0 +1,225 @@
+---
+// Simple Sandbox Dashboard
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Sandbox - Universal Signature System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .sandbox-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .sandbox-header {
+      background: #1976d2;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .sandbox-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .sandbox-header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .sandbox-content {
+      padding: 3rem;
+    }
+    
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .demo-card {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    
+    .demo-card:hover {
+      border-color: #1976d2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .demo-card h3 {
+      color: #1976d2;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .demo-card p {
+      color: #666;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    
+    .demo-btn {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    .demo-btn:hover {
+      background: #1565c0;
+    }
+    
+    .demo-btn.secondary {
+      background: #757575;
+    }
+    
+    .demo-btn.secondary:hover {
+      background: #616161;
+    }
+    
+    .info-section {
+      background: #e3f2fd;
+      border-left: 4px solid #1976d2;
+      padding: 1.5rem;
+      border-radius: 4px;
+    }
+    
+    .info-section h3 {
+      color: #1976d2;
+      margin-bottom: 1rem;
+    }
+    
+    .info-section p {
+      color: #555;
+      line-height: 1.6;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    
+    .status-active { background: #4caf50; }
+    .status-pending { background: #ff9800; }
+    .status-inactive { background: #9e9e9e; }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .sandbox-content {
+        padding: 2rem 1rem;
+      }
+      
+      .demo-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sandbox-container">
+    <div class="sandbox-header">
+      <h1>🚀 Widget Sandbox</h1>
+      <p>Test and demonstrate the Universal Signature Widget integration</p>
+    </div>
+    
+    <div class="sandbox-content">
+      <div class="demo-grid">
+        <div class="demo-card">
+          <h3>📋 Integration Demo</h3>
+          <p>See how external clients would integrate and use the widget in their own portals.</p>
+          <a href="/sandbox/integration-demo" class="demo-btn">View Integration Demo</a>
+        </div>
+        
+        <div class="demo-card">
+          <h3>🧪 Testing Lab</h3>
+          <p>Test widget functionality directly and get integration code for your sessions.</p>
+          <a href="/sandbox/testing-lab" class="demo-btn">Open Testing Lab</a>
+        </div>
+        
+        <div class="demo-card">
+          <h3>🔑 API Key Management</h3>
+          <p>Manage client credentials, monitor usage, and configure widget access permissions.</p>
+          <a href="/admin/api-keys" class="demo-btn secondary">Manage API Keys</a>
+        </div>
+        
+        <div class="demo-card">
+          <h3>📚 Integration Guide</h3>
+          <p>View documentation and code examples for implementing the widget.</p>
+          <a href="/WIDGET-IMPLEMENTATION-GUIDE.md" class="demo-btn secondary" target="_blank">View Guide</a>
+        </div>
+      </div>
+      
+      <div class="info-section">
+        <h3>🎯 About This Sandbox</h3>
+        <p>
+          This sandbox environment demonstrates the embeddable widget system for external clients. 
+          The widget allows clients to embed Universal Signature System functionality directly into 
+          their own portals, supporting both advocate and victim user roles with seamless integration.
+        </p>
+        <br>
+        <p><strong>Features Demonstrated:</strong></p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.6;">
+          <li>Client authentication via API keys</li>
+          <li>Session creation and management</li>
+          <li>Role-based widget interfaces (advocate/victim)</li>
+          <li>DocuSeal PDF integration</li>
+          <li>Browser form signature capabilities</li>
+          <li>Iframe and JavaScript embedding options</li>
+        </ul>
+      </div>
+      
+      <div style="margin-top: 2rem; text-align: center; color: #666;">
+        <p>
+          <span class="status-indicator status-active"></span>
+          Widget API: Active
+          &nbsp;&nbsp;&nbsp;
+          <span class="status-indicator status-active"></span>
+          DocuSeal Integration: Ready
+          &nbsp;&nbsp;&nbsp;
+          <span class="status-indicator status-active"></span>
+          Session Management: Operational
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

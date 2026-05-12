@@ -1,0 +1,174 @@
+---
+/**
+ * Recruiter Dashboard Home
+ * RBAC Layer 1: Page Wrapper
+ * Shows pipeline overview and stats
+ */
+import RBACComponent from '../../components/RBAC/RBACComponent.astro';
+import { COOKIE_NAME } from '../../lib/constants/constants.js';
+import { RBAC_CONFIG } from '../../lib/configs/rbacConfig.js';
+import { getSession } from '../../lib/auth/session-adapter';
+import { getLoginUrl } from '../../lib/auth/feature-flag';
+
+// Set currentPage constant - MUST match rbacConfig key
+const currentPage = 'dashboard';
+
+console.log("These are the props on dashboard", Astro.props)
+
+// Get Session Cookie Name
+let isLocal = Astro.request.url.split('://')[0];
+let cookieName = COOKIE_NAME;
+
+const LOCAL_URL = process.env.LOCAL_URL;
+const PRODUCTION_URL = process.env.PRODUCTION_URL;
+
+// Use unified session adapter (works with both Xano and Better Auth)
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+    console.log('No session found');
+    return Astro.redirect(getLoginUrl());
+}
+
+// For backward compatibility with Xano flow
+let cookie = Astro.cookies.has(cookieName) ? Astro.cookies.get(cookieName).value : null;
+
+if(isLocal === 'https'){
+  isLocal = PRODUCTION_URL
+} else{
+    console.log("this is localhost")
+    isLocal = LOCAL_URL
+}
+
+// Fetch data for this page from readapi endpoint with encrypted user details
+let readapi;
+
+// Handle Better Auth sessions - use session data directly
+if (session.provider === 'better-auth') {
+	console.log('Using Better Auth session data');
+	readapi = {
+		id: session.user.id,
+		name: session.user.name || '',
+		email: session.user.email,
+		role: session.user.role,
+		authStatus: 'success',
+		fullData: {}
+	};
+} else {
+	// Xano auth - fetch from readapi endpoint
+	try {
+		const response =  await fetch(
+				`${isLocal}/readapi/Reads/dashboard.json?cookie=${cookie}&page=${currentPage}`,{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Origin': 'https://app.data3d.io'
+					},
+					body: JSON.stringify({ cookie })
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data, data.message);
+				if(data.message == 'success'){
+					console.log('success getting data from readapi endpoint')
+					let readApiData = data.data.message
+					let addOnData = data.addOnData[0]
+					let totalData = data.addOnData
+					let dashboardData = {...readApiData, ...addOnData, fullData:totalData}
+					readapi = dashboardData
+					return readapi
+				}else{
+					console.log('error getting data from readapi endpoint')
+				}
+			});
+	} catch (error) {
+		console.error('There was a problem with the fetch operation:', error.message);
+	}
+}
+
+console.log('Dashboard page - readapi data:', readapi);
+
+// Core Page Entity and Event Objects
+let userId = readapi?.id;
+let userRole = readapi?.role;
+
+// Validate role access before passing to RBAC Component
+if (!userRole) {
+    console.log('No role found for user:', userId);
+    return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+    console.log('Invalid role:', userRole, 'for user:', userId);
+    return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+    console.log('Role', userRole, 'does not have access to page:', currentPage);
+    return Astro.redirect('/access-denied?reason=no_access&page=' + currentPage);
+}
+---
+<div class="fade-in">
+    <div id="loader" class="loader"></div>
+    <div id="dashboardContainer" class="hidden">
+        <RBACComponent userRole={userRole} userId={userId} data={readapi} currentPage={currentPage} />	
+    </div>
+
+</div>
+
+<script>
+	setTimeout(() => {
+		document.getElementById('loader').classList.add('hidden');
+		document.getElementById('dashboardContainer').classList.remove('hidden');
+	}, 500); // Page loader spinner set to 500ms
+</script>
+
+
+<style>
+	@keyframes spin {
+	 0% { transform: rotate(0deg); }
+	 100% { transform: rotate(360deg); }
+   }
+   
+   .loader {
+	 border: 16px solid #f3f3f3;
+	 border-top: 16px solid #3498db;
+	 border-radius: 50%;
+	 width: 50px;
+	 height: 50px;
+	 animation: spin 0.5s linear infinite;
+	 position: absolute;
+	 top: 50%;
+	 left: 50%;
+	 transform: translate(-50%, -50%);
+   }
+   
+   .hidden {
+	 display: none;
+   }
+   .wrapper {
+    display: flex;
+    overflow-x: hidden;
+	
+	}
+
+	.content-container {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 100vh;
+	}
+
+	.sticky-top {
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+	}
+
+	.top-nav-adjusted {
+		flex: 0.7;
+	}
+
+</style>
+
+

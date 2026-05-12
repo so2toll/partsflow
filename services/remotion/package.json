@@ -1,0 +1,24 @@
+{
+  "name": "school-counselor-recruitment-video",
+  "version": "1.0.0",
+  "description": "30-second CTV recruitment ad for school counselors/psychologists",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.241",
+    "@remotion/bundler": "4.0.241",
+    "remotion": "4.0.241",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "lucide-react": "0.344.0",
+    "qrcode.react": "3.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.1",
+    "@types/node": "20.11.24",
+    "typescript": "5.3.3"
+  }
+}

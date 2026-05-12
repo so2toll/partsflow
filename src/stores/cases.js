@@ -1,0 +1,28 @@
+import {atom} from "nanostores"
+
+export const createCase = atom({
+    _id:"",
+    name:"",
+    email:"",
+    password:"",
+    phone:"",
+    usertype:"witness",
+    typeOfConcern:"",
+    version:"",
+    priorityLevel:"",
+    witnessName:"",
+    witnessPhone:"",
+    witnessRelationshipWithPerson:"",
+    personName:"",
+    personPhone:"",
+    personRelationshipWithPerson:"",
+    priorityAddress:"",
+    mediaPhotoUpload:"",
+    // comments: "",
+    geoLong:"",
+    geoLat:"",
+    createTime:"",
+    xanoUserId:"",
+    concernCategory:"",
+    // caseStatus:"",
+})

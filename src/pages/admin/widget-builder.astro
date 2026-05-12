@@ -1,0 +1,552 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Widget Configuration Dashboard">
+  <div class="dashboard-container">
+    <div class="header">
+      <h1>Embeddable Widget Builder</h1>
+      <p>Configure and generate embeddable PDF form widgets for your clients</p>
+    </div>
+    
+    <div class="main-content">
+      <div class="config-panel">
+        <div class="section">
+          <h2>Client Configuration</h2>
+          <div class="form-group">
+            <label for="clientId">Client ID</label>
+            <input type="text" id="clientId" placeholder="e.g., client123" value="demo-client" />
+            <small>Unique identifier for this client</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="clientName">Client Name</label>
+            <input type="text" id="clientName" placeholder="e.g., Acme Corp" value="Demo Client" />
+          </div>
+        </div>
+        
+        <div class="section">
+          <h2>Form Configuration</h2>
+          <div class="form-group">
+            <label for="formType">Form Type</label>
+            <select id="formType">
+              <option value="tax-form">Tax Document</option>
+              <option value="benefits-app">Benefits Application</option>
+              <option value="permit-request">Permit Request</option>
+              <option value="custom">Custom Form</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="docusealTemplate">DocuSeal Template ID</label>
+            <input type="text" id="docusealTemplate" placeholder="Template ID from DocuSeal" />
+            <small>The PDF template configured in your DocuSeal account</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="formTitle">Widget Title</label>
+            <input type="text" id="formTitle" placeholder="e.g., Tax Document Submission" value="Complete Your Form" />
+          </div>
+          
+          <div class="form-group">
+            <label for="formDescription">Widget Description</label>
+            <textarea id="formDescription" placeholder="Instructions for the end user" rows="3">Please fill out all required fields and sign where indicated. Your information will be securely processed.</textarea>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h2>Widget Customization</h2>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="primaryColor">Primary Color</label>
+              <input type="color" id="primaryColor" value="#4CAF50" />
+            </div>
+            
+            <div class="form-group">
+              <label for="accentColor">Accent Color</label>
+              <input type="color" id="accentColor" value="#2196F3" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="widgetHeight">Widget Height</label>
+            <select id="widgetHeight">
+              <option value="400">400px</option>
+              <option value="600" selected>600px</option>
+              <option value="800">800px</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="showLogo" checked />
+              Show your company logo
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="whiteLabel" />
+              White label (remove your branding)
+            </label>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h2>Submission Settings</h2>
+          <div class="form-group">
+            <label for="webhookUrl">Webhook URL (Optional)</label>
+            <input type="url" id="webhookUrl" placeholder="https://client.com/webhook" />
+            <small>Get notified when forms are submitted</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="successMessage">Success Message</label>
+            <textarea id="successMessage" rows="2">Thank you! Your form has been submitted successfully. You will receive confirmation shortly.</textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="redirectUrl">Redirect URL (Optional)</label>
+            <input type="url" id="redirectUrl" placeholder="https://client.com/success" />
+            <small>Redirect user after successful submission</small>
+          </div>
+        </div>
+        
+        <div class="actions">
+          <button id="generateWidget" class="btn-primary">Generate Widget</button>
+          <button id="previewWidget" class="btn-secondary">Preview Widget</button>
+        </div>
+      </div>
+      
+      <div class="preview-panel">
+        <div class="preview-header">
+          <h3>Widget Preview</h3>
+          <span class="preview-url" id="previewUrl">Generate widget to see preview</span>
+        </div>
+        
+        <div class="preview-frame">
+          <div class="iframe-container">
+            <iframe id="widgetPreview" src="about:blank"></iframe>
+          </div>
+        </div>
+        
+        <div class="embed-code-section" id="embedCodeSection" style="display: none;">
+          <h4>Embed Code</h4>
+          <div class="code-block">
+            <textarea id="embedCode" readonly></textarea>
+            <button id="copyEmbedCode" class="btn-copy">Copy Code</button>
+          </div>
+          
+          <h4>Widget URL</h4>
+          <div class="url-block">
+            <input type="text" id="widgetUrl" readonly />
+            <button id="copyWidgetUrl" class="btn-copy">Copy URL</button>
+          </div>
+          
+          <div class="integration-notes">
+            <h4>Integration Notes</h4>
+            <ul>
+              <li>Widget is responsive and mobile-friendly</li>
+              <li>HTTPS required for iframe embedding</li>
+              <li>Completed forms appear in your admin dashboard</li>
+              <li>Webhooks fire on form completion (if configured)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .dashboard-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 2rem;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .header h1 {
+    color: #1976d2;
+    margin-bottom: 0.5rem;
+  }
+  
+  .header p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+  
+  .config-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: fit-content;
+  }
+  
+  .section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .form-group input[type="color"] {
+    height: 50px;
+    padding: 0.25rem;
+  }
+  
+  .form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+  }
+  
+  .form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .btn-primary {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+  }
+  
+  .btn-primary:hover {
+    background: #45a049;
+  }
+  
+  .btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+  }
+  
+  .btn-secondary:hover {
+    background: #e0e0e0;
+  }
+  
+  .preview-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: fit-content;
+  }
+  
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .preview-header h3 {
+    color: #333;
+    margin: 0;
+  }
+  
+  .preview-url {
+    font-size: 0.875rem;
+    color: #666;
+    font-family: monospace;
+  }
+  
+  .preview-frame {
+    margin-bottom: 2rem;
+  }
+  
+  .iframe-container {
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 400px;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+  
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .embed-code-section h4 {
+    color: #333;
+    margin: 1.5rem 0 0.5rem 0;
+    font-size: 1.1rem;
+  }
+  
+  .code-block,
+  .url-block {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .code-block textarea,
+  .url-block input {
+    width: 100%;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .url-block input {
+    min-height: auto;
+    padding-right: 100px;
+  }
+  
+  .btn-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+  
+  .btn-copy:hover {
+    background: #1976d2;
+  }
+  
+  .integration-notes {
+    background: #e3f2fd;
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-top: 1.5rem;
+  }
+  
+  .integration-notes h4 {
+    color: #1565c0;
+    margin: 0 0 1rem 0;
+  }
+  
+  .integration-notes ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #1565c0;
+  }
+  
+  .integration-notes li {
+    margin-bottom: 0.5rem;
+  }
+  
+  @media (max-width: 1024px) {
+    .main-content {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Form elements
+  const clientId = document.getElementById('clientId');
+  const formType = document.getElementById('formType');
+  const generateBtn = document.getElementById('generateWidget');
+  const previewBtn = document.getElementById('previewWidget');
+  const embedCodeSection = document.getElementById('embedCodeSection');
+  const embedCode = document.getElementById('embedCode');
+  const widgetUrl = document.getElementById('widgetUrl');
+  const previewUrl = document.getElementById('previewUrl');
+  const widgetPreview = document.getElementById('widgetPreview');
+  
+  // Generate widget configuration
+  function getWidgetConfig() {
+    return {
+      clientId: clientId.value,
+      clientName: document.getElementById('clientName').value,
+      formType: formType.value,
+      docusealTemplate: document.getElementById('docusealTemplate').value,
+      formTitle: document.getElementById('formTitle').value,
+      formDescription: document.getElementById('formDescription').value,
+      primaryColor: document.getElementById('primaryColor').value,
+      accentColor: document.getElementById('accentColor').value,
+      widgetHeight: document.getElementById('widgetHeight').value,
+      showLogo: document.getElementById('showLogo').checked,
+      whiteLabel: document.getElementById('whiteLabel').checked,
+      webhookUrl: document.getElementById('webhookUrl').value,
+      successMessage: document.getElementById('successMessage').value,
+      redirectUrl: document.getElementById('redirectUrl').value
+    };
+  }
+  
+  // Generate widget
+  generateBtn.addEventListener('click', async () => {
+    const config = getWidgetConfig();
+    
+    if (!config.clientId || !config.formType) {
+      alert('Please fill in required fields: Client ID and Form Type');
+      return;
+    }
+    
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
+    
+    try {
+      // Save widget configuration
+      const response = await fetch('/createapi/widget-create.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create widget');
+      }
+      
+      const result = await response.json();
+      const widgetUrlValue = `${window.location.origin}/widget/${config.clientId}/${config.formType}`;
+      
+      // Update UI
+      widgetUrl.value = widgetUrlValue;
+      previewUrl.textContent = widgetUrlValue;
+      
+      // Generate embed code
+      const height = config.widgetHeight === 'auto' ? '600' : config.widgetHeight;
+      embedCode.value = `<iframe
+  src="${widgetUrlValue}"
+  width="100%"
+  height="${height}px"
+  frameborder="0"
+  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+</iframe>`;
+      
+      // Show embed code section
+      embedCodeSection.style.display = 'block';
+      
+      // Update preview
+      widgetPreview.src = widgetUrlValue;
+      
+    } catch (error) {
+      console.error('Error generating widget:', error);
+      alert('Failed to generate widget. Please try again.');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate Widget';
+    }
+  });
+  
+  // Preview widget
+  previewBtn.addEventListener('click', () => {
+    const config = getWidgetConfig();
+    const widgetUrlValue = `${window.location.origin}/widget/${config.clientId}/${config.formType}?preview=true`;
+    
+    widgetPreview.src = widgetUrlValue;
+    previewUrl.textContent = widgetUrlValue;
+  });
+  
+  // Copy embed code
+  document.getElementById('copyEmbedCode').addEventListener('click', () => {
+    embedCode.select();
+    document.execCommand('copy');
+    
+    const btn = document.getElementById('copyEmbedCode');
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  });
+  
+  // Copy widget URL
+  document.getElementById('copyWidgetUrl').addEventListener('click', () => {
+    widgetUrl.select();
+    document.execCommand('copy');
+    
+    const btn = document.getElementById('copyWidgetUrl');
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  });
+  
+  // Auto-generate client ID from name
+  document.getElementById('clientName').addEventListener('input', (e) => {
+    if (!clientId.value || clientId.value === 'demo-client') {
+      const slug = e.target.value.toLowerCase()
+        .replace(/[^\w\s]/gi, '')
+        .replace(/\s+/g, '-');
+      clientId.value = slug || 'demo-client';
+    }
+  });
+</script>

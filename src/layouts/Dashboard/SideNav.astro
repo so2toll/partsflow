@@ -1,0 +1,113 @@
+---
+// import { Icon } from 'astro-icon'
+// import {SearchDropdown} from '../../components/Selects/SearchDropdownTemplate.jsx';
+let testData = ['Demo', ] 
+---
+
+<div class="sidebar" id="sidebar" data-theme="light" style="background:#fecc180d">
+  <!-- Sidebar Header with Logo -->
+  <div class="sidebar-header">
+      <div class="logo-container">
+          <!-- Light Theme Logos -->
+          <img src="/assets/img/logo-main.svg" alt="CarPool" class="logo-full logo-light" style="height:80px;">
+          <img src="/assets/img/logo-icon.svg" alt="CarPool" class="logo-icon logo-light">
+          
+          <!-- Dark Theme Logos -->
+          <img src="/assets/img/logo-white.svg" alt="CarPool" class="logo-full logo-dark">
+          <img src="/assets/img/logo-icon-white.svg" alt="CarPool" class="logo-icon logo-dark">
+      </div>
+      <button class="btn d-md-none" id="close-sidebar">
+          <i class="ri-close-line"></i>
+      </button>
+  </div>
+  
+  <!-- Sidebar Menu -->
+  <div class="sidebar-menu">
+      <ul>
+          <li>
+              <a href="/dashboard">
+                  <i class="ri-dashboard-line"></i>
+                  <span>Dashboard</span>
+              </a>
+          </li>
+
+          <!-- App Section -->
+          <li class="has-dropdown">
+              <a href="#appMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="appMenu">
+                  <i class="ri-video-line"></i>
+                  <span>App</span>
+                  <i class="ri-arrow-down-s-line ms-auto"></i>
+              </a>
+              <ul class="collapse submenu" id="appMenu">
+                  <li><a href="/app/dashboard">Dashboard</a></li>
+                  <li><a href="/app/projects">Projects</a></li>
+                  <li><a href="/app/teams">Teams</a></li>
+              </ul>
+          </li>
+
+            <!-- Bookings Section -->
+          <li>
+            <a href="/booking">
+                <i class="ri-calendar-line"></i>
+                <span>Bookings</span>
+            </a>
+        </li>
+
+         <!-- Rides Section -->
+         <li>
+            <a href="/rides">
+                <i class="ri-steering-line"></i>
+                <span>Rides</span>
+            </a>
+        </li>
+
+         <!-- Tracking Section -->
+         <li>
+            <a href="/tracking">
+                <i class="ri-map-pin-line"></i>
+                <span>Tracking</span>
+            </a>
+        </li>
+
+         <!-- Activity Section -->
+         <li>
+            <a href="/activity">
+                <i class="ri-route-line"></i>
+                <span>Activity</span>
+            </a>
+        </li>
+    
+        
+
+          <!-- Settings Section -->
+          <li class="has-dropdown">
+              <a href="#settingsMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="settingsMenu">
+                  <i class="ri-settings-line"></i>
+                  <span>Settings</span>
+                  <i class="ri-arrow-down-s-line ms-auto"></i>
+              </a>
+              <ul class="collapse submenu" id="settingsMenu">
+                  <li><a href="/settings">General Settings</a></li>
+                  <li><a href="/profile">Profile</a></li>
+              </ul>
+          </li>
+      </ul>
+  </div>
+  
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+      <div class="d-flex justify-content-between align-items-center">
+          <a href="/settings/profile" class="d-flex align-items-center w-100" title="User Profile">
+              <div class="avatar avatar-sm me-3">
+                  <img src="/assets/img/headshot_32x32.png" alt="User Avatar" class="rounded-circle">
+                  
+              </div>
+              <div class="user-info">
+                  <span class="fw-medium">John Doe</span>
+                  <small class="d-block text-muted">Passenger</small>
+              </div>
+          </a>
+      </div>
+  </div>
+
+</div>

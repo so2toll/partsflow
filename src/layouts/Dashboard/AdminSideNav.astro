@@ -1,0 +1,142 @@
+---
+// import { Icon } from 'astro-icon'
+// import {SearchDropdown} from '../../components/Selects/SearchDropdownTemplate.jsx';
+let testData = ['Demo', ] 
+---
+
+<div class="sidebar" id="sidebar" data-theme="light" style="background:#fecc180d">
+  <!-- Sidebar Header with Logo -->
+  <div class="sidebar-header">
+      <div class="logo-container">
+          <!-- Light Theme Logos -->
+          <img src="/assets/img/logo-main.svg" alt="CarPool" class="logo-full logo-light" style="height:80px;">
+          <img src="/assets/img/logo-icon.svg" alt="CarPool" class="logo-icon logo-light">
+          
+          <!-- Dark Theme Logos -->
+          <img src="/assets/img/logo-white.svg" alt="CarPool" class="logo-full logo-dark">
+          <img src="/assets/img/logo-icon-white.svg" alt="CarPool" class="logo-icon logo-dark">
+      </div>
+      <button class="btn d-md-none" id="close-sidebar">
+          <i class="ri-close-line"></i>
+      </button>
+  </div>
+  <!-- Driver Management - Onboarding, Documents, Ratings&Reviews, Vehicles, 
+   Rides - requests, schedule, active rides, 
+   Operations - Analytics, Reveue reports, Expense Tracking, Driver Payouts  -->
+  <!-- Sidebar Menu -->
+  <div class="sidebar-menu">
+      <ul>
+          <li>
+              <a href="/dashboard/admin">
+                  <i class="ri-dashboard-line"></i>
+                  <span>Dashboard</span>
+              </a>
+          </li>
+
+             <!-- Rides Section -->
+             <li class="has-dropdown">
+                <a href="#tripMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="tripMenu">
+                    <i class="ri-settings-5-line"></i>
+                    <span>Trip Management</span>
+                    <i class="ri-arrow-down-s-line ms-auto"></i>
+                </a>
+                <ul class="collapse submenu" id="tripMenu">
+                    <li><a href="/operations/analytics">Real-time Monitoring</a></li>
+                    <li><a href="/operations/analytics">Manage Rides</a></li>
+                    <li><a href="/operations/fleet-management">Schedules</a></li>
+                    <li><a href="/operations/rides">Activity Logs</a></li>
+                    <li><a href="/operations/maps">Maps</a></li>
+                </ul>
+            </li>
+    
+          <!-- Driver Management Section -->
+          <li class="has-dropdown">
+              <a href="#driverMenu" data-bs-toggle="collapse">
+                  <i class="ri-steering-line"></i>
+                  <span>Driver Management</span>
+                  <i class="ri-arrow-down-s-line ms-auto"></i>
+              </a>
+              <ul class="collapse" id="driverMenu">
+                  <li><a href="/driver-management/driver-onboarding">Onboarding</a></li>
+                  <!-- <li><a href="/driver-management/driver-verification">Verification</a></li> -->
+                  <li><a href="/driver-management/driver-documents">Documents</a></li>
+                  <!-- <li><a href="/driver-management/driver-training">Training</a></li> -->
+                  <li><a href="/driver-management/driver-ratings">Ratings & Reviews</a></li>
+                  <!-- <li><a href="/driver-management/drivers">Drivers List</a></li> -->
+                  <li><a href="/driver-management/driver-schedule">Fleet Management</a></li>
+                  <!-- <li><a href="/driver-management/drivers-earnings">Earnings</a></li> -->
+                  <!-- <li><a href="/driver-management/vehicle-management">Vehicles</a></li> -->
+              </ul>
+          </li>
+
+        
+          <!-- Operations Section -->
+          <li class="has-dropdown">
+              <a href="#operationsMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="operationsMenu">
+                  <i class="ri-settings-5-line"></i>
+                  <span>Operations</span>
+                  <i class="ri-arrow-down-s-line ms-auto"></i>
+              </a>
+              <ul class="collapse submenu" id="operationsMenu">
+                  <li><a href="/operations/analytics">Analytics</a></li>
+                  <li><a href="/financial/revenue-reports">Reports</a></li>
+                  <li><a href="/financial/driver-payouts">User & Fleet Management</a></li>
+                  <li><a href="/financial/expense-tracking">Expense Tracking</a></li>
+                  <li><a href="/financial/driver-payouts">Notifications</a></li>
+                  
+                  <li><a href="/financial/payments">Payments</a></li>
+                 
+              </ul>
+          </li>
+
+           <!-- Operations Section -->
+           <li class="has-dropdown">
+            <a href="#customerServiceMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="customerServiceMenu">
+                <i class="ri-settings-5-line"></i>
+                <span>Customer Service</span>
+                <i class="ri-arrow-down-s-line ms-auto"></i>
+            </a>
+            <ul class="collapse submenu" id="customerServiceMenu">
+                <li><a href="/operations/analytics">Support Tickets</a></li>
+                <li><a href="/financial/revenue-reports">Feedback</a></li>
+                <li><a href="/financial/driver-payouts">Communication</a></li>
+                <li><a href="/financial/expense-tracking">Expense Tracking</a></li>
+                <li><a href="/financial/driver-payouts">Notifications</a></li>
+               
+               
+            </ul>
+        </li>
+
+          <!-- Settings Section -->
+          <li class="has-dropdown">
+              <a href="#settingsMenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="settingsMenu">
+                  <i class="ri-settings-line"></i>
+                  <span>Settings</span>
+                  <i class="ri-arrow-down-s-line ms-auto"></i>
+              </a>
+              <ul class="collapse submenu" id="settingsMenu">
+                  <li><a href="/settings/admin">General Settings</a></li>
+                  <li><a href="/profile/admin">Preferences</a></li>
+                
+              
+              </ul>
+          </li>
+      </ul>
+  </div>
+  
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+      <div class="d-flex justify-content-between align-items-center">
+          <a href="/settings/profile" class="d-flex align-items-center w-100" title="User Profile">
+              <div class="avatar avatar-sm me-3">
+                  <img src="/assets/img/headshot_32x32.png" alt="User Avatar" class="rounded-circle">
+              </div>
+              <div class="user-info">
+                  <span class="fw-medium">John Driver</span>
+                  <small class="d-block text-muted">Driver</small>
+              </div>
+          </a>
+      </div>
+  </div>
+
+</div>

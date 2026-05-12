@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "types": {
+    "button": {
+      "base": "btn",
+      "variants": {
+        "default": "btn-primary",
+        "secondary": "btn-secondary",
+        "outline": "btn-outline",
+        "ghost": "btn-ghost",
+        "link": "btn-tertiary"
+      }
+    }
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}

@@ -1,0 +1,589 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Form Submissions Dashboard">
+  <div class="dashboard-container">
+    <div class="header">
+      <h1>Form Submissions Dashboard</h1>
+      <p>Review and manage submitted forms from your embedded widgets</p>
+    </div>
+    
+    <div class="toolbar">
+      <div class="filters">
+        <select id="clientFilter">
+          <option value="">All Clients</option>
+        </select>
+        
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending Review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        
+        <button id="refreshBtn" class="btn-secondary">Refresh</button>
+      </div>
+      
+      <div class="stats">
+        <div class="stat-card">
+          <span class="stat-number" id="totalSubmissions">0</span>
+          <span class="stat-label">Total Submissions</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="pendingSubmissions">0</span>
+          <span class="stat-label">Pending Review</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="submissions-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Submission ID</th>
+            <th>Client</th>
+            <th>Form Type</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="submissionsTableBody">
+          <tr>
+            <td colspan="6" class="no-data">Loading submissions...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Submission Detail Modal -->
+    <div id="submissionModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Submission Details</h2>
+          <button id="closeModal" class="close-btn">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="submission-info">
+            <div class="info-group">
+              <label>Submission ID:</label>
+              <span id="modalSubmissionId"></span>
+            </div>
+            
+            <div class="info-group">
+              <label>Client:</label>
+              <span id="modalClientId"></span>
+            </div>
+            
+            <div class="info-group">
+              <label>Form Type:</label>
+              <span id="modalFormType"></span>
+            </div>
+            
+            <div class="info-group">
+              <label>Submitted:</label>
+              <span id="modalSubmittedAt"></span>
+            </div>
+          </div>
+          
+          <div class="form-data">
+            <h3>Form Data</h3>
+            <div id="modalFormData"></div>
+          </div>
+          
+          <div class="signature-preview" id="modalSignature" style="display: none;">
+            <h3>Electronic Signature</h3>
+            <img id="modalSignatureImg" alt="Signature" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+          
+          <div class="review-actions">
+            <h3>Review Actions</h3>
+            <div class="action-buttons">
+              <button id="approveBtn" class="btn-approve">Approve</button>
+              <button id="rejectBtn" class="btn-reject">Reject</button>
+              <button id="downloadBtn" class="btn-secondary">Download PDF</button>
+            </div>
+            
+            <div class="review-notes">
+              <label for="reviewNotes">Review Notes:</label>
+              <textarea id="reviewNotes" placeholder="Add notes about this submission..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .dashboard-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 2rem;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .header h1 {
+    color: #1976d2;
+    margin-bottom: 0.5rem;
+  }
+  
+  .header p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .filters select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .stats {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .stat-card {
+    text-align: center;
+  }
+  
+  .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1976d2;
+  }
+  
+  .stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+  
+  .submissions-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  thead {
+    background: #f8f9fa;
+  }
+  
+  th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  th {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .status-pending {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  
+  .status-approved {
+    background: #e8f5e8;
+    color: #2e7d32;
+  }
+  
+  .status-rejected {
+    background: #ffebee;
+    color: #c62828;
+  }
+  
+  .action-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+  }
+  
+  .btn-view {
+    background: #2196F3;
+    color: white;
+  }
+  
+  .no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .submission-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+  
+  .info-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .info-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+  }
+  
+  .form-data,
+  .signature-preview,
+  .review-actions {
+    margin-bottom: 2rem;
+  }
+  
+  .form-data h3,
+  .signature-preview h3,
+  .review-actions h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .form-data-item {
+    display: flex;
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .form-data-item:last-child {
+    border-bottom: none;
+  }
+  
+  .form-data-label {
+    font-weight: 500;
+    color: #555;
+    width: 150px;
+    flex-shrink: 0;
+  }
+  
+  .form-data-value {
+    flex: 1;
+    color: #333;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-approve {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btn-reject {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .review-notes textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+  }
+</style>
+
+<script>
+  let submissions = [];
+  let currentSubmission = null;
+  
+  // Load submissions on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSubmissions();
+    setupEventListeners();
+  });
+  
+  async function loadSubmissions() {
+    try {
+      const response = await fetch('/readapi/widget-submissions.json');
+      if (response.ok) {
+        submissions = await response.json();
+        renderSubmissions();
+        updateStats();
+      } else {
+        console.error('Failed to load submissions');
+      }
+    } catch (error) {
+      console.error('Error loading submissions:', error);
+      // Show demo data for testing
+      showDemoData();
+    }
+  }
+  
+  function showDemoData() {
+    submissions = [
+      {
+        id: 'widget_demo_123',
+        clientId: 'demo-client',
+        formType: 'tax-form',
+        submittedAt: new Date().toISOString(),
+        reviewStatus: 'pending',
+        data: {
+          fullName: 'John Doe',
+          ssn: '***-**-1234',
+          address: '123 Main St, New York, NY 10001',
+          filingStatus: 'single',
+          signature: 'data:image/png;base64,demo-signature-data'
+        }
+      }
+    ];
+    renderSubmissions();
+    updateStats();
+  }
+  
+  function renderSubmissions() {
+    const tbody = document.getElementById('submissionsTableBody');
+    
+    if (submissions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="no-data">No submissions found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = submissions.map(submission => `
+      <tr>
+        <td>${submission.id}</td>
+        <td>${submission.clientId}</td>
+        <td>${submission.formType}</td>
+        <td>${formatDate(submission.submittedAt)}</td>
+        <td>
+          <span class="status-badge status-${submission.reviewStatus}">
+            ${submission.reviewStatus || 'pending'}
+          </span>
+        </td>
+        <td>
+          <button class="action-btn btn-view" onclick="viewSubmission('${submission.id}')">
+            View Details
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  function updateStats() {
+    document.getElementById('totalSubmissions').textContent = submissions.length;
+    document.getElementById('pendingSubmissions').textContent = 
+      submissions.filter(s => s.reviewStatus === 'pending').length;
+  }
+  
+  function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString() + ' ' + 
+           new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  
+  window.viewSubmission = function(submissionId) {
+    currentSubmission = submissions.find(s => s.id === submissionId);
+    if (!currentSubmission) return;
+    
+    // Populate modal
+    document.getElementById('modalSubmissionId').textContent = currentSubmission.id;
+    document.getElementById('modalClientId').textContent = currentSubmission.clientId;
+    document.getElementById('modalFormType').textContent = currentSubmission.formType;
+    document.getElementById('modalSubmittedAt').textContent = formatDate(currentSubmission.submittedAt);
+    
+    // Show form data
+    const formDataContainer = document.getElementById('modalFormData');
+    formDataContainer.innerHTML = Object.entries(currentSubmission.data)
+      .filter(([key]) => key !== 'signature')
+      .map(([key, value]) => `
+        <div class="form-data-item">
+          <div class="form-data-label">${formatFieldName(key)}:</div>
+          <div class="form-data-value">${value}</div>
+        </div>
+      `).join('');
+    
+    // Show signature if available
+    if (currentSubmission.data.signature) {
+      document.getElementById('modalSignature').style.display = 'block';
+      document.getElementById('modalSignatureImg').src = currentSubmission.data.signature;
+    } else {
+      document.getElementById('modalSignature').style.display = 'none';
+    }
+    
+    // Show modal
+    document.getElementById('submissionModal').style.display = 'flex';
+  }
+  
+  function formatFieldName(key) {
+    return key.replace(/([A-Z])/g, ' $1')
+              .replace(/^./, str => str.toUpperCase());
+  }
+  
+  function setupEventListeners() {
+    // Close modal
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('submissionModal').style.display = 'none';
+    });
+    
+    // Approve submission
+    document.getElementById('approveBtn').addEventListener('click', () => {
+      updateSubmissionStatus('approved');
+    });
+    
+    // Reject submission
+    document.getElementById('rejectBtn').addEventListener('click', () => {
+      updateSubmissionStatus('rejected');
+    });
+    
+    // Refresh submissions
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      loadSubmissions();
+    });
+  }
+  
+  async function updateSubmissionStatus(status) {
+    if (!currentSubmission) return;
+    
+    try {
+      const response = await fetch('/createapi/submission-review.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId: currentSubmission.id,
+          status,
+          notes: document.getElementById('reviewNotes').value
+        })
+      });
+      
+      if (response.ok) {
+        // Update local data
+        currentSubmission.reviewStatus = status;
+        
+        // Refresh display
+        renderSubmissions();
+        updateStats();
+        
+        // Close modal
+        document.getElementById('submissionModal').style.display = 'none';
+        
+        alert(`Submission ${status} successfully!`);
+      } else {
+        throw new Error('Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error updating submission:', error);
+      alert('Failed to update submission status');
+    }
+  }
+  
+  // Close modal on background click
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'submissionModal') {
+      document.getElementById('submissionModal').style.display = 'none';
+    }
+  });
+</script>

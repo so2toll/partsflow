@@ -1,0 +1,842 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Component receives props from RBAC system
+const { userId, userRole, data } = Astro.props;
+
+console.log('API Keys admin component loaded for user:', userId, 'role:', userRole);
+---
+
+<Layout title="API Key Management - Admin">
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>🔑 API Key Management</h1>
+      <p>Manage client credentials for widget integration</p>
+      <button id="createClientBtn" class="btn btn-primary">
+        <span>+</span> Create New Client
+      </button>
+    </div>
+    
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-value" id="totalClientsCount">-</div>
+        <div class="stat-label">Total Clients</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeClientsCount">-</div>
+        <div class="stat-label">Active Clients</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalUsageCount">-</div>
+        <div class="stat-label">Total API Calls</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="revokedClientsCount">-</div>
+        <div class="stat-label">Revoked Clients</div>
+      </div>
+    </div>
+    
+    <div class="clients-section">
+      <div class="section-header">
+        <h2>Client Credentials</h2>
+        <button id="refreshClientsBtn" class="btn btn-secondary">
+          🔄 Refresh
+        </button>
+      </div>
+      
+      <div class="clients-table-container">
+        <table class="clients-table" id="clientsTable">
+          <thead>
+            <tr>
+              <th>Client ID</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Last Used</th>
+              <th>Usage</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTableBody">
+            <tr>
+              <td colspan="7" class="loading-row">Loading clients...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Create Client Modal -->
+    <div id="createClientModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Client</h3>
+          <button id="closeCreateModal" class="btn-close">&times;</button>
+        </div>
+        <form id="createClientForm" class="modal-body">
+          <div class="form-group">
+            <label for="clientName">Client Name *</label>
+            <input type="text" id="clientName" required placeholder="e.g. Acme Corporation">
+            <small>Will be used to generate the client ID</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="allowedDomains">Allowed Domains</label>
+            <textarea id="allowedDomains" placeholder="example.com&#10;portal.example.com&#10;One domain per line"></textarea>
+            <small>Domains that can make API requests (leave empty for any domain)</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="webhookUrl">Webhook URL (Optional)</label>
+            <input type="url" id="webhookUrl" placeholder="https://example.com/webhooks/signature">
+            <small>URL to receive completion notifications</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="brandingColor">Primary Color</label>
+            <input type="color" id="brandingColor" value="#1976d2">
+            <small>Primary color for widget branding</small>
+          </div>
+        </form>
+        <div class="modal-footer">
+          <button type="button" id="cancelCreate" class="btn btn-secondary">Cancel</button>
+          <button type="submit" form="createClientForm" id="submitCreate" class="btn btn-primary">Create Client</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Client Details Modal -->
+    <div id="clientDetailsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Client Details</h3>
+          <button id="closeDetailsModal" class="btn-close">&times;</button>
+        </div>
+        <div class="modal-body" id="clientDetailsContent">
+          <!-- Content loaded dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="closeDetails" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script define:vars={{ userId }}>
+  let clients = [];
+  let stats = {};
+  
+  // Initialize page
+  document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    loadClients();
+    loadStats();
+  });
+  
+  function setupEventListeners() {
+    // Create client button
+    document.getElementById('createClientBtn').addEventListener('click', openCreateModal);
+    
+    // Modal controls
+    document.getElementById('closeCreateModal').addEventListener('click', closeCreateModal);
+    document.getElementById('cancelCreate').addEventListener('click', closeCreateModal);
+    document.getElementById('closeDetailsModal').addEventListener('click', closeDetailsModal);
+    document.getElementById('closeDetails').addEventListener('click', closeDetailsModal);
+    
+    // Form submission
+    document.getElementById('createClientForm').addEventListener('submit', handleCreateClient);
+    
+    // Refresh button
+    document.getElementById('refreshClientsBtn').addEventListener('click', () => {
+      loadClients();
+      loadStats();
+    });
+    
+    // Close modals on outside click
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+      }
+    });
+  }
+  
+  async function loadClients() {
+    try {
+      const response = await fetch('/readapi/admin/clients.json');
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        clients = result.data.clients || [];
+        renderClientsTable();
+      } else {
+        console.error('Failed to load clients:', result.error);
+        showError('Failed to load clients');
+      }
+    } catch (error) {
+      console.error('Error loading clients:', error);
+      showError('Error loading clients');
+    }
+  }
+  
+  async function loadStats() {
+    try {
+      const response = await fetch('/readapi/admin/client-stats.json');
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        stats = result.data.stats || {};
+        renderStats();
+      } else {
+        console.error('Failed to load stats:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+  
+  function renderStats() {
+    document.getElementById('totalClientsCount').textContent = stats.totalClients || 0;
+    document.getElementById('activeClientsCount').textContent = stats.activeClients || 0;
+    document.getElementById('totalUsageCount').textContent = stats.totalUsage || 0;
+    document.getElementById('revokedClientsCount').textContent = stats.revokedClients || 0;
+  }
+  
+  function renderClientsTable() {
+    const tbody = document.getElementById('clientsTableBody');
+    
+    if (clients.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="no-data">No clients found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = clients.map(client => `
+      <tr>
+        <td><code>${client.clientId}</code></td>
+        <td>${client.name}</td>
+        <td><span class="status ${client.status}">${client.status}</span></td>
+        <td>${new Date(client.createdAt).toLocaleDateString()}</td>
+        <td>${client.lastUsed ? new Date(client.lastUsed).toLocaleDateString() : 'Never'}</td>
+        <td>${client.usageCount || 0}</td>
+        <td class="actions">
+          <button onclick="viewClient('${client.clientId}')" class="btn-small btn-info">View</button>
+          ${client.status === 'active' ? 
+            `<button onclick="revokeClient('${client.clientId}')" class="btn-small btn-danger">Revoke</button>` :
+            `<button onclick="reactivateClient('${client.clientId}')" class="btn-small btn-success">Reactivate</button>`
+          }
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  function openCreateModal() {
+    document.getElementById('createClientModal').style.display = 'flex';
+    document.getElementById('clientName').focus();
+  }
+  
+  function closeCreateModal() {
+    document.getElementById('createClientModal').style.display = 'none';
+    document.getElementById('createClientForm').reset();
+  }
+  
+  function closeDetailsModal() {
+    document.getElementById('clientDetailsModal').style.display = 'none';
+  }
+  
+  async function handleCreateClient(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitCreate');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Creating...';
+    submitBtn.disabled = true;
+    
+    try {
+      const formData = {
+        name: document.getElementById('clientName').value.trim(),
+        allowedDomains: document.getElementById('allowedDomains').value
+          .split('\n')
+          .map(d => d.trim())
+          .filter(d => d.length > 0),
+        webhookUrl: document.getElementById('webhookUrl').value.trim() || null,
+        branding: {
+          primaryColor: document.getElementById('brandingColor').value
+        }
+      };
+      
+      const response = await fetch('/createapi/admin/create-client.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        closeCreateModal();
+        loadClients();
+        loadStats();
+        showSuccess('Client created successfully!');
+        
+        // Show the new client details
+        setTimeout(() => viewClient(result.data.client.clientId), 500);
+      } else {
+        showError(result.error || 'Failed to create client');
+      }
+      
+    } catch (error) {
+      console.error('Error creating client:', error);
+      showError('Error creating client');
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  }
+  
+  window.viewClient = async (clientId) => {
+    const client = clients.find(c => c.clientId === clientId);
+    if (!client) return;
+    
+    const content = `
+      <div class="client-details">
+        <div class="detail-group">
+          <label>Client ID</label>
+          <div class="detail-value">
+            <code>${client.clientId}</code>
+            <button onclick="copyToClipboard('${client.clientId}')" class="btn-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Client Secret</label>
+          <div class="detail-value">
+            <code class="secret">${client.clientSecret}</code>
+            <button onclick="copyToClipboard('${client.clientSecret}')" class="btn-copy">Copy</button>
+            <button onclick="regenerateSecret('${client.clientId}')" class="btn-small btn-warning">Regenerate</button>
+          </div>
+          <small class="warning">⚠️ Keep this secret secure - treat it like a password</small>
+        </div>
+        
+        <div class="detail-group">
+          <label>Name</label>
+          <div class="detail-value">${client.name}</div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Status</label>
+          <div class="detail-value">
+            <span class="status ${client.status}">${client.status}</span>
+          </div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Allowed Domains</label>
+          <div class="detail-value">
+            ${client.allowedDomains.length > 0 ? 
+              client.allowedDomains.map(d => `<code>${d}</code>`).join(', ') : 
+              '<em>Any domain allowed</em>'
+            }
+          </div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Webhook URL</label>
+          <div class="detail-value">
+            ${client.settings.webhookUrl ? 
+              `<code>${client.settings.webhookUrl}</code>` : 
+              '<em>No webhook configured</em>'
+            }
+          </div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Usage Statistics</label>
+          <div class="detail-value">
+            <strong>${client.usageCount || 0}</strong> API calls<br>
+            <small>Last used: ${client.lastUsed ? new Date(client.lastUsed).toLocaleString() : 'Never'}</small>
+          </div>
+        </div>
+        
+        <div class="detail-group">
+          <label>Created</label>
+          <div class="detail-value">${new Date(client.createdAt).toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('clientDetailsContent').innerHTML = content;
+    document.getElementById('clientDetailsModal').style.display = 'flex';
+  };
+  
+  window.revokeClient = async (clientId) => {
+    if (!confirm('Are you sure you want to revoke this client? This will immediately disable all API access.')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch('/createapi/admin/revoke-client.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        loadClients();
+        loadStats();
+        showSuccess('Client revoked successfully');
+      } else {
+        showError(result.error || 'Failed to revoke client');
+      }
+    } catch (error) {
+      console.error('Error revoking client:', error);
+      showError('Error revoking client');
+    }
+  };
+  
+  window.reactivateClient = async (clientId) => {
+    try {
+      const response = await fetch('/createapi/admin/update-client.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, updates: { status: 'active' } })
+      });
+      
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        loadClients();
+        loadStats();
+        showSuccess('Client reactivated successfully');
+      } else {
+        showError(result.error || 'Failed to reactivate client');
+      }
+    } catch (error) {
+      console.error('Error reactivating client:', error);
+      showError('Error reactivating client');
+    }
+  };
+  
+  window.regenerateSecret = async (clientId) => {
+    if (!confirm('Are you sure you want to regenerate the client secret? The old secret will immediately stop working.')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch('/createapi/admin/regenerate-secret.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.message === 'success') {
+        loadClients();
+        showSuccess('Client secret regenerated successfully');
+        
+        // Refresh the details modal
+        setTimeout(() => viewClient(clientId), 500);
+      } else {
+        showError(result.error || 'Failed to regenerate secret');
+      }
+    } catch (error) {
+      console.error('Error regenerating secret:', error);
+      showError('Error regenerating secret');
+    }
+  };
+  
+  window.copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showSuccess('Copied to clipboard');
+    }).catch(() => {
+      showError('Failed to copy to clipboard');
+    });
+  };
+  
+  function showSuccess(message) {
+    showNotification(message, 'success');
+  }
+  
+  function showError(message) {
+    showNotification(message, 'error');
+  }
+  
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 100);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+</script>
+
+<style>
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .admin-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .admin-header h1 {
+    color: #1976d2;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1976d2;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .clients-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .section-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .clients-table-container {
+    overflow-x: auto;
+  }
+  
+  .clients-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .clients-table th,
+  .clients-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .clients-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .clients-table code {
+    background: #f0f0f0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  
+  .status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .status.active {
+    background: #c8e6c9;
+    color: #2e7d32;
+  }
+  
+  .status.revoked {
+    background: #ffcdd2;
+    color: #c62828;
+  }
+  
+  .actions {
+    white-space: nowrap;
+  }
+  
+  .loading-row, .no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 2rem;
+  }
+  
+  /* Button Styles */
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary {
+    background: #1976d2;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #1565c0;
+  }
+  
+  .btn-secondary {
+    background: #757575;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background: #616161;
+  }
+  
+  .btn-small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+  }
+  
+  .btn-info {
+    background: #0288d1;
+    color: white;
+  }
+  
+  .btn-danger {
+    background: #d32f2f;
+    color: white;
+  }
+  
+  .btn-success {
+    background: #388e3c;
+    color: white;
+  }
+  
+  .btn-warning {
+    background: #f57c00;
+    color: white;
+  }
+  
+  .btn-copy {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+  }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .form-group textarea {
+    height: 80px;
+    resize: vertical;
+  }
+  
+  .form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #666;
+    font-size: 0.8rem;
+  }
+  
+  /* Client Details */
+  .client-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .detail-group {
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 1rem;
+  }
+  
+  .detail-group:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-group label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .detail-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .secret {
+    font-family: monospace;
+    background: #fffbf0;
+    border: 1px solid #ffc107;
+  }
+  
+  .warning {
+    color: #f57c00;
+    font-weight: 500;
+    display: block;
+    margin-top: 0.5rem;
+  }
+  
+  /* Notifications */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    color: white;
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    background: #4caf50;
+  }
+  
+  .notification.error {
+    background: #f44336;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 1rem;
+    }
+    
+    .admin-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    
+    .clients-table {
+      font-size: 0.9rem;
+    }
+    
+    .modal-content {
+      width: 95%;
+      margin: 1rem;
+    }
+  }
+</style>

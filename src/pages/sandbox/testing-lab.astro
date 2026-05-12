@@ -1,0 +1,567 @@
+---
+// Testing Lab - Test widget functionality and get integration code
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Testing Lab - Universal Signature System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      padding: 2rem;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .test-header {
+      background: #1976d2;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .test-content {
+      padding: 2rem;
+    }
+    
+    .test-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .control-group {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .control-group h3 {
+      color: #495057;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #495057;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .btn {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background: #1565c0;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .status-display {
+      background: #e3f2fd;
+      border: 1px solid #1976d2;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .status-display h4 {
+      color: #1976d2;
+      margin-bottom: 0.5rem;
+    }
+    
+    .session-info {
+      font-family: monospace;
+      font-size: 0.9rem;
+      background: white;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      border: 1px solid #dee2e6;
+    }
+    
+    .widget-frame {
+      width: 100% !important;
+      height: 700px !important;
+      min-height: 700px !important;
+      border: none !important;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: block;
+    }
+    
+    /* Container for widget iframe */
+    #widgetArea {
+      /* background: #f8f9fa; */
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    
+    .no-session {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      background: #f8f9fa;
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      color: #6c757d;
+      text-align: center;
+    }
+    
+    .integration-code {
+      background: #f0f9ff;
+      border: 1px solid #0284c7;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .integration-code h4 {
+      color: #0284c7;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .code-tab {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .code-tab strong {
+      display: block;
+      color: #475569;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .code-tab pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .copy-btn {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: #0369a1;
+    }
+    
+    .success-message {
+      color: #16a34a;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .test-content {
+        padding: 1rem;
+      }
+      
+      .test-controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="test-header">
+      <h1>🧪 Widget Testing Lab</h1>
+      <p>Test widget functionality and get integration code for your sessions</p>
+    </div>
+    
+    <div class="test-content">
+      <div class="test-controls">
+        <div class="control-group">
+          <h3>Session Configuration</h3>
+          
+          <div class="form-group">
+            <label>User Role</label>
+            <select id="userRole">
+              <option value="advocate">Advocate</option>
+              <option value="victim">Victim</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>User Name</label>
+            <input type="text" id="userName" value="Test User" placeholder="Enter user name">
+          </div>
+          
+          <div class="form-group">
+            <label>User Email</label>
+            <input type="email" id="userEmail" value="test@example.com" placeholder="Enter email">
+          </div>
+          
+          <button id="createSessionBtn" class="btn">Create Session</button>
+        </div>
+        
+        <div class="control-group">
+          <h3>Testing Scenarios</h3>
+          
+          <div style="display: grid; gap: 0.5rem;">
+            <button id="advocateLegalBtn" data-preset="advocate-legal" class="btn btn-secondary">
+              👩‍💼 Legal Advocate
+            </button>
+            <button id="victimCompensationBtn" data-preset="victim-compensation" class="btn btn-secondary">
+              👤 Compensation Victim
+            </button>
+            <button id="advocateBenefitsBtn" data-preset="advocate-benefits" class="btn btn-secondary">
+              👨‍💼 Benefits Advocate
+            </button>
+          </div>
+          
+          <div style="margin-top: 1rem;">
+            <button id="clearSessionBtn" class="btn btn-secondary">
+              🗑️ Clear Session
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Status Display -->
+      <div id="statusDisplay" class="status-display" style="display: none;">
+        <h4>Session Status</h4>
+        <div id="sessionInfo" class="session-info"></div>
+      </div>
+      
+      <!-- Integration Code Section -->
+      <div id="integrationCode" class="integration-code" style="display: none;">
+        <h4>📋 Integration Code for This Session</h4>
+        
+        <div class="code-tab">
+          <strong>Direct iframe Embed:</strong>
+          <pre><code id="iframeCode"></code></pre>
+          <button class="copy-btn" onclick="copyCode('iframe')">Copy iframe Code</button>
+        </div>
+        
+        <div class="code-tab">
+          <strong>API Call Used:</strong>
+          <pre><code id="apiCode"></code></pre>
+          <button class="copy-btn" onclick="copyCode('api')">Copy API Code</button>
+        </div>
+        
+        <div class="success-message" id="copySuccess" style="display:none">
+          ✅ Copied to clipboard!
+        </div>
+      </div>
+      
+      <!-- Widget Display -->
+      <div id="widgetArea">
+        <div class="no-session">
+          <div>
+            <h3>No Active Session</h3>
+            <p>Configure and create a session above to test the widget</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSession = null;
+    
+    // Preset configurations
+    const presets = {
+      'advocate-legal': {
+        role: 'advocate',
+        name: 'Sarah Johnson',
+        email: 'sarah.johnson@legalaid.org'
+      },
+      'victim-compensation': {
+        role: 'victim',
+        name: 'John Doe',
+        email: 'john.doe@example.com'
+      },
+      'advocate-benefits': {
+        role: 'advocate',
+        name: 'Michael Chen',
+        email: 'michael.chen@benefitsorg.com'
+      }
+    };
+    
+    function loadPreset(presetName) {
+      const preset = presets[presetName];
+      if (preset) {
+        document.getElementById('userRole').value = preset.role;
+        document.getElementById('userName').value = preset.name;
+        document.getElementById('userEmail').value = preset.email;
+      }
+    }
+    
+    async function createTestSession() {
+      const userRole = document.getElementById('userRole').value;
+      const userName = document.getElementById('userName').value;
+      const userEmail = document.getElementById('userEmail').value;
+      
+      if (!userName || !userEmail) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      const widgetArea = document.getElementById('widgetArea');
+      
+      // Show loading state
+      widgetArea.innerHTML = `
+        <div class="no-session">
+          <div>
+            <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #e3f2fd; border-top: 4px solid #1976d2; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <h3 style="margin-top: 1rem;">Creating ${userRole} session...</h3>
+            <p>Setting up widget environment...</p>
+          </div>
+        </div>
+      `;
+      
+      try {
+        // Create widget session
+        const response = await fetch('/createapi/widget-session-create.json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Client-Id': 'test-client',
+            'X-Client-Secret': 'sk_test_abcdef123456'
+          },
+          body: JSON.stringify({
+            userRole: userRole,
+            userId: `test_${Date.now()}`,
+            userName: userName,
+            userEmail: userEmail,
+            metadata: {
+              testMode: true,
+              source: 'widget-testing-lab'
+            }
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.message === 'success') {
+          currentSession = result.data;
+          
+          // Update status display
+          document.getElementById('statusDisplay').style.display = 'block';
+          document.getElementById('sessionInfo').innerHTML = `
+            <strong>Session ID:</strong> ${result.data.sessionId}<br>
+            <strong>Widget URL:</strong> ${result.data.widgetUrl}<br>
+            <strong>User Role:</strong> ${result.data.metadata.userRole}<br>
+            <strong>Expires:</strong> ${new Date(result.data.expiresAt).toLocaleString()}
+          `;
+          
+          // Show integration code section
+          document.getElementById('integrationCode').style.display = 'block';
+          
+          // Populate iframe code
+          const iframeCode = `<iframe 
+  src="${result.data.widgetUrl}"
+  width="100%"
+  height="700px"
+  frameborder="0"
+  style="border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+</iframe>`;
+          document.getElementById('iframeCode').textContent = iframeCode;
+          
+          // Populate API code
+          const apiCode = `// API Call to create this session
+const response = await fetch('/api/widget/create-session.json', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Client-Id': 'test-client',
+    'X-Client-Secret': 'sk_test_abcdef123456'
+  },
+  body: JSON.stringify({
+    userRole: '${userRole}',
+    userId: 'user_id_here',
+    userName: '${userName}',
+    userEmail: '${userEmail}',
+    metadata: {
+      // Your custom metadata
+    }
+  })
+});
+
+const { widgetUrl, sessionId } = await response.json();`;
+          document.getElementById('apiCode').textContent = apiCode;
+          
+          // Load widget
+          widgetArea.innerHTML = `
+            <iframe 
+              src="${result.data.widgetUrl}" 
+              class="widget-frame"
+              title="Universal Signature Widget"
+              frameborder="0"
+              style="width: 100%; height: 700px; min-height: 700px; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: block;">
+            </iframe>
+          `;
+          
+          console.log('Test session created:', result);
+          
+        } else {
+          throw new Error(result.error || result.details || 'Failed to create session');
+        }
+        
+      } catch (error) {
+        console.error('Error creating test session:', error);
+        
+        widgetArea.innerHTML = `
+          <div class="no-session">
+            <div>
+              <h3 style="color: #dc3545;">❌ Error Creating Session</h3>
+              <p>${error.message}</p>
+              <button onclick="createTestSession()" class="btn" style="margin-top: 1rem; width: auto; padding: 0.5rem 1rem;">
+                Retry
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function clearSession() {
+      currentSession = null;
+      
+      document.getElementById('statusDisplay').style.display = 'none';
+      document.getElementById('integrationCode').style.display = 'none';
+      document.getElementById('widgetArea').innerHTML = `
+        <div class="no-session">
+          <div>
+            <h3>Session Cleared</h3>
+            <p>Configure and create a new session above to test the widget</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    function copyCode(type) {
+      let codeElement;
+      if (type === 'iframe') {
+        codeElement = document.getElementById('iframeCode');
+      } else if (type === 'api') {
+        codeElement = document.getElementById('apiCode');
+      }
+      
+      if (codeElement) {
+        // Create a temporary textarea to copy from
+        const textarea = document.createElement('textarea');
+        textarea.value = codeElement.textContent;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        
+        // Select and copy
+        textarea.select();
+        document.execCommand('copy');
+        
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
+        
+        // Show success message
+        const successMsg = document.getElementById('copySuccess');
+        successMsg.style.display = 'block';
+        
+        // Hide success message after 2 seconds
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+        }, 2000);
+      }
+    }
+    
+    // Add spin animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Setup event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create session button
+      document.getElementById('createSessionBtn').addEventListener('click', createTestSession);
+      
+      // Preset buttons
+      document.querySelectorAll('[data-preset]').forEach(button => {
+        button.addEventListener('click', function() {
+          const presetName = this.getAttribute('data-preset');
+          loadPreset(presetName);
+        });
+      });
+      
+      // Clear session button
+      document.getElementById('clearSessionBtn').addEventListener('click', clearSession);
+    });
+  </script>
+</body>
+</html>

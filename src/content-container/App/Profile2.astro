@@ -1,0 +1,340 @@
+---
+/**
+ * App Profile2 Content Component - TEST PAGE
+ *
+ * Profile2 page demonstrating the pattern:
+ * - User role: Sees their own profile
+ * - SuperAdmin role: Sees all users (system view)
+ *
+ * @component App/Profile2
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const user = data.user || {};
+const organization = data.organization;
+const allUsers = data.allUsers || [];
+const organizations = data.organizations || [];
+const isSuperAdmin = userRole === 'SuperAdmin';
+---
+
+<Layout title="Profile2">
+  <div class="profile-content">
+    <div class="container">
+      <div class="grid">
+        <!-- Main Content -->
+        <div class="profile-section">
+          <div class="card">
+            <h2 class="card-title">
+              {isSuperAdmin ? 'System User Management' : 'My Profile'}
+            </h2>
+            <p class="card-description">
+              {isSuperAdmin
+                ? 'View and manage all users across the system.'
+                : 'View your profile information.'}
+            </p>
+          </div>
+
+          {isSuperAdmin ? (
+            // SuperAdmin: Show all users
+            <div class="card">
+              <h3 class="card-subtitle">All Users ({allUsers.length})</h3>
+              <div class="users-list">
+                {allUsers.map(u => (
+                  <div class="user-item">
+                    <div class="user-info">
+                      <div class="user-name">{u.name || 'Unknown'}</div>
+                      <div class="user-email">{u.email}</div>
+                    </div>
+                    <div class="user-meta">
+                      <span class={`role-badge role-${u.role?.toLowerCase()}`}>
+                        {u.role}
+                      </span>
+                      <span class="user-date">
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            // Regular User: Show their own profile
+            <div class="card">
+              <h3 class="card-subtitle">Profile Information</h3>
+
+              <div class="info-group">
+                <label class="info-label">Name</label>
+                <div class="info-value">{user.name || 'Not set'}</div>
+              </div>
+
+              <div class="info-group">
+                <label class="info-label">Email</label>
+                <div class="info-value">{user.email || 'Not set'}</div>
+              </div>
+
+              <div class="info-group">
+                <label class="info-label">Role</label>
+                <div class="info-value">
+                  <span class={`role-badge role-${user.role?.toLowerCase()}`}>
+                    {user.role || 'Unknown'}
+                  </span>
+                </div>
+              </div>
+
+              {organization && (
+                <div class="info-group">
+                  <label class="info-label">Organization</label>
+                  <div class="info-value">{organization.name || 'Not set'}</div>
+                </div>
+              )}
+
+              {user.createdAt && (
+                <div class="info-group">
+                  <label class="info-label">Member Since</label>
+                  <div class="info-value">
+                    {new Date(user.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="card">
+            <h2 class="card-title">Profile2 Test Page</h2>
+            <p class="card-description">
+              This is a test page demonstrating the pattern for adding new features.
+            </p>
+            <div class="settings-links">
+              <a href="/app/profile" class="settings-link">Original Profile</a>
+              <a href="/app/profile2" class="settings-link active">Profile2 (Test)</a>
+            </div>
+          </div>
+
+          {isSuperAdmin && (
+            <div class="card">
+              <h2 class="card-title">SuperAdmin View</h2>
+              <p class="card-description">
+                You are viewing all {allUsers.length} users in the system.
+              </p>
+            </div>
+          )}
+
+          {!isSuperAdmin && organization && (
+            <div class="card">
+              <h2 class="card-title">Organization</h2>
+              <p class="card-description">
+                <strong>{organization.name}</strong>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .container {
+    max-width: 1200px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #2d3748;
+  }
+
+  .card-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #2d3748;
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* Info Groups */
+  .info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .info-group:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-size: 16px;
+    color: #2d3748;
+  }
+
+  /* Role Badges */
+  .role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .role-superadmin {
+    background-color: #f687b3;
+    color: white;
+  }
+
+  .role-admin {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .role-user {
+    background-color: #48bb78;
+    color: white;
+  }
+
+  .role-studioviewer {
+    background-color: #a0aec0;
+    color: white;
+  }
+
+  /* Users List */
+  .users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+  }
+
+  .user-info {
+    flex: 1;
+  }
+
+  .user-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+  }
+
+  .user-email {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  .user-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-date {
+    font-size: 12px;
+    color: #a0aec0;
+  }
+
+  /* Settings Links */
+  .settings-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .settings-link {
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .settings-link:hover {
+    background-color: #f7fafc;
+    color: #2d3748;
+  }
+
+  .settings-link.active {
+    background-color: #667eea;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .user-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+</style>

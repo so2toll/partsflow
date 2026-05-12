@@ -1,0 +1,528 @@
+---
+/**
+ * Pricing Content Component
+ *
+ * Displays subscription pricing tiers:
+ * - Free (5 min/month)
+ * - Creator (60 min/month)
+ * - Pro (300 min/month)
+ * - Enterprise (unlimited)
+ *
+ * @component App/Pricing
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import UsageMeter from '../../components/video/UsageMeter';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const currentPlan = data?.subscription?.planType || 'free';
+const usedMinutes = data?.subscription?.usedMinutes || 0;
+
+// Pricing tiers configuration
+const PRICING_TIERS = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: '$0',
+    period: 'forever',
+    minutes: 5,
+    quality: '720p',
+    features: [
+      '5 minutes per month',
+      'Standard quality (720p)',
+      'Basic support',
+    ],
+    cta: 'Current Plan' as const,
+    highlighted: false,
+  },
+  {
+    id: 'creator',
+    name: 'Creator',
+    price: '$29',
+    period: '/month',
+    minutes: 60,
+    quality: '1080p',
+    features: [
+      '60 minutes per month',
+      'High quality (1080p)',
+      'Priority support',
+      'Custom characters',
+    ],
+    cta: 'Start Free Trial' as const,
+    highlighted: true,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '$99',
+    period: '/month',
+    minutes: 300,
+    quality: '4K',
+    features: [
+      '300 minutes per month',
+      'Premium quality (4K)',
+      'Priority rendering',
+      'Advanced AI models',
+      'API access',
+    ],
+    cta: 'Start Free Trial' as const,
+    highlighted: false,
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    minutes: Infinity,
+    quality: '4K',
+    features: [
+      'Unlimited minutes',
+      'Premium quality (4K)',
+      'Dedicated support',
+      'Custom AI models',
+      'SLA guarantee',
+      'White-label option',
+    ],
+    cta: 'Contact Sales' as const,
+    highlighted: false,
+  },
+];
+---
+
+<Layout title="Pricing">
+  <div class="pricing-page">
+    <div class="container">
+      {/* Header */}
+      <div class="page-header">
+        <h1 class="page-title">Simple, Transparent Pricing</h1>
+        <p class="page-description">
+          Choose the plan that fits your video creation needs
+        </p>
+      </div>
+
+      {/* Current Usage */}
+      <div class="usage-section">
+        <h2 class="section-title">Your Current Usage</h2>
+        <UsageMeter
+          client:idle
+          usedMinutes={usedMinutes}
+          totalMinutes={data?.subscription?.totalMinutes || 5}
+          planType={currentPlan}
+          periodEnd={data?.subscription?.periodEnd}
+          onUpgrade={() => {
+            const creatorCard = document.querySelector('[data-plan="creator"]');
+            creatorCard?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
+      </div>
+
+      {/* Pricing Cards */}
+      <div class="pricing-grid">
+        {PRICING_TIERS.map((tier) => {
+          const isCurrentPlan = tier.id === currentPlan;
+
+          return (
+            <div
+              class={`pricing-card ${tier.highlighted ? 'highlighted' : ''} ${isCurrentPlan ? 'current' : ''}`}
+              data-plan={tier.id}
+            >
+              {tier.highlighted && (
+                <div class="popular-badge">Most Popular</div>
+              )}
+
+              <div class="card-header">
+                <h3 class="plan-name">{tier.name}</h3>
+                <div class="plan-price">
+                  <span class="price-amount">{tier.price}</span>
+                  {tier.period && <span class="price-period">{tier.period}</span>}
+                </div>
+                {isCurrentPlan && (
+                  <div class="current-badge">Current Plan</div>
+                )}
+              </div>
+
+              <div class="card-body">
+                <div class="plan-specs">
+                  <div class="spec">
+                    <span class="spec-icon">⏱️</span>
+                    <span class="spec-text">
+                      {tier.minutes === Infinity ? 'Unlimited' : `${tier.minutes}`} minutes/month
+                    </span>
+                  </div>
+                  <div class="spec">
+                    <span class="spec-icon">🎬</span>
+                    <span class="spec-text">{tier.quality} quality</span>
+                  </div>
+                </div>
+
+                <ul class="features-list">
+                  {tier.features.map((feature) => (
+                    <li key={feature} class="feature-item">
+                      <span class="feature-icon">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={() => window.handlePlanSelect(tier.id)}
+                  disabled={isCurrentPlan}
+                  class={`plan-cta ${tier.highlighted ? 'primary' : ''} ${isCurrentPlan ? 'disabled' : ''}`}
+                >
+                  {isCurrentPlan ? 'Current Plan' : tier.cta}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* FAQ Section */}
+      <div class="faq-section">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3 class="faq-question">What happens if I exceed my monthly limit?</h3>
+            <p class="faq-answer">
+              You can upgrade to a higher tier or purchase additional minutes. Your videos will pause until you have available minutes.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question">Can I change plans anytime?</h3>
+            <p class="faq-answer">
+              Yes! You can upgrade or downgrade your plan at any time. When upgrading, you get instant access to more minutes.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question">Do unused minutes roll over?</h3>
+            <p class="faq-answer">
+              No, minutes reset each billing period. However, you can purchase add-on packs that don't expire.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question">What payment methods do you accept?</h3>
+            <p class="faq-answer">
+              We accept all major credit cards (Visa, MasterCard, American Express) via Stripe.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Handle plan selection
+  window.handlePlanSelect = async (planId: string) => {
+    if (planId === 'enterprise') {
+      // Open contact form or email
+      window.location.href = 'mailto:sales@example.com?subject=Enterprise Plan Inquiry';
+      return;
+    }
+
+    if (planId === 'free') {
+      window.location.href = '/app/dashboard';
+      return;
+    }
+
+    // Create checkout session for paid plans
+    try {
+      const response = await fetch('/api/billing/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout');
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert(error.message || 'Failed to start checkout. Please try again.');
+    }
+  };
+</script>
+
+<style>
+  .pricing-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  /* Page Header */
+  .page-header {
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 12px 0;
+  }
+
+  .page-description {
+    font-size: 18px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Section Title */
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    margin: 0 0 24px 0;
+  }
+
+  /* Usage Section */
+  .usage-section {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Pricing Grid */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+
+  .pricing-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.3s;
+  }
+
+  .pricing-card:hover {
+    border-color: #cbd5e0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .pricing-card.highlighted {
+    border-color: #DFFF00;
+    box-shadow: 0 8px 32px rgba(223, 255, 0, 0.3);
+  }
+
+  .pricing-card.current {
+    border-color: #48bb78;
+    background-color: #f0fff4;
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #DFFF00 0%, #c4e600 100%);
+    color: #2d3748;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 12px;
+    text-transform: uppercase;
+  }
+
+  .current-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #48bb78;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+
+  /* Card Header */
+  .card-header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+  }
+
+  .plan-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 12px 0;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .price-amount {
+    font-size: 36px;
+    font-weight: 800;
+    color: #2d3748;
+  }
+
+  .price-period {
+    font-size: 16px;
+    color: #718096;
+  }
+
+  /* Card Body */
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .plan-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .spec {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #4a5568;
+  }
+
+  .spec-icon {
+    font-size: 16px;
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #4a5568;
+  }
+
+  .feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: #c6f6d5;
+    color: #22543d;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .plan-cta {
+    width: 100%;
+    padding: 14px 24px;
+    background-color: #edf2f7;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .plan-cta:hover:not(.disabled) {
+    background-color: #e2e8f0;
+  }
+
+  .plan-cta.primary {
+    background: linear-gradient(135deg, #DFFF00 0%, #c4e600 100%);
+  }
+
+  .plan-cta.primary:hover:not(.disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(223, 255, 0, 0.4);
+  }
+
+  .plan-cta.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* FAQ Section */
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .faq-item {
+    padding: 20px;
+    background-color: #f7fafc;
+    border-radius: 12px;
+  }
+
+  .faq-question {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+  }
+
+  .faq-answer {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .pricing-page {
+      padding: 16px;
+    }
+
+    .page-title {
+      font-size: 28px;
+    }
+
+    .page-description {
+      font-size: 16px;
+    }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

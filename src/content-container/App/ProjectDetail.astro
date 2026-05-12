@@ -1,0 +1,337 @@
+---
+/**
+ * App ProjectDetail Content Component
+ *
+ * Displays detailed information for a specific project including:
+ * - Project name and description
+ * - Assigned teams
+ * - Project owner
+ * - Organization info
+ * - Creation/update timestamps
+ *
+ * @component App/ProjectDetail
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const project = data.project;
+const teams = data.teams || [];
+const organization = data.organization;
+const owner = data.owner;
+
+// Handle project not found case
+const projectNotFound = !project;
+---
+
+<Layout title="Project Details">
+  {projectNotFound ? (
+    <div class="error-state">Project not found</div>
+  ) : (
+  <div class="project-detail-content">
+    <div class="container">
+    <!-- Project Details -->
+    <div class="card">
+      <div class="card-header">
+        <div class="project-title-section">
+          <h1 class="project-title">{project.name}</h1>
+          {project.description && (
+            <p class="project-description">{project.description}</p>
+          )}
+        </div>
+        {owner && (
+          <div class="badge-owner">
+            Owned by {owner.email}
+          </div>
+        )}
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Project ID</div>
+          <div class="info-value code">{project.id}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Organization</div>
+          <div class="info-value">{organization?.name || "Unknown"}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Created</div>
+          <div class="info-value">
+            {new Date(project.createdAt).toLocaleDateString()} at {new Date(project.createdAt).toLocaleTimeString()}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Last Updated</div>
+          <div class="info-value">
+            {new Date(project.updatedAt).toLocaleDateString()}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Teams Assigned</div>
+          <div class="info-value">{teams.length}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Teams -->
+    <div class="card">
+      <h2 class="card-title">Assigned Teams</h2>
+      {teams.length === 0 ? (
+        <div class="empty-state">
+          <p>No teams assigned to this project yet.</p>
+          <p class="empty-action">
+            <a href="/app/projects">Assign teams</a> to collaborate on this project.
+          </p>
+        </div>
+      ) : (
+        <div class="team-list">
+          {teams.map((team) => (
+            <div class="team-badge" key={team.id}>
+              {team.properties?.name || team.id}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <h2 class="card-title">Quick Actions</h2>
+      <div class="action-buttons">
+        <a href="/app/projects" class="action-button primary">
+          Manage Teams
+        </a>
+        <a href="/app/dashboard" class="action-button secondary">
+          Go to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+  )}
+</Layout>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 900px;
+  }
+
+  /* Cards */
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 16px 0;
+  }
+
+  /* Project Title */
+  .project-title-section {
+    flex: 1;
+  }
+
+  .project-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+  }
+
+  .project-description {
+    font-size: 16px;
+    color: #718096;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Badge */
+  .badge-owner {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #c6f6d5;
+    color: #22543d;
+  }
+
+  /* Info Grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    color: #2d3748;
+  }
+
+  .info-value.code {
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  /* Team List */
+  .team-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .team-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #edf2f7;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4a5568;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .action-button {
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .action-button.primary {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .action-button.primary:hover {
+    background-color: #5a67d8;
+  }
+
+  .action-button.secondary {
+    background-color: #edf2f7;
+    color: #4a5568;
+  }
+
+  .action-button.secondary:hover {
+    background-color: #e2e8f0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: #718096;
+  }
+
+  .empty-state p {
+    margin: 0;
+  }
+
+  .empty-action {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .empty-action a {
+    color: #667eea;
+    text-decoration: none;
+  }
+
+  .empty-action a:hover {
+    text-decoration: underline;
+  }
+
+  /* Error State */
+  .error-state {
+    padding: 48px;
+    text-align: center;
+    color: #e53e3e;
+    font-size: 16px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .container {
+      padding: 16px;
+    }
+
+    .card {
+      padding: 16px;
+    }
+
+    .card-header {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .project-title {
+      font-size: 22px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .action-button {
+      text-align: center;
+    }
+  }
+</style>
+)}

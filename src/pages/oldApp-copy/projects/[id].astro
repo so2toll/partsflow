@@ -1,0 +1,364 @@
+---
+/**
+ * Project Detail Page
+ *
+ * Shows details for a specific project including:
+ * - Project name and description
+ * - Assigned teams
+ * - Project owner
+ * - Creation date
+ *
+ * Requires authentication
+ */
+
+import { getSession } from "../../../lib/auth/session-adapter";
+import { projectRepository } from "../../../lib/db/repositories/ProjectRepository";
+import { teamRepository } from "../../../lib/db/repositories/TeamRepository";
+import { graph } from "../../../lib/db/graph";
+import { canViewProject } from "../../../lib/services/ProjectPermissionService";
+
+// Get session
+const session = await getSession(Astro.request, Astro.cookies);
+
+// Redirect if not authenticated
+if (!session) {
+  return Astro.redirect("/login");
+}
+
+const projectId = Astro.params.id;
+
+// Get project
+const project = await projectRepository.findById(projectId);
+
+if (!project) {
+  return new Response("Project not found", { status: 404 });
+}
+
+// Check if user can view this project
+const userId = session?.user?.global_id || session?.user?.id;
+const hasAccess = await canViewProject(userId, projectId);
+
+// Redirect if no access (unless SuperAdmin or Org Admin)
+const userRole = session?.user?.role;
+const isSuperAdmin = userRole === "SuperAdmin";
+const isOrgAdmin = userRole === "Admin" && project.organizationId === session?.user?.organizationId;
+
+if (!hasAccess && !isSuperAdmin && !isOrgAdmin) {
+  return new Response("You don't have access to this project", { status: 403 });
+}
+
+// Get project teams
+const teams = await projectRepository.getTeams(projectId);
+
+// Get project owner
+const ownerResults = await graph.query<any>(
+  `
+  MATCH (u:User)-[:OWNS]->(p:Project {id: $projectId})
+  RETURN u
+  `,
+  { projectId }
+);
+
+const owner = ownerResults.length > 0 ? ownerResults[0].u.properties : null;
+
+// Get organization
+const orgResults = await graph.query<any>(
+  `
+  MATCH (o:Organization)-[:HAS_PROJECT]->(p:Project {id: $projectId})
+  RETURN o
+  `,
+  { projectId }
+);
+
+const org = orgResults.length > 0 ? orgResults[0].o.properties : null;
+
+const metadata = {
+  title: `${project.name} - Video AI Studio`,
+  description: project.description || `Project details for ${project.name}`,
+};
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{metadata.title}</title>
+  <meta name="description" content={metadata.description} />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #f7fafc;
+      min-height: 100vh;
+    }
+
+    .header {
+      background-color: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 16px 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-right: 8px;
+    }
+
+    .nav-link.primary {
+      background-color: #667eea;
+      color: white;
+    }
+
+    .nav-link.secondary {
+      background-color: #edf2f7;
+      color: #4a5568;
+    }
+
+    .nav-link:hover {
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .project-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .project-description {
+      font-size: 16px;
+      color: #718096;
+      line-height: 1.6;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: #2d3748;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 16px;
+    }
+
+    .team-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background-color: #edf2f7;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #4a5568;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: #718096;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-owner {
+      background-color: #c6f6d5;
+      color: #22543d;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <h1>Project Details</h1>
+    <div style={{ marginTop: "12px" }}>
+      <a href="/app/projects" class="nav-link primary">← Back to Projects</a>
+      <a href="/app/dashboard" class="nav-link secondary">Dashboard</a>
+      <a href="/app/teams" class="nav-link secondary">Teams</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Project Details -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="project-title">{project.name}</div>
+          {project.description && (
+            <div class="project-description">{project.description}</div>
+          )}
+        </div>
+        {owner && (
+          <div class="badge badge-owner">
+            Owned by {owner.email}
+          </div>
+        )}
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Project ID</div>
+          <div class="info-value" style={{ fontFamily: "monospace", fontSize: "12px" }}>
+            {project.id}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Organization</div>
+          <div class="info-value">{org?.name || "Unknown"}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Created</div>
+          <div class="info-value">
+            {new Date(project.createdAt).toLocaleDateString()} at {new Date(project.createdAt).toLocaleTimeString()}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Last Updated</div>
+          <div class="info-value">
+            {new Date(project.updatedAt).toLocaleDateString()}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Teams Assigned</div>
+          <div class="info-value">{teams.length}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Teams -->
+    <div class="card">
+      <h2 class="section-title">Assigned Teams</h2>
+      {teams.length === 0 ? (
+        <div class="empty-state">
+          <p>No teams assigned to this project yet.</p>
+          <p style={{ marginTop: "8px", fontSize: "14px" }}>
+            <a href="/app/projects" style={{ color: "#667eea" }}>Assign teams</a> to collaborate on this project.
+          </p>
+        </div>
+      ) : (
+        <div class="team-list">
+          {teams.map((team) => (
+            <div class="team-badge" key={team.id}>
+              {team.properties?.name || team.id}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <h2 class="section-title">Quick Actions</h2>
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+        <a
+          href="/app/projects"
+          style={{
+            padding: "10px 16px",
+            backgroundColor: "#667eea",
+            color: "white",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontSize: "14px",
+            fontWeight: "600",
+          }}
+        >
+          Manage Teams
+        </a>
+        <a
+          href="/app/dashboard"
+          style={{
+            padding: "10px 16px",
+            backgroundColor: "#edf2f7",
+            color: "#4a5568",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontSize: "14px",
+            fontWeight: "600",
+          }}
+        >
+          Go to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

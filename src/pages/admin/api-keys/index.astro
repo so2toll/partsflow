@@ -1,0 +1,157 @@
+---
+import RBACComponent from '../../../components/RBAC/RBACComponent.astro'
+import { COOKIE_NAME } from '../../../lib/constants/constants.js';
+import { RBAC_CONFIG } from '../../../lib/configs/rbacConfig.js';
+
+// Set the current page identifier
+const currentPage = 'apiKeys';
+
+console.log("Admin API Keys page accessed", Astro.params);
+
+// Get environment URLs (following your pattern)
+const LOCAL_URL = process.env.LOCAL_URL;
+const PRODUCTION_URL = process.env.PRODUCTION_URL;
+
+let isLocal = Astro.request.url.split('://')[0]; 
+if(isLocal === 'https'){
+  isLocal = PRODUCTION_URL 
+} else { 
+  console.log("this is localhost")
+  isLocal = LOCAL_URL 
+}
+
+// Auth check (following your pattern)
+let cookie = Astro.cookies.has(COOKIE_NAME) ? Astro.cookies.get(COOKIE_NAME).value : null;
+
+if(!Astro.cookies.has(COOKIE_NAME)){
+    console.log('No cookie found');    
+    return Astro.redirect('/log-in/')
+}
+
+// Fetch data for this page from readapi endpoint
+let readapi;
+
+try {
+  const response = await fetch(
+    `${isLocal}/readapi/Reads/dashboard.json?cookie=${cookie}&page=${currentPage}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'https://app.data3d.io'
+      },
+      body: JSON.stringify({ cookie })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Admin API Keys data received:', data);
+      if(data.message === 'success') {
+        console.log('Success getting admin data');
+        let readApiData = data.data.message;
+        let addOnData = data.addOnData[0];
+        let totalData = data.addOnData;
+        let dashboardData = {...readApiData, ...addOnData, fullData: totalData};
+        readapi = dashboardData;
+        return readapi;
+      } else {
+        console.log('Error getting admin data:', data.error);
+        throw new Error(data.error || 'Failed to get admin data');
+      }
+    });       
+} catch (error) {
+  console.error('There was a problem with the admin fetch:', error.message);
+  return Astro.redirect('/404?error=admin_fetch_failed');
+}
+
+console.log('Admin readapi data:', readapi);
+
+//****This is just mimicing a role. The actual role will come from the login which takes place through an auth flow backed from Xano */
+// readapi = {
+//   id: 1,
+//   created_at: 1697075046561,
+//   name: 'Steven',
+//   email: 'stedasdfdven.osdfasdfaftu@gmail.com',
+//   role: 'Admin',
+//   authStatus: 'success',
+//   fullData: { test: '131344' }
+// }
+
+// Core Page Entity and Event Objects (following your pattern)
+let userId = readapi.id;
+let userRole = readapi.role;
+
+console.log('Admin user details:', { userId, userRole });
+
+// Validate role access - only Admin role can access
+if (!userRole) {
+    console.log('No role found for user:', userId);
+    return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (userRole !== 'Admin') {
+    console.log('Insufficient permissions. Role:', userRole, 'required: Admin');
+    return Astro.redirect('/access-denied?reason=insufficient_permissions&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+    console.log('Invalid role:', userRole, 'for user:', userId);
+    return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+    console.log('Role', userRole, 'does not have access to page:', currentPage);
+    return Astro.redirect('/access-denied?reason=no_page_access&page=' + currentPage);
+}
+
+console.log('Admin RBAC validation passed for role:', userRole);
+---
+
+<div class="fade-in">
+    <div id="loader" class="loader"></div>
+    <div id="dashboardContainer" class="hidden">
+        <RBACComponent userRole={userRole} userId={userId} data={readapi} currentPage={currentPage} />	
+    </div>
+</div>
+
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 50px auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  // Show admin interface once loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      const container = document.getElementById('dashboardContainer');
+      if (loader) loader.style.display = 'none';
+      if (container) container.classList.remove('hidden');
+    }, 500);
+  });
+</script>

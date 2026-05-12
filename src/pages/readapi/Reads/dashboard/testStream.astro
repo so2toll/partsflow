@@ -1,0 +1,88 @@
+---
+// import Layout from '../layouts/Layout.astro';
+import { get_count } from './events';
+
+
+const { message = 'Welcome, world!' } = Astro.props;
+
+---
+
+<div title="Welcome to Astro." data-message={message}>
+	<main>
+		<!-- <h1>Astro SSE Counter <span class="text-gradient">{current_count}</span></h1> -->
+		<h1>Astro SSE Counter r </h1><span class="text-gradient">sdd</span>
+		<button data-confetti-button>
+		<p>SSE: Server Sent Events with Node18 using ReadableStream()</p>
+		<br/><br/>
+		<div data-value-button><span class="text-value">val</span> Celebrate!</button>Celebrate!</div>
+		<p>Events are coming from a separate file using a timer and Emitter</p>
+		<p>Note that reloading the page has no effect on server counter</p>
+	</main>
+</div>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1.5rem;
+		max-width: 60ch;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 800;
+		margin: 0;
+	}
+	.text-gradient {
+		/* background-image: var(--accent-gradient); */
+		/* -webkit-background-clip: text; */
+		/* -webkit-text-fill-color: transparent; */
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		line-height: 1.6;
+		margin: 1rem 0;
+		border: 1px solid rgba(var(--accent), 25%);
+		background-color: white;
+		padding: 1rem;
+		border-radius: 0.4rem;
+	}
+</style>
+
+<script>
+	const evtSource = new EventSource("/registration/onboard/stream")
+	
+
+	evtSource.onmessage = (event) => {	
+		
+		const span = document.querySelector('.text-gradient')
+		const divSpan = document.querySelector('.text-value')
+	    const data = JSON.parse(event.data)
+	
+
+		if (data.counter >80) {
+			evtSource.close()
+
+		}
+		if (data.counter <=80) {
+			span.textContent = data.counter
+			divSpan.textContent = data.counter
+
+		}
+	
+
+	}
+
+	// Find our component DOM on the page.
+	const buttons = document.querySelectorAll('[data-confetti-button]');
+	const valueButton = document.querySelectorAll('[data-value-button');
+
+	// Add event listeners to fire confetti when a button is clicked.
+	buttons.forEach((button) => {
+	button.addEventListener('click', () => alert("hi there"));
+	});
+
+	valueButton.forEach((button) => {
+	button.addEventListener('click', () => alert("whoat there"));
+	});
+
+</script>

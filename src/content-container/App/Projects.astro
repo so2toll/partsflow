@@ -1,0 +1,443 @@
+---
+/**
+ * App Projects Content Component
+ *
+ * Displays the project management interface including:
+ * - Project list with descriptions
+ * - Create new project form (via ProjectForm widget)
+ * - Team assignment to projects
+ * - Team removal from projects
+ *
+ * @component App/Projects
+ */
+
+import ProjectForm from "../../components/widgets/ProjectForm";
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const organization = data.organization;
+const projects = data.projects || [];
+const teams = data.teams || [];
+---
+
+<Layout title="Projects">
+  <div class="projects-content">
+    <div class="container">
+    <div class="grid">
+      <!-- Projects List -->
+      <div class="projects-section">
+        <h2 class="section-title">Your Projects</h2>
+
+        {projects.length === 0 ? (
+          <div class="empty-state">
+            <p>No projects yet. Create your first project to get started!</p>
+          </div>
+        ) : (
+          projects.map((project) => (
+            <div class="project-card" data-project-id={project.id}>
+              <div class="project-header">
+                <div>
+                  <div class="project-name">{project.name}</div>
+                  {project.description && (
+                    <div class="project-description">{project.description}</div>
+                  )}
+                  <div class="project-info">Created {new Date(project.createdAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              <!-- Assigned Teams -->
+              <div
+                class="teams-list"
+                data-project-id={project.id}
+              >
+                <p class="teams-loading">Loading teams...</p>
+              </div>
+
+              <!-- Assign Team -->
+              <div class="assign-team-section">
+                <label class="assign-label">
+                  Assign Team
+                </label>
+                <select
+                  class="assign-team-select"
+                  data-project-id={project.id}
+                >
+                  <option value="">Select a team...</option>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Create Project Form -->
+        <div class="card">
+          <h2 class="card-title">Create Project</h2>
+          <ProjectForm client:load />
+        </div>
+
+        <!-- Project Info -->
+        <div class="card">
+          <h2 class="card-title">About Projects</h2>
+          <p class="card-description">
+            Projects are where you organize your video content. Assign teams to projects
+            to control who can access and edit your videos.
+          </p>
+          <p class="card-info-text">
+            Anyone with User role or higher can create projects.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</Layout>
+
+<script>
+  // Load teams for each project
+  document.querySelectorAll('.teams-list').forEach(async (teamsList) => {
+    const projectId = teamsList.getAttribute('data-project-id');
+
+    if (projectId) {
+      try {
+        const response = await fetch(`/api/projects/${projectId}/teams`);
+        if (response.ok) {
+          const data = await response.json();
+          const teams = data.teams || [];
+
+          if (teams.length === 0) {
+            teamsList.innerHTML = '<p class="teams-empty">No teams assigned</p>';
+          } else {
+            teamsList.innerHTML = `
+              <div class="teams-header">Assigned Teams (${teams.length})</div>
+              ${teams.map((team) => `
+                <span class="team-badge" data-team-id="${team.id}">
+                  ${team.name}
+                  <span class="team-remove" data-project-id="${projectId}" data-team-id="${team.id}" title="Remove team">×</span>
+                </span>
+              `).join('')}
+            `;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading teams:', error);
+      }
+    }
+  });
+
+  // Handle assign team dropdowns
+  document.querySelectorAll('.assign-team-select').forEach(async (select) => {
+    select.addEventListener('change', async (e) => {
+      const target = e.target;
+      const projectId = target.getAttribute('data-project-id');
+      const teamId = target.value;
+
+      if (!teamId) return;
+
+      try {
+        const response = await fetch(`/api/projects/${projectId}/assign-team`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teamId }),
+        });
+
+        if (response.ok) {
+          // Refresh the teams list for this project
+          const teamsList = document.querySelector(`.teams-list[data-project-id="${projectId}"]`);
+          if (teamsList) {
+            const teamsResponse = await fetch(`/api/projects/${projectId}/teams`);
+            if (teamsResponse.ok) {
+              const data = await teamsResponse.json();
+              const teams = data.teams || [];
+
+              if (teams.length === 0) {
+                teamsList.innerHTML = '<p class="teams-empty">No teams assigned</p>';
+              } else {
+                teamsList.innerHTML = `
+                  <div class="teams-header">Assigned Teams (${teams.length})</div>
+                  ${teams.map((team) => `
+                    <span class="team-badge" data-team-id="${team.id}">
+                      ${team.name}
+                      <span class="team-remove" data-project-id="${projectId}" data-team-id="${team.id}" title="Remove team">×</span>
+                    </span>
+                  `).join('')}
+                `;
+              }
+            }
+          }
+          // Reset the select
+          target.value = "";
+        } else {
+          alert('Failed to assign team. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error assigning team:', error);
+        alert('Failed to assign team. Please try again.');
+      }
+    });
+  });
+
+  // Handle remove team buttons
+  document.addEventListener('click', async (e) => {
+    const target = e.target;
+    if (target.classList.contains('team-remove')) {
+      const projectId = target.getAttribute('data-project-id');
+      const teamId = target.getAttribute('data-team-id');
+      const teamName = target.parentElement?.textContent.replace('×', '').trim();
+
+      if (!confirm(`Remove "${teamName}" from this project?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/projects/${projectId}/remove-team`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teamId }),
+        });
+
+        if (response.ok) {
+          // Refresh the teams list for this project
+          const teamsList = document.querySelector(`.teams-list[data-project-id="${projectId}"]`);
+          if (teamsList) {
+            const teamsResponse = await fetch(`/api/projects/${projectId}/teams`);
+            if (teamsResponse.ok) {
+              const data = await teamsResponse.json();
+              const teams = data.teams || [];
+
+              if (teams.length === 0) {
+                teamsList.innerHTML = '<p class="teams-empty">No teams assigned</p>';
+              } else {
+                teamsList.innerHTML = `
+                  <div class="teams-header">Assigned Teams (${teams.length})</div>
+                  ${teams.map((team) => `
+                    <span class="team-badge" data-team-id="${team.id}">
+                      ${team.name}
+                      <span class="team-remove" data-project-id="${projectId}" data-team-id="${team.id}" title="Remove team">×</span>
+                    </span>
+                  `).join('')}
+                `;
+              }
+            }
+          }
+        } else {
+          alert('Failed to remove team. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error removing team:', error);
+        alert('Failed to remove team. Please try again.');
+      }
+    }
+  });
+</script>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 1200px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .projects-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+  }
+
+  /* Cards */
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #2d3748;
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.5;
+  }
+
+  .card-info-text {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* Project Card */
+  .project-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .project-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .project-description {
+    font-size: 14px;
+    color: #718096;
+    margin-top: 4px;
+  }
+
+  .project-info {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 8px;
+  }
+
+  /* Teams List */
+  .teams-list {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #4a5568;
+  }
+
+  .teams-loading,
+  .teams-empty {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+  }
+
+  .teams-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+
+  .team-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background-color: #edf2f7;
+    border-radius: 4px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .team-remove {
+    cursor: pointer;
+    color: #a0aec0;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .team-remove:hover {
+    color: #e53e3e;
+    background-color: #fed7d7;
+  }
+
+  /* Assign Team Section */
+  .assign-team-section {
+    margin-top: 16px;
+  }
+
+  .assign-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a5568;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .assign-team-select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    background-color: #f7fafc;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .assign-team-select:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+
+  /* Empty State */
+  .empty-state {
+    background-color: white;
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .container {
+      padding: 16px;
+    }
+  }
+</style>

@@ -1,0 +1,709 @@
+---
+/**
+ * App Characters Content Component
+ *
+ * Character Library page for managing AI video characters.
+ * Users can view, create, edit, and delete characters.
+ * Follows the Stitch Design System with Electric Lime accent.
+ *
+ * @component App/Characters
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const characters = data.characters || [];
+const organizations = data.organizations || [];
+const organization = data.organization;
+const isSuperAdmin = userRole === 'SuperAdmin';
+const user = data.user || {};
+---
+
+<Layout title="Character Library">
+  <div class="characters-content">
+    <div class="container">
+      <!-- Header -->
+      <div class="page-header">
+        <div class="header-left">
+          <div class="header-badge">🎭 Character Library</div>
+          <h1>Characters</h1>
+          <p class="page-description">
+            {isSuperAdmin
+              ? `Manage all characters across ${organizations.length} organizations`
+              : `Manage characters for ${organization?.name || 'your organization'}`
+            }
+          </p>
+        </div>
+        <button id="create-character-btn" class="btn btn-primary">
+          <span>+</span> Create Character
+        </button>
+      </div>
+
+      <!-- Usage Meter (if not on enterprise plan) -->
+      {user.planType && user.planType !== 'enterprise' && (
+        <div class="usage-section">
+          <div class="usage-card">
+            <div class="usage-info">
+              <span class="usage-label">Plan Usage</span>
+              <span class="usage-stats">{user.planType || 'free'} plan</span>
+            </div>
+            {(user.usedMinutes !== undefined && user.totalMinutes !== undefined) && (
+              <div class="usage-bar">
+                <div class="usage-fill" style={`width: ${Math.min(100, (user.usedMinutes / user.totalMinutes) * 100)}%`}></div>
+              </div>
+            )}
+            <div class="usage-text">
+              {user.totalMinutes >= 999999
+                ? 'Unlimited characters'
+                : `${user.totalMinutes - (user.usedMinutes || 0)} characters remaining`
+              }
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Characters Grid -->
+      {characters.length === 0 ? (
+        <div class="empty-state">
+          <div class="empty-icon">🎭</div>
+          <h2>No characters yet</h2>
+          <p>Create your first AI character to maintain consistency across your videos.</p>
+          <button id="create-character-empty-btn" class="btn btn-primary">
+            Create Your First Character
+          </button>
+        </div>
+      ) : (
+        <div class="characters-grid">
+          {characters.map((character: any) => (
+            <div class="character-card" data-character-id={character.id}>
+              <div class="character-header">
+                <div class="character-avatar">
+                  {character.referenceImageUrl ? (
+                    <img src={character.referenceImageUrl} alt={character.name} class="avatar-img" />
+                  ) : (
+                    <div class="avatar-placeholder">{character.name?.charAt(0) || '?'}</div>
+                  )}
+                  <div class="character-meta">
+                    <h3 class="character-name">{character.name}</h3>
+                    {character.description && (
+                      <p class="character-description">{character.description}</p>
+                    )}
+                  </div>
+                </div>
+                <div class="character-actions">
+                  <button class="btn-action btn-edit" data-character-id={character.id}>Edit</button>
+                  <button class="btn-action btn-delete" data-character-id={character.id}>Delete</button>
+                </div>
+                {character.metadata && (
+                  <div class="character-tags">
+                    {(() => {
+                      const metadata = typeof character.metadata === 'string'
+                        ? JSON.parse(character.metadata)
+                        : character.metadata;
+                      return metadata.style ? (
+                        <span class="tag tag-style">{metadata.style}</span>
+                      ) : null;
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Create Character Modal (hidden by default) -->
+    <div id="create-character-modal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create New Character</h2>
+          <button id="close-modal-btn" class="btn-close">&times;</button>
+        </div>
+        <form id="create-character-form">
+          <div class="form-group">
+            <label for="character-name">Character Name *</label>
+            <input
+              type="text"
+              id="character-name"
+              name="name"
+              placeholder="e.g., Detective Sarah"
+              required
+              maxlength="100"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="character-description">Description *</label>
+            <textarea
+              id="character-description"
+              name="description"
+              placeholder="e.g., Mid-30s detective, determined expression, noir aesthetic"
+              required
+              rows="3"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="character-style">Style</label>
+            <select id="character-style" name="style">
+              <option value="">Select a style...</option>
+              <option value="realistic">Realistic</option>
+              <option value="cartoon">Cartoon</option>
+              <option value="anime">Anime</option>
+              <option value="stylized">Stylized</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="character-image">Reference Image</label>
+            <input
+              type="file"
+              id="character-image"
+              name="referenceImage"
+              accept="image/*"
+            />
+            <p class="help-text">Upload a reference image to maintain character consistency</p>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="cancel-create-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Character</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Modal handling
+  const createBtn = document.getElementById('create-character-btn');
+  const createEmptyBtn = document.getElementById('create-character-empty-btn');
+  const modal = document.getElementById('create-character-modal');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+  const cancelCreateBtn = document.getElementById('cancel-create-btn');
+  const overlay = modal?.querySelector('.modal-overlay');
+  const form = document.getElementById('create-character-form');
+
+  function openModal() {
+    modal?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal?.classList.add('hidden');
+    document.body.style.overflow = '';
+    form?.reset();
+  }
+
+  createBtn?.addEventListener('click', openModal);
+  createEmptyBtn?.addEventListener('click', openModal);
+  closeModalBtn?.addEventListener('click', closeModal);
+  cancelCreateBtn?.addEventListener('click', closeModal);
+  overlay?.addEventListener('click', closeModal);
+
+  // Form submission
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const imageFile = (document.getElementById('character-image') as HTMLInputElement).files?.[0];
+
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating...';
+
+    try {
+      // Prepare form data for API call
+      const apiFormData = new FormData();
+      apiFormData.append('name', formData.get('name') as string);
+      apiFormData.append('description', formData.get('description') as string);
+
+      const style = formData.get('style');
+      if (style) {
+        apiFormData.append('metadata', JSON.stringify({ style }));
+      }
+
+      if (imageFile) {
+        apiFormData.append('referenceImage', imageFile);
+      }
+
+      // Call API to create character
+      const response = await fetch('/api/characters', {
+        method: 'POST',
+        body: apiFormData,
+        credentials: 'include',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to create character');
+      }
+
+      // Success! Close modal and refresh page
+      closeModal();
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Error creating character:', error);
+      alert(error instanceof Error ? error.message : 'Failed to create character. Please try again.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Character';
+    }
+  });
+
+  // Edit buttons
+  document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const characterId = (e.target as HTMLElement).dataset.characterId;
+      alert('Edit feature coming soon! (characterId: ' + characterId + ')');
+    });
+  });
+
+  // Delete buttons
+  document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const characterId = (e.target as HTMLElement).dataset.characterId;
+
+      if (confirm('Are you sure you want to delete this character?')) {
+        try {
+          const response = await fetch(`/api/characters/${characterId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to delete character');
+          }
+
+          // Success! Refresh page to show updated list
+          window.location.reload();
+
+        } catch (error) {
+          console.error('Error deleting character:', error);
+          alert(error instanceof Error ? error.message : 'Failed to delete character. Please try again.');
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 1200px;
+  }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .header-left {
+    flex: 1;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: #DFFF00;
+    color: #000000;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px 0;
+    color: #1a1c1c;
+  }
+
+  .page-description {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #666666;
+    max-width: 600px;
+    margin: 0;
+  }
+
+  /* Buttons - Stitch Design System */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+  }
+
+  .btn-primary {
+    background: #DFFF00;
+    color: #000000;
+  }
+
+  .btn-primary:hover {
+    background: #c8e600;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #1a1c1c;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-secondary:hover {
+    background: #f8fafc;
+  }
+
+  /* Usage Section */
+  .usage-section {
+    margin-bottom: 32px;
+  }
+
+  .usage-card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .usage-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .usage-label {
+    font-size: 13px;
+    color: #666666;
+    font-weight: 500;
+  }
+
+  .usage-stats {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1c1c;
+  }
+
+  .usage-bar {
+    width: 200px;
+    height: 8px;
+    background: #f3f3f4;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .usage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #DFFF00, #c8e600);
+    transition: width 0.3s ease;
+  }
+
+  .usage-text {
+    font-size: 13px;
+    color: #666666;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .empty-state h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1a1c1c;
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    color: #666666;
+    margin: 0 0 24px 0;
+  }
+
+  /* Characters Grid */
+  .characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .character-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .character-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  .character-header {
+    padding: 20px;
+  }
+
+  .character-avatar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .avatar-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+  }
+
+  .avatar-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .character-meta {
+    flex: 1;
+  }
+
+  .character-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1a1c1c;
+  }
+
+  .character-description {
+    font-size: 14px;
+    color: #666666;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .character-actions {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid #f3f3f4;
+  }
+
+  .btn-action {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-edit {
+    background: #f3f3f4;
+    color: #1a1c1c;
+    border: none;
+  }
+
+  .btn-edit:hover {
+    background: #e2e8f0;
+  }
+
+  .btn-delete {
+    background: #fef2f2;
+    color: #ef4444;
+    border: none;
+  }
+
+  .btn-delete:hover {
+    background: #fee2e2;
+  }
+
+  .character-tags {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+  }
+
+  .tag {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .tag-style {
+    background: #f3f3f4;
+    color: #666666;
+  }
+
+  /* Modal */
+  .modal.hidden {
+    display: none;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 16px;
+    padding: 0;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1001;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1c1c;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666666;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .modal-header + form {
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1a1c1c;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .help-text {
+    font-size: 13px;
+    color: #666666;
+    margin-top: 4px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 8px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 32px;
+    }
+
+    .page-header {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .characters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .usage-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .modal-content {
+      width: 95%;
+    }
+  }
+</style>

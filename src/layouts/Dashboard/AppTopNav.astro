@@ -1,0 +1,181 @@
+---
+/**
+ * App Top Navigation
+ *
+ * Simple top nav for app pages with:
+ * - Organization context
+ * - Navigation links (Projects, Teams)
+ * - Logout button
+ */
+
+interface Props {
+  title?: string;
+  userRole?: string;
+  userId?: string;
+  organization?: any;
+}
+
+const { title, userRole, userId, organization } = Astro.props;
+
+const isSuperAdmin = userRole === "SuperAdmin";
+---
+
+<header class="app-top-nav">
+  <div class="app-top-nav-content">
+    <div class="app-top-nav-left">
+      <h1 class="app-top-nav-title">
+        {isSuperAdmin ? "System Administrator" : organization ? organization.name : "Loading..."}
+      </h1>
+      {isSuperAdmin && (
+        <p class="app-top-nav-subtitle">
+          SuperAdmin View - All Organizations
+        </p>
+      )}
+      {!isSuperAdmin && organization && (
+        <p class="app-top-nav-subtitle">
+          Video AI Content Studio
+        </p>
+      )}
+    </div>
+
+    <div class="app-top-nav-right">
+      <a href="/app/dashboard" class="app-nav-btn app-nav-btn-primary">
+        Dashboard
+      </a>
+      <a href="/app/projects" class="app-nav-btn app-nav-btn-primary">
+        Projects
+      </a>
+      <a href="/app/teams" class="app-nav-btn app-nav-btn-secondary">
+        Teams
+      </a>
+      <a href="/app/profile" class="app-nav-btn app-nav-btn-secondary">
+        Profile
+      </a>
+      <a href="/app/profile2" class="app-nav-btn app-nav-btn-secondary">
+        Profile2
+      </a>
+      <a href="/app/profile3" class="app-nav-btn app-nav-btn-secondary">
+        Profile3
+      </a>
+      <button
+        id="app-logout-button"
+        type="button"
+        class="app-logout-btn"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Client-side logout using Better Auth's client-side signOut
+  document.getElementById('app-logout-button')?.addEventListener('click', async function(e) {
+    e.preventDefault();
+
+    console.log('[AppTopNav] Client-side logout initiated');
+
+    // Disable button to prevent double-click
+    const button = e.target;
+    button.disabled = true;
+    button.textContent = 'Logging out...';
+
+    try {
+      // Import and use Better Auth's client-side signOut
+      const { logout } = await import('../../lib/auth/auth-client');
+      console.log('[AppTopNav] Calling Better Auth client-side signOut...');
+
+      await logout();
+      console.log('[AppTopNav] Better Auth signOut completed successfully');
+
+      // Clear local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      console.log('[AppTopNav] Cleared storage');
+
+      // Redirect to login
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('[AppTopNav] Error:', error);
+      // Fallback: just redirect
+      window.location.href = '/auth/login';
+    }
+  });
+</script>
+
+<style>
+  .app-top-nav {
+    background-color: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+  }
+
+  .app-top-nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .app-top-nav-left h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #2d3748;
+  }
+
+  .app-top-nav-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin: 4px 0 0 0;
+  }
+
+  .app-top-nav-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .app-nav-btn {
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .app-nav-btn:hover {
+    opacity: 0.9;
+  }
+
+  .app-nav-btn-primary {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .app-nav-btn-secondary {
+    background-color: #edf2f7;
+    color: #4a5568;
+  }
+
+  .app-logout-btn {
+    padding: 8px 16px;
+    background-color: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .app-logout-btn:hover {
+    opacity: 0.9;
+  }
+
+  .app-logout-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>

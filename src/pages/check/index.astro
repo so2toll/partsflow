@@ -1,0 +1,118 @@
+---
+import Iron from '@hapi/iron';
+import swal from 'sweetalert';
+
+//Set Token Secret
+const TOKEN_SECRET = process.env.TOKEN_SECRET;
+
+const LOCAL_URL = process.env.LOCAL_URL;
+const PRODUCTION_URL = process.env.PRODUCTION_URL;
+
+//Get magic token from url
+// const magicToken = await Astro.url.href.split('a876o6brightcheck')[1];
+const magicToken = await Astro.url.href.split('iyuh')[1];
+
+
+let isLocal = Astro.request.url.split('://')[0]; 
+console.log(TOKEN_SECRET,"this token working?",magicToken ) 
+if(isLocal === 'https'){
+  isLocal = PRODUCTION_URL }
+    else{ console.log("this is localhost") 
+    isLocal = LOCAL_URL 
+} 
+
+
+
+  //Send magic token to server to verify 
+  console.log("the current url",isLocal ); 
+
+try {
+                    // let body = await JSON.stringify({email: $user.email}) 
+                  //   let response =   await fetch(
+                  //     `${isLocal}/createapi/eventHandleLoginVerify.json?magicToken=${magicToken}`,
+                  //     { method: "POST" }
+                  // )
+                  // .then(response => response.json())
+                  //   .then(data => {
+                    
+                          
+                  //         return data
+                     
+                  //   });  
+
+                  // check.astro (temporary diagnostic)
+const response = await fetch(`${isLocal}/createapi/eventHandleLoginVerify.json?magicToken=${magicToken}`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Origin': 'https://app.data3d.io'   // set to the production origin the backend expects
+  },
+  body: JSON.stringify({ magicToken })
+})
+.then(response => response.json())
+                    .then(data => {
+                    
+                          
+                          return data
+                     
+                    });  
+// const text = await res.text();
+// console.log('RESP STATUS', res.status, 'BODY', text.slice(0,400));
+                  // const text = await response.text();            // <- capture raw body
+  // console.log('STATUS', response.status, 'HEADERS', Object.fromEntries(response.headers.entries()), 'BODY', text.slice(0,400));
+  // console.log('BODY:', text.slice(0, 200)); // log a snippet (avoid huge logs)
+  // let data;
+  // try {
+    // data = JSON.parse(text);
+  // } catch (err) {
+    // throw new Error(`Non-JSON reSponse from backend (status ${response.status}): ${text.slice(0,500)}`);
+  // }
+  // return data;
+// } catch (err) {
+  // console.error('Fetch error', err);
+  // throw err;
+// }
+                    // console.log("the current response on check here is",response ); 
+                    // console.log("the current data on check here is",data ); 
+                    // console.log(`Non-JSON reSponse from backend (status ${response.status}): ${text.slice(0,500)}`)
+                    // response['message'] = response
+const authCheck = response.message.authStatus;
+// const authCheck = 'success'
+
+console.log("made it to auth check on check here is",authCheck ); 
+
+if(authCheck !== 'success'){
+    return Astro.redirect('/log-in');
+}
+else{
+
+  console.log("this the auth check now ", response);
+  console.log(53245234234234);
+    const encryptToken = await Iron.seal(response, TOKEN_SECRET, Iron.defaults);;
+
+    
+    console.log("within check, this is the encrypt token", encryptToken)
+    const headers = new Headers();
+    headers.append('Set-Cookie', `bright_anon=${ encryptToken }; Path=/; HttpOnly; expires=${new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString()}; sameSite="lax"`);
+        
+
+    headers.append('Location', '/support/');
+
+  console.log("did we get down here check, before respnose return")
+    return new Response('', {
+      status: 302,
+      headers,
+    });
+  
+
+}
+        
+                } catch (error) {
+                  console.log(1234, "theres an error on verify check astro index")
+                  console.error(error);
+                }
+     
+
+
+---
+

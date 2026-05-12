@@ -1,0 +1,218 @@
+---
+/**
+ * Interview Session Page Wrapper
+ *
+ * Purpose:
+ * Thin wrapper that handles authentication and routing for candidate interview sessions.
+ * Validates that the candidate has access to this specific interview and passes
+ * data to the RBAC component for rendering.
+ *
+ * Flow:
+ * 1. Verify session exists
+ * 2. Validate candidate role or interview access
+ * 3. Load interview data
+ * 4. Pass to RBACComponent with currentPage='interview'
+ *
+ * Reference Implementation: src/pages/support/index.astro
+ */
+
+import RBACComponent from '../../../../components/RBAC/RBACComponent.astro';
+import { getSession } from '../../../../lib/auth/session-adapter';
+import { getLoginUrl } from '../../../../lib/auth/feature-flag';
+import { RBAC_CONFIG } from '../../../../lib/configs/rbacConfig.js';
+
+// Set the current page key (must match rbacConfig)
+const currentPage = 'interview';
+
+// Get interview ID from URL params
+const interviewId = Astro.params.id;
+
+if (!interviewId) {
+	console.error('No interview ID provided in URL');
+	return Astro.redirect('/404');
+}
+
+// Verify user session
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+	console.log('No session found, redirecting to login');
+	return Astro.redirect(getLoginUrl());
+}
+
+const userId = session.user.id;
+const userRole = session.user.role;
+
+// Build user data object
+let readapi;
+
+if (session.provider === 'better-auth') {
+	readapi = {
+		id: session.user.id,
+		name: session.user.name || '',
+		email: session.user.email,
+		role: session.user.role,
+		authStatus: 'success',
+		fullData: {}
+	};
+} else {
+	// Xano auth - would fetch from readapi endpoint
+	// For interviews, we primarily use Better Auth
+	readapi = {
+		id: userId,
+		name: session.user.name || '',
+		email: session.user.email || '',
+		role: userRole,
+		authStatus: 'success',
+		fullData: {}
+	};
+}
+
+// REQUIRED: Validate interview access
+// Verify:
+// 1. Interview exists
+// 2. Candidate owns this interview OR user is Admin/Recruiter
+// 3. Interview is in valid status (pending or in_progress)
+
+// TODO: Replace with actual database query once schema is created
+// For now, we use a placeholder that allows access if authenticated
+// In production, this MUST query the database to verify ownership
+let interview;
+try {
+	// NOTE: This validation will be fully implemented once database schema exists
+	// Candidates can only access their own interviews
+	// Admins and Recruiters can access any interview
+
+	// PLACEHOLDER: Allow access for now - MUST be replaced with actual DB query
+	// Example of required implementation:
+	/*
+	const db = getTursoClient();
+	if (effectiveRole === 'Candidate') {
+		const result = await db.execute({
+			sql: 'SELECT * FROM interviews WHERE id = ? AND candidate_id = ?',
+			args: [interviewId, userId]
+		});
+		interview = result.rows[0];
+	} else if (['Admin', 'Recruiter'].includes(effectiveRole)) {
+		const result = await db.execute({
+			sql: 'SELECT * FROM interviews WHERE id = ?',
+			args: [interviewId]
+		});
+		interview = result.rows[0];
+	}
+	*/
+
+	// TEMPORARY: Mock interview object for development
+	interview = {
+		id: interviewId,
+		status: 'pending',
+		candidate_id: userId,  // Allow current user to proceed
+	};
+
+} catch (error) {
+	console.error('Failed to validate interview access:', error);
+	return Astro.redirect('/access-denied?reason=interview_error');
+}
+
+if (!interview) {
+	console.error('Interview not found or access denied:', interviewId);
+	return Astro.redirect('/access-denied?reason=interview_not_found');
+}
+
+// Verify interview is in valid status for viewing
+if (!['pending', 'in_progress'].includes(interview.status)) {
+	console.error('Interview not in valid status:', interview.status);
+	// For completed interviews, could redirect to results page
+	if (interview.status === 'completed') {
+		return Astro.redirect(`/interviews/${interviewId}/results`);
+	}
+	return Astro.redirect('/access-denied?reason=interview_invalid_status');
+}
+
+// Add interview data to readapi object
+readapi.interview = interview;
+readapi.interviewId = interviewId;
+
+// Determine which role configuration to use
+// Candidates use Candidate role config, others use their actual role
+let effectiveRole = userRole;
+
+// If user is candidate or this is a candidate interview, use Candidate role
+if (userRole === 'Candidate' || !['Admin', 'Recruiter'].includes(userRole)) {
+	effectiveRole = 'Candidate';
+}
+
+// Validate role has access to interview page
+if (!RBAC_CONFIG[effectiveRole]) {
+	console.error('Invalid role:', effectiveRole);
+	return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[effectiveRole][currentPage]) {
+	console.error('Role', effectiveRole, 'does not have access to page:', currentPage);
+	return Astro.redirect('/access-denied?reason=no_access&page=' + currentPage);
+}
+
+console.log('Interview session page loaded:', {
+	interviewId,
+	userId,
+	userRole,
+	effectiveRole
+});
+---
+
+<div class="fade-in">
+	<div id="loader" class="loader"></div>
+	<div id="dashboardContainer" class="hidden">
+		<RBACComponent
+			userRole={effectiveRole}
+			userId={userId}
+			data={readapi}
+			currentPage={currentPage}
+		/>
+	</div>
+</div>
+
+<script>
+	// Simple page loader
+	setTimeout(() => {
+		const loader = document.getElementById('loader');
+		const container = document.getElementById('dashboardContainer');
+
+		if (loader) loader.classList.add('hidden');
+		if (container) container.classList.remove('hidden');
+	}, 300);
+</script>
+
+<style>
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+
+	.loader {
+		border: 16px solid #f3f3f3;
+		border-top: 16px solid #3498db;
+		border-radius: 50%;
+		width: 50px;
+		height: 50px;
+		animation: spin 0.5s linear infinite;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.hidden {
+		display: none;
+	}
+
+	.fade-in {
+		animation: fadeIn 0.3s ease-in;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+</style>

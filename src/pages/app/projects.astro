@@ -1,0 +1,102 @@
+---
+/**
+ * App Projects Page
+ *
+ * Standard page template following the support/index.astro pattern:
+ * 1. Get session
+ * 2. Set currentPage
+ * 3. Fetch data via unified getPageData()
+ * 4. Validate role access
+ * 5. Render RBACComponent
+ */
+
+import { getSession } from "../../lib/auth/session-adapter";
+import { getLoginUrl } from "../../lib/auth/feature-flag";
+import { RBAC_CONFIG } from "../../lib/configs/rbacConfig.js";
+import RBACComponent from "../../components/RBAC/RBACComponent.astro";
+import { getPageData } from "../../lib/data/appPageData";
+import { graph } from "../../lib/db/graph";
+
+// ========================================================================
+// PAGE CONFIGURATION - Only this changes per page!
+// ========================================================================
+const currentPage = 'appProjects';
+
+// ========================================================================
+// STANDARD PAGE LOGIC - Copy-paste for all app pages
+// ========================================================================
+
+// Get session
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+  return Astro.redirect(getLoginUrl());
+}
+
+// Get user info from session
+let user = session.user;
+
+// Fallback: If session doesn't have organizationId, look up user from database by email
+// (Better Auth IDs don't match database ULID IDs, so we use email as the key)
+if (!user?.organizationId && user?.email) {
+  console.log(`[Projects] No organizationId in session, looking up user by email ${user.email} in database`);
+  const userResults = await graph.query<any>(
+    `
+    MATCH (u:User {email: $email})
+    RETURN u
+    `,
+    { email: user.email }
+  );
+
+  if (userResults.length > 0 && userResults[0].u) {
+    const userProps = userResults[0].u.properties;
+    user = {
+      id: userProps.id,
+      email: userProps.email,
+      name: userProps.name,
+      role: userProps.role,
+      organizationId: userProps.organizationId,
+    };
+    console.log(`[Projects] Found organizationId in database: ${user.organizationId}`);
+  }
+}
+
+const userId = user?.id;
+const userRole = user?.role;
+const organizationId = user?.organizationId;
+
+// ========================================================================
+// DATA FETCHING - Uses unified getPageData() function
+// ========================================================================
+
+const data = await getPageData(currentPage, userId, userRole, organizationId);
+
+// ========================================================================
+// ROLE VALIDATION
+// ========================================================================
+
+if (!userRole) {
+  console.log('No role found for user:', userId);
+  return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+  console.log('Invalid role:', userRole, 'for user:', userId);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+  console.log('Role', userRole, 'does not have access to page:', currentPage);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+// ========================================================================
+// RENDER RBAC COMPONENT
+// ========================================================================
+---
+<RBACComponent
+  userRole={userRole}
+  userId={userId}
+  data={data}
+  currentPage={currentPage}
+/>

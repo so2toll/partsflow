@@ -1,0 +1,353 @@
+---
+/**
+ * App Profile Content Component
+ *
+ * Displays user profile information including:
+ * - User email and name
+ * - User role
+ * - Organization information (for regular users)
+ * - System statistics (for SuperAdmin)
+ *
+ * @component App/Profile
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const user = data.user || {};
+const organization = data.organization;
+const stats = data.stats || {};
+const isSuperAdmin = userRole === 'SuperAdmin';
+---
+
+<Layout title="Profile">
+  <div class="profile-content">
+    <div class="container">
+      <div class="grid">
+        <!-- User Information -->
+        <div class="profile-section">
+          <div class="card">
+            <h2 class="card-title">Profile Information</h2>
+
+            <div class="info-group">
+              <label class="info-label">Name</label>
+              <div class="info-value">{user.name || 'Not set'}</div>
+            </div>
+
+            <div class="info-group">
+              <label class="info-label">Email</label>
+              <div class="info-value">{user.email || 'Not set'}</div>
+            </div>
+
+            <div class="info-group">
+              <label class="info-label">Role</label>
+              <div class="info-value">
+                <span class={`role-badge role-${user.role?.toLowerCase()}`}>
+                  {user.role || 'Unknown'}
+                </span>
+              </div>
+            </div>
+
+            {organization && (
+              <div class="info-group">
+                <label class="info-label">Organization</label>
+                <div class="info-value">{organization.name || 'Not set'}</div>
+              </div>
+            )}
+
+            {user.createdAt && (
+              <div class="info-group">
+                <label class="info-label">Member Since</label>
+                <div class="info-value">
+                  {new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <!-- Stats Section -->
+          <div class="card">
+            <h2 class="card-title">
+              {isSuperAdmin ? 'System Statistics' : 'Organization Statistics'}
+            </h2>
+
+            <div class="stats-grid">
+              {isSuperAdmin ? (
+                <>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.userCount || 0}</div>
+                    <div class="stat-label">Total Users</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.orgCount || 0}</div>
+                    <div class="stat-label">Organizations</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.projectCount || 0}</div>
+                    <div class="stat-label">Projects</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.teamCount || 0}</div>
+                    <div class="stat-label">Teams</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.videoCount || 0}</div>
+                    <div class="stat-label">Videos</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.highlightCount || 0}</div>
+                    <div class="stat-label">Highlights</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.projectCount || 0}</div>
+                    <div class="stat-label">Projects</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.teamCount || 0}</div>
+                    <div class="stat-label">Teams</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.videoCount || 0}</div>
+                    <div class="stat-label">Videos</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{stats.highlightCount || 0}</div>
+                    <div class="stat-label">Highlights</div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="card">
+            <h2 class="card-title">Account Settings</h2>
+            <p class="card-description">
+              Manage your account settings and preferences.
+            </p>
+            <div class="settings-links">
+              <a href="/app/profile" class="settings-link active">Profile</a>
+              <a href="/app/settings" class="settings-link">Settings</a>
+            </div>
+          </div>
+
+          {isSuperAdmin && (
+            <div class="card">
+              <h2 class="card-title">Admin Access</h2>
+              <p class="card-description">
+                You have SuperAdmin privileges and can access all organizations and system-wide data.
+              </p>
+            </div>
+          )}
+
+          {!isSuperAdmin && organization && (
+            <div class="card">
+              <h2 class="card-title">Organization Details</h2>
+              <p class="card-description">
+                <strong>{organization.name}</strong>
+              </p>
+              <p class="card-description">
+                ID: {organization.id}
+              </p>
+              {organization.description && (
+                <p class="card-description">
+                  {organization.description}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Note: Layout provides global styling (background, padding, max-width) */
+
+  .container {
+    max-width: 1200px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Cards */
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #2d3748;
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* Info Groups */
+  .info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .info-group:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-size: 16px;
+    color: #2d3748;
+  }
+
+  /* Role Badges */
+  .role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .role-superadmin {
+    background-color: #f687b3;
+    color: white;
+  }
+
+  .role-studioadmin {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .role-user {
+    background-color: #48bb78;
+    color: white;
+  }
+
+  .role-studioviewer {
+    background-color: #a0aec0;
+    color: white;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 16px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 500;
+  }
+
+  /* Settings Links */
+  .settings-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .settings-link {
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .settings-link:hover {
+    background-color: #f7fafc;
+    color: #2d3748;
+  }
+
+  .settings-link.active {
+    background-color: #667eea;
+    color: white;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

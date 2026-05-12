@@ -1,0 +1,331 @@
+---
+/**
+ * Error Boundary Component
+ *
+ * Astro component that catches and displays errors in the UI.
+ * Provides a user-friendly error display with recovery options.
+ *
+ * Features:
+ * - Catches runtime errors during rendering
+ * - Displays user-friendly error messages
+ * - Provides recovery actions (retry, go home, contact support)
+ * - Includes error details for debugging (in development)
+ * - Maintains visual consistency with app design
+ *
+ * @module components/ErrorBoundary
+ * @version 1.0.0
+ *
+ * @param {string} title - Error title
+ * @param {string} message - Error message
+ * @param {Error} [error] - Optional error object for debugging
+ * @param {boolean} [showDetails=false] - Whether to show error details
+ */
+
+interface Props {
+  title?: string;
+  message?: string;
+  error?: Error;
+  showDetails?: boolean;
+}
+
+const {
+  title = 'Something went wrong',
+  message = 'An unexpected error occurred. Please try again or contact support if the problem persists.',
+  error,
+  showDetails = false,
+} = Astro.props;
+
+// Generate a unique error ID for tracking
+const errorId = `ERR_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+// Get error details if available
+const errorDetails = error
+  ? {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    }
+  : null;
+
+// Log error for monitoring
+if (error) {
+  console.error(`[ErrorBoundary] ${errorId}:`, error);
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error - Data3D Expert Reasoning Engine</title>
+  <style>
+    /* Error Page Styles */
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .error-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .error-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .error-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .error-message {
+      font-size: 1.125rem;
+      color: #4a5568;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .error-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .error-button-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .error-button-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .error-button-secondary {
+      background: #f7fafc;
+      color: #4a5568;
+      border: 1px solid #e2e8f0;
+    }
+
+    .error-button-secondary:hover {
+      background: #edf2f7;
+      transform: translateY(-2px);
+    }
+
+    .error-id {
+      font-size: 0.875rem;
+      color: #a0aec0;
+      margin-bottom: 1rem;
+    }
+
+    .error-details {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: left;
+      margin-top: 2rem;
+      font-size: 0.875rem;
+    }
+
+    .error-details-title {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .error-details-toggle {
+      background: none;
+      border: none;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .error-details-content {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .error-details-content.show {
+      display: block;
+    }
+
+    .error-stack {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.75rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .error-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .error-title {
+        font-size: 1.5rem;
+      }
+
+      .error-actions {
+        flex-direction: column;
+      }
+
+      .error-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-card">
+      <!-- Error Icon -->
+      <div class="error-icon">⚠️</div>
+
+      <!-- Error Title -->
+      <h1 class="error-title">{title}</h1>
+
+      <!-- Error Message -->
+      <p class="error-message">{message}</p>
+
+      <!-- Error ID for Support -->
+      <p class="error-id">Error ID: {errorId}</p>
+
+      <!-- Action Buttons -->
+      <div class="error-actions">
+        <button class="error-button error-button-primary" onclick="window.location.reload()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          Try Again
+        </button>
+        <a href="/" class="error-button error-button-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+          Go Home
+        </a>
+      </div>
+
+      <!-- Error Details (Toggle) -->
+      {showDetails && errorDetails && (
+        <div class="error-details">
+          <div class="error-details-title">
+            <span>Error Details</span>
+            <button
+              class="error-details-toggle"
+              onclick="document.getElementById('error-stack').classList.toggle('show')"
+            >
+              Show Details
+            </button>
+          </div>
+          <div id="error-stack" class="error-details-content">
+            <div>
+              <strong>Error Name:</strong> {errorDetails.name}
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <strong>Error Message:</strong> {errorDetails.message}
+            </div>
+            {errorDetails.stack && (
+              <div class="error-stack">{errorDetails.stack}</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <!-- Support Link -->
+      <p style="margin-top: 2rem; font-size: 0.875rem; color: #a0aec0;">
+        Need help? <a href="mailto:support@data3d.com" style="color: #667eea; text-decoration: none;">Contact Support</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Reporting Script (sends to monitoring service) -->
+  <script define:vars={{ errorId, title, message, errorDetails }}>
+    // Report error to monitoring service (if configured)
+    if (typeof window !== 'undefined' && window.onerror) {
+      const errorReport = {
+        id: errorId,
+        title: title,
+        message: message,
+        details: errorDetails,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Send to error tracking service (e.g., Sentry, LogRocket)
+      // This is a placeholder - integrate with your error tracking service
+      console.log('[Error Report]', errorReport);
+
+      // Store in sessionStorage for support reference
+      try {
+        sessionStorage.setItem('lastError', JSON.stringify(errorReport));
+      } catch (e) {
+        // Session storage might not be available
+      }
+    }
+  </script>
+</body>
+</html>

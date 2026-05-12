@@ -1,0 +1,285 @@
+---
+/**
+ * Graph Explorer - Development Only
+ *
+ * Visualizes your graph data stored in SQL as an interactive graph.
+ * Like Neo4j Bloom, but for your SQLite/Turso data.
+ *
+ * Access at: http://localhost:3000/dev/graph-explorer
+ *
+ * NOTE: This route is for development only. Remove or protect in production.
+ */
+
+import { graph } from '../../lib/db/graph';
+import GraphSidebar from '../../components/widgets/GraphSidebar';
+
+// Server-side data fetching
+const { nodes, relationships } = await graph.getGraphData(200);
+
+// Format nodes for vis.js
+const visNodes = nodes.map((node) => ({
+  id: node.id,
+  label: `${node.label}\n${node.id}`,
+  title: JSON.stringify(node.properties, null, 2),
+  group: node.label,
+  color: getNodeColor(node.label),
+}));
+
+// Format relationships for vis.js
+const visEdges = relationships.map((rel) => ({
+  id: rel.id,
+  from: rel.fromNodeId,
+  to: rel.toNodeId,
+  label: rel.type,
+  title: JSON.stringify(rel.properties, null, 2),
+  arrows: "to",
+}));
+
+function getNodeColor(label: string): string {
+  const colors: Record<string, string> = {
+    Video: "#4CAF50",
+    Scene: "#2196F3",
+    Detection: "#FF9800",
+    AIModel: "#9C27B0",
+    Project: "#F44336",
+    Asset: "#00BCD4",
+    User: "#607D8B",
+  };
+
+  return colors[label] || "#9E9E9E";
+}
+
+// Pass data to client-side
+const graphData = {
+  nodes: visNodes,
+  edges: visEdges,
+  stats: {
+    nodeCount: nodes.length,
+    edgeCount: relationships.length,
+    nodeTypes: [...new Set(nodes.map(n => n.label))]
+  }
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Explorer - Dev</title>
+  <script src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      grid-template-rows: auto 1fr;
+      height: 100vh;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .header {
+      grid-column: 1 / -1;
+      padding: 1rem;
+      background: #1e293b;
+      border-radius: 0.5rem;
+    }
+
+    .header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      margin: 0 0 1rem 0;
+      opacity: 0.7;
+      font-size: 0.875rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3b82f6;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    .graph-container {
+      background: #1e293b;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    #mynetwork {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      #mynetwork {
+        min-height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🕸️ Graph Explorer</h1>
+      <p class="subtitle">
+        Visualize your graph data stored in SQL (SQLite/Turso)
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value">{graphData.stats.nodeCount}</span>
+          <span class="stat-label">Nodes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{graphData.stats.edgeCount}</span>
+          <span class="stat-label">Relationships</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-container">
+      <div id="mynetwork"></div>
+    </div>
+
+    <GraphSidebar graphData={graphData} client:load />
+  </div>
+
+  <script define:vars={{ graphData }}>
+    // Client-side graph initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if vis.js is loaded
+      if (typeof vis === 'undefined') {
+        console.error('vis.js library not loaded');
+        const container = document.getElementById('mynetwork');
+        if (container) {
+          container.innerHTML =
+            '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; text-align: center; padding: 2rem;">' +
+            '<div>' +
+            '<h3>Loading vis.js library...</h3>' +
+            '<p>If this persists, check your internet connection or CDN access.</p>' +
+            '</div></div>';
+        }
+        return;
+      }
+
+      console.log('Initializing graph with:', graphData);
+
+      if (graphData.nodes.length > 0 || graphData.edges.length > 0) {
+        const container = document.getElementById("mynetwork");
+        if (!container) return;
+
+        const nodes = new vis.DataSet(graphData.nodes);
+        const edges = new vis.DataSet(graphData.edges);
+
+        const data = { nodes, edges };
+
+        const options = {
+          nodes: {
+            shape: "box",
+            margin: 10,
+            widthConstraint: { maximum: 200 },
+            font: { color: "#ffffff", size: 12 },
+            borderWidth: 2,
+            borderWidthSelected: 4,
+          },
+          edges: {
+            smooth: {
+              type: "cubicBezier",
+              forceDirection: "horizontal",
+              roundness: 0.4,
+            },
+            arrows: {
+              to: { enabled: true, scaleFactor: 0.8 },
+            },
+            font: { color: "#ffffff", size: 10 },
+            width: 2,
+          },
+          layout: {
+            hierarchical: {
+              enabled: true,
+              direction: "UD",
+              sortMethod: "directed",
+              levelSeparation: 200,
+              nodeSpacing: 150,
+            },
+          },
+          physics: {
+            enabled: true,
+            stabilization: {
+              iterations: 200,
+              updateInterval: 50,
+            },
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 200,
+            navigationButtons: true,
+            keyboard: true,
+          },
+        };
+
+        try {
+          const network = new vis.Network(container, data, options);
+          console.log('Graph initialized successfully');
+
+          // Fit the graph to view
+          network.fit();
+        } catch (error) {
+          console.error('Error initializing graph:', error);
+          container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8;">Error initializing graph: ' + error + '</div>';
+        }
+      } else {
+        const container = document.getElementById('mynetwork');
+        if (container) {
+          container.innerHTML =
+            '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; text-align: center; padding: 2rem;">' +
+            '<div>' +
+            '<h3>No graph data available</h3>' +
+            '<p>Run the demo script to populate the graph:</p>' +
+            '<code>npx tsx scripts/graph-demo.ts</code>' +
+            '</div></div>';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

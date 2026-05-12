@@ -1,0 +1,374 @@
+---
+---
+<!-- Main Content -->
+<div class="container-fluid py-4">
+    <!-- Statistics Cards Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Total Rides</h6>
+                            <h2 class="card-title mb-0">1,248</h2>
+                        </div>
+                        <div class="stat-icon" style="background: #e8e4ce;">
+                            <i class="ri-taxi-line" style="color:black"></i>
+                        </div>
+                    </div>
+                    <div class="stat-change mt-3">
+                        <span class="text-success"><i class="ri-arrow-up-line"></i> 12.5%</span>
+                        <span class="text-muted ms-1">Since last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Revenue</h6>
+                            <h2 class="card-title mb-0">$24,500</h2>
+                        </div>
+                        <div class="stat-icon" style="background: #e8e4ce;">
+                            <i class="ri-money-dollar-circle-line" style="color: black;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-change mt-3">
+                        <span class="text-success"><i class="ri-arrow-up-line"></i> 8.2%</span>
+                        <span class="text-muted ms-1">Since last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">Active Drivers</h6>
+                            <h2 class="card-title mb-0">156</h2>
+                        </div>
+                        <div class="stat-icon" style="background: #e8e4ce;">
+                            <i class="ri-user-line" style="color: black;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-change mt-3">
+                        <span class="text-danger"><i class="ri-arrow-down-line"></i> 3.8%</span>
+                        <span class="text-muted ms-1">Since last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">New Users</h6>
+                            <h2 class="card-title mb-0">385</h2>
+                        </div>
+                        <div class="stat-icon" style="background: #e8e4ce;">
+                            <i class="ri-team-line" style="color: black;"></i>
+                        </div>
+                    </div>
+                    <div class="stat-change mt-3">
+                        <span class="text-success"><i class="ri-arrow-up-line"></i> 18.3%</span>
+                        <span class="text-muted ms-1">Since last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ride Tracking Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Active Rides</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" id="rideFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: #e8e4ce; color:black">
+                            Today
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="rideFilterDropdown">
+                            <li><a class="dropdown-item" href="#">Today</a></li>
+                            <li><a class="dropdown-item" href="#">This Week</a></li>
+                            <li><a class="dropdown-item" href="#">This Month</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ride ID</th>
+                                    <th>Driver</th>
+                                    <th>User</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#RD7829</td>
+                                    <td>John Smith</td>
+                                    <td>Michael Brown</td>
+                                    <td>Downtown</td>
+                                    <td>Airport</td>
+                                    <td><span class="badge bg-success">In Progress</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#RD7830</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>Emily Davis</td>
+                                    <td>Suburb</td>
+                                    <td>City Center</td>
+                                    <td><span class="badge bg-warning">Picking Up</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#RD7831</td>
+                                    <td>Robert Wilson</td>
+                                    <td>James Taylor</td>
+                                    <td>Mall</td>
+                                    <td>University</td>
+                                    <td><span class="badge bg-info">Scheduled</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#RD7832</td>
+                                    <td>Lisa Anderson</td>
+                                    <td>Jennifer White</td>
+                                    <td>Hospital</td>
+                                    <td>Residential Area</td>
+                                    <td><span class="badge bg-success">In Progress</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#RD7833</td>
+                                    <td>David Miller</td>
+                                    <td>Thomas Moore</td>
+                                    <td>Train Station</td>
+                                    <td>Hotel</td>
+                                    <td><span class="badge bg-warning">Picking Up</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ride Map</h5>
+                </div>
+                <div class="card-body">
+                    <div class="map-container">
+                        <!-- Map placeholder - would be replaced with actual map integration -->
+                        <div class="map-placeholder">
+                            <i class="ri-map-2-line"></i>
+                            <h3 class="text-muted mb-2">Live Tracking Map</h3>
+                            <p class="text-muted mb-4">Real-time vehicle location tracking will be displayed here</p>
+                            <div class="map-legend d-flex gap-3">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-taxi-line me-2"></i> Active Rides
+                                </span>
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-user-location-line me-2"></i> Passengers
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver & User Management Row -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Top Drivers</h5>
+                    <a href="/drivers" class="btn btn-sm " style="background: #e8e4ce; color:black">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="driver-list">
+                        <div class="driver-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-6.png" alt="Driver" class="avatar avatar-md me-3">
+                            <div class="driver-info flex-grow-1">
+                                <h6 class="mb-0">John Smith</h6>
+                                <div class="driver-rating">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-half text-warning"></i>
+                                    <span class="ms-1">4.5</span>
+                                </div>
+                            </div>
+                            <div class="driver-stats text-end">
+                                <div class="driver-rides">128 rides</div>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="driver-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-6.png" alt="Driver" class="avatar avatar-md me-3">
+                            <div class="driver-info flex-grow-1">
+                                <h6 class="mb-0">Sarah Johnson</h6>
+                                <div class="driver-rating">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star text-warning"></i>
+                                    <span class="ms-1">4.0</span>
+                                </div>
+                            </div>
+                            <div class="driver-stats text-end">
+                                <div class="driver-rides">112 rides</div>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="driver-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-6.png" alt="Driver" class="avatar avatar-md me-3">
+                            <div class="driver-info flex-grow-1">
+                                <h6 class="mb-0">Robert Wilson</h6>
+                                <div class="driver-rating">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star text-warning"></i>
+                                    <span class="ms-1">4.0</span>
+                                </div>
+                            </div>
+                            <div class="driver-stats text-end">
+                                <div class="driver-rides">98 rides</div>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Users</h5>
+                    <a href="/users" class="btn btn-sm " style="background: #e8e4ce; color:black">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="user-list">
+                        <div class="user-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-4.png" alt="User" class="avatar avatar-md me-3">
+                            <div class="user-info flex-grow-1">
+                                <h6 class="mb-0">Michael Brown</h6>
+                                <small class="text-muted">Joined: Jan 15, 2023</small>
+                            </div>
+                            <div class="user-stats text-end">
+                                <div class="user-rides">24 rides</div>
+                                <div class="user-spent">$345.00 spent</div>
+                            </div>
+                        </div>
+                        <div class="user-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-5.png" alt="User" class="avatar avatar-md me-3">
+                            <div class="user-info flex-grow-1">
+                                <h6 class="mb-0">Emily Davis</h6>
+                                <small class="text-muted">Joined: Feb 28, 2023</small>
+                            </div>
+                            <div class="user-stats text-end">
+                                <div class="user-rides">18 rides</div>
+                                <div class="user-spent">$276.50 spent</div>
+                            </div>
+                        </div>
+                        <div class="user-item d-flex align-items-center mb-3">
+                            <img src="/assets/img/user-6.png" alt="User" class="avatar avatar-md me-3">
+                            <div class="user-info flex-grow-1">
+                                <h6 class="mb-0">James Taylor</h6>
+                                <small class="text-muted">Joined: Mar 10, 2023</small>
+                            </div>
+                            <div class="user-stats text-end">
+                                <div class="user-rides">12 rides</div>
+                                <div class="user-spent">$189.75 spent</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Interface -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Bookings</h5>
+                    <a href="/bookings" class="btn btn-sm " style="background: #e8e4ce; color:black">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#BK4521</td>
+                                    <td>Michael Brown</td>
+                                    <td>Jul 15, 2023</td>
+                                    <td>09:30 AM</td>
+                                    <td>Downtown</td>
+                                    <td>Airport</td>
+                                    <td><span class="badge bg-success">Confirmed</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#BK4522</td>
+                                    <td>Emily Davis</td>
+                                    <td>Jul 16, 2023</td>
+                                    <td>10:15 AM</td>
+                                    <td>Suburb</td>
+                                    <td>City Center</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td>#BK4523</td>
+                                    <td>James Taylor</td>
+                                    <td>Jul 16, 2023</td>
+                                    <td>02:45 PM</td>
+                                    <td>Mall</td>
+                                    <td>University</td>
+                                    <td><span class="badge bg-info">Scheduled</span></td>
+                                    <td><button class="btn btn-sm "style="background: #e8e4ce;">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
