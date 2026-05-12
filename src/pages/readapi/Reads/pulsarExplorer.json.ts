@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import Iron from '@hapi/iron';
 import neo4j from 'neo4j-driver';
-import Pulsar from 'pulsar-client';
+// import Pulsar from 'pulsar-client'; // DISABLED: pulsar-client not installed
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 
 
