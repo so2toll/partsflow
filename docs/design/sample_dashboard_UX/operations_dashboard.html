@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PartsFlow – Back Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05070F;--s1:#0A0F1A;--s2:#0F1620;--s3:#162030;--s4:#1A2535;
+  --border:#1D2D42;--border2:#253550;
+  --accent:#FF6A00;--ah:#FF2500;--aw:#FF9800;--ag:rgba(255,106,0,.18);
+  --text:#FFF;--t2:#C8D8F0;--muted:#7A90AA;--m2:#253040;
+  --green:#00F07A;--gd:rgba(0,240,122,.12);
+  --red:#FF3A3A;--rd:rgba(255,58,58,.12);
+  --yellow:#FFD600;--yd:rgba(255,214,0,.12);
+  --blue:#1E90FF;--bb:#60B4FF;--bg2:rgba(30,144,255,.18);
+  --purple:#A855F7;--pd:rgba(168,85,247,.14);
+  --cyan:#00E5FF;--cd:rgba(0,229,255,.1);
+  --teal:#00C9A7;--td:rgba(0,201,167,.12);
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'Space Mono',monospace;
+  --sb:228px;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:56px;background:rgba(5,7,15,.98);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:100}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer}
+.logo-box{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--ah));
+  display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:900;font-size:12px}
+.logo-text{font-family:var(--fd);font-weight:900;font-size:17px;letter-spacing:1px}
+.logo-tag{font-family:var(--fm);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-left:2px}
+.top-stats{display:flex;gap:0;margin-left:16px;flex:1;overflow:hidden}
+.tstat{padding:0 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:1px}
+.tstat:first-child{padding-left:0}
+.tstat-v{font-family:var(--fd);font-weight:900;font-size:18px;line-height:1}
+.tstat-l{font-family:var(--fm);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.top-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.live-pill{display:flex;align-items:center;gap:6px;background:var(--gd);border:1px solid rgba(0,240,122,.3);
+  border-radius:20px;padding:4px 10px;font-family:var(--fm);font-size:9px;color:var(--green);letter-spacing:1px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.alert-bell{position:relative;cursor:pointer}
+.badge-count{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;
+  width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:8px;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;
+  border:none;cursor:pointer;font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;transition:all .2s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--ah));color:#fff;box-shadow:0 3px 14px var(--ag)}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--aw)}
+.btn-green{background:var(--gd);color:var(--green);border:1px solid rgba(0,240,122,.3)}
+.btn-green:hover{background:rgba(0,240,122,.2)}
+.btn-red{background:var(--rd);color:var(--red);border:1px solid rgba(255,58,58,.3)}
+.btn-red:hover{background:rgba(255,58,58,.2)}
+.btn-yellow{background:var(--yd);color:var(--yellow);border:1px solid rgba(255,214,0,.3)}
+.btn-yellow:hover{background:rgba(255,214,0,.22)}
+.btn-sm{padding:5px 10px !important;font-size:11px !important}
+.btn-xs{padding:3px 8px !important;font-size:10px !important}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden}
+.sidebar{width:var(--sb);background:var(--s1);border-right:1px solid var(--border);
+  overflow-y:auto;flex-shrink:0;padding:10px 0 20px}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.main::-webkit-scrollbar{width:5px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── SIDEBAR ── */
+.nav-group{padding:14px 16px 6px;font-family:var(--fm);font-size:9px;color:var(--m2);letter-spacing:2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;color:var(--muted);cursor:pointer;
+  transition:all .15s;font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.5px;
+  border-left:2px solid transparent;position:relative}
+.nav-item:hover{color:var(--text);background:var(--s2)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(255,106,0,.07)}
+.nav-item .nav-badge{margin-left:auto;background:var(--rd);color:var(--red);
+  font-family:var(--fm);font-size:8px;padding:1px 5px;border-radius:3px}
+.nav-item .nav-badge.green{background:var(--gd);color:var(--green)}
+.nav-item .nav-badge.yellow{background:var(--yd);color:var(--yellow)}
+.nav-divider{border:none;border-top:1px solid var(--border);margin:8px 0}
+
+/* ── PAGES ── */
+.page{display:none;padding:22px;min-height:100%}
+.page.active{display:block}
+.pg-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:14px;flex-wrap:wrap}
+.pg-title{font-family:var(--fd);font-weight:900;font-size:28px;line-height:1}
+.pg-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.pg-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── CARDS / GRIDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px}
+.card-sm{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:13px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px}
+.g5{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+
+/* ── METRICS ── */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-bottom:18px}
+.metric{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px 16px;position:relative;overflow:hidden}
+.metric::after{content:'';position:absolute;top:-15px;right:-15px;width:60px;height:60px;background:radial-gradient(circle,var(--ag),transparent 70%)}
+.metric.green::after{background:radial-gradient(circle,var(--gd) 10%,transparent 70%)}
+.metric.blue::after{background:radial-gradient(circle,var(--bg2),transparent 70%)}
+.metric.yellow::after{background:radial-gradient(circle,var(--yd),transparent 70%)}
+.metric.red::after{background:radial-gradient(circle,var(--rd),transparent 70%)}
+.metric.purple::after{background:radial-gradient(circle,var(--pd),transparent 70%)}
+.metric-val{font-family:var(--fd);font-weight:900;font-size:28px;line-height:1;margin-bottom:2px}
+.metric-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.metric-delta{font-family:var(--fm);font-size:9px;margin-top:5px}
+.delta-up{color:var(--green)}.delta-dn{color:var(--red)}.delta-nt{color:var(--yellow)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;
+  font-family:var(--fm);font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.bg{background:var(--gd);color:var(--green)}.bo{background:var(--ag);color:var(--aw)}
+.bb{background:var(--bg2);color:var(--bb)}.br{background:var(--rd);color:var(--red)}
+.by{background:var(--yd);color:var(--yellow)}.bp{background:var(--pd);color:var(--purple)}
+.bc{background:var(--cd);color:var(--cyan)}.bt{background:var(--td);color:var(--teal)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;padding:9px 13px;font-family:var(--fm);font-size:8px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--s2);white-space:nowrap}
+tbody td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:12px;color:var(--t2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
+.td-mono{font-family:var(--fm);font-size:11px}
+
+/* ── FORMS ── */
+.form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
+.form-label{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.input{background:var(--s2);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;font-family:var(--fb);font-size:13px;border-radius:6px;outline:none;transition:all .2s;width:100%}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ag)}
+.input::placeholder{color:var(--muted)}
+.select{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:8px 28px 8px 12px;
+  font-family:var(--fb);font-size:13px;border-radius:6px;outline:none;cursor:pointer;appearance:none;width:100%;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A90AA' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+.input:focus,.select:focus{border-color:var(--accent)}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--s3);border-radius:22px;cursor:pointer;transition:.3s;border:1px solid var(--border)}
+.slider::before{content:'';position:absolute;height:16px;width:16px;left:2px;bottom:2px;background:var(--muted);border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.slider::before{transform:translateX(18px);background:#fff}
+
+/* ── SECTION TABS ── */
+.section-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;gap:0}
+.stab{padding:9px 16px;background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--muted);font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap}
+.stab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.stab-panel{display:none}.stab-panel.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ALERTS ── */
+.alert{border-radius:8px;padding:12px 15px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.alert-body{font-size:12px;line-height:1.6;color:var(--t2);flex:1}
+.alert-body strong{color:var(--text)}
+.alert-g{background:var(--gd);border:1px solid rgba(0,240,122,.25)}
+.alert-b{background:var(--bg2);border:1px solid rgba(30,144,255,.3)}
+.alert-y{background:var(--yd);border:1px solid rgba(255,214,0,.3)}
+.alert-r{background:var(--rd);border:1px solid rgba(255,58,58,.3)}
+.alert-p{background:var(--pd);border:1px solid rgba(168,85,247,.3)}
+
+/* ── PROGRESS BARS ── */
+.pbar{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-top:5px}
+.pfill{height:100%;border-radius:3px;transition:width .6s ease}
+
+/* ── TIMELINE ── */
+.timeline{border-left:2px solid var(--border);padding-left:16px;margin-left:8px}
+.tl-item{position:relative;padding-bottom:16px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-22px;top:3px;width:12px;height:12px;border-radius:50%;border:2px solid var(--border2);background:var(--bg)}
+.tl-dot.done{background:var(--accent);border-color:var(--accent)}
+.tl-dot.warn{background:var(--yellow);border-color:var(--yellow)}
+.tl-dot.err{background:var(--red);border-color:var(--red)}
+.tl-h{font-family:var(--fd);font-weight:700;font-size:13px;margin-bottom:2px}
+.tl-d{font-size:11px;color:var(--muted);line-height:1.5}
+.tl-t{font-family:var(--fm);font-size:9px;color:var(--muted)}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:24px;
+  max-width:520px;width:100%;max-height:80vh;overflow-y:auto;animation:fadeIn .2s ease}
+.modal-h{font-family:var(--fd);font-weight:900;font-size:22px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.modal-footer{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* ── SPARKLINES (SVG) ── */
+.spark{display:block}
+
+/* ── STATUS DOTS ── */
+.sdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;flex-shrink:0}
+.sdot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sdot.yellow{background:var(--yellow)}
+.sdot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.sdot.gray{background:var(--muted)}
+
+/* ── FEED ── */
+.feed-item{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.feed-body{flex:1;min-width:0}
+.feed-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.feed-meta{font-family:var(--fm);font-size:9px;color:var(--muted)}
+.feed-action{flex-shrink:0}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.tag{display:inline-block;background:var(--s3);border:1px solid var(--border);border-radius:4px;
+  padding:2px 7px;font-family:var(--fm);font-size:9px;color:var(--muted);margin:2px}
+.heat{display:flex;gap:2px;flex-wrap:wrap}
+.heat-cell{width:12px;height:12px;border-radius:2px;cursor:pointer;transition:transform .1s}
+.heat-cell:hover{transform:scale(1.3)}
+code{background:var(--s3);padding:1px 5px;border-radius:3px;font-family:var(--fm);font-size:10px;color:var(--cyan)}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.row-actions{display:flex;gap:5px;opacity:0;transition:opacity .2s}
+tbody tr:hover .row-actions{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-box">PF</div>
+    <span class="logo-text">PartsFlow</span>
+    <span class="logo-tag">Back Office</span>
+  </div>
+  <div class="top-stats">
+    <div class="tstat"><div class="tstat-v" style="color:var(--green)" id="ts-rev">$4,820</div><div class="tstat-l">Revenue Today</div></div>
+    <div class="tstat"><div class="tstat-v" id="ts-orders">47</div><div class="tstat-l">Orders Today</div></div>
+    <div class="tstat"><div class="tstat-v" id="ts-drivers">23</div><div class="tstat-l">Drivers Online</div></div>
+    <div class="tstat"><div class="tstat-v" id="ts-sla" style="color:var(--green)">94%</div><div class="tstat-l">SLA Compliance</div></div>
+    <div class="tstat"><div class="tstat-v" id="ts-eta" style="color:var(--aw)">31 min</div><div class="tstat-l">Avg Delivery</div></div>
+  </div>
+  <div class="top-actions">
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+    <div class="alert-bell" onclick="nav('alerts')">
+      <button class="btn btn-ghost btn-sm">🔔 Alerts</button>
+      <div class="badge-count" id="alert-count">3</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openModal('dispatch-modal')">⚡ Emergency Dispatch</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal('new-order-modal')">+ New Order</button>
+  </div>
+</div>
+
+<div class="body-wrap">
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="nav-group">Operations</div>
+  <div class="nav-item active" onclick="nav('dashboard')"><span>📊</span>Dashboard<span class="nav-badge green">LIVE</span></div>
+  <div class="nav-item" onclick="nav('orders')"><span>📦</span>Orders<span class="nav-badge" id="nb-orders">12</span></div>
+  <div class="nav-item" onclick="nav('dispatch')"><span>🗺</span>Dispatch Center<span class="nav-badge" id="nb-dispatch">3</span></div>
+  <div class="nav-item" onclick="nav('drivers')"><span>🚗</span>Driver Ops</div>
+  <div class="nav-item" onclick="nav('suppliers')"><span>📡</span>Supplier Ops<span class="nav-badge yellow" id="nb-suppliers">2</span></div>
+  <hr class="nav-divider"/>
+  <div class="nav-group">Business</div>
+  <div class="nav-item" onclick="nav('shops')"><span>🔧</span>Shop Accounts</div>
+  <div class="nav-item" onclick="nav('municipal')"><span>🏛</span>Municipal HQ</div>
+  <div class="nav-item" onclick="nav('billing')"><span>💰</span>Billing & Revenue</div>
+  <div class="nav-item" onclick="nav('referrals')"><span>🤝</span>Referral HQ</div>
+  <hr class="nav-divider"/>
+  <div class="nav-group">Platform</div>
+  <div class="nav-item" onclick="nav('zones')"><span>⚡</span>Zone Control</div>
+  <div class="nav-item" onclick="nav('pricing')"><span>🧮</span>Pricing Config</div>
+  <div class="nav-item" onclick="nav('alerts')"><span>🔔</span>Alerts & SLA<span class="nav-badge" id="nb-alerts">3</span></div>
+  <div class="nav-item" onclick="nav('audit')"><span>📋</span>Audit Log</div>
+  <div class="nav-item" onclick="nav('health')"><span>🖥</span>System Health</div>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<div class="main">
+
+<!-- ════════════════════ DASHBOARD ════════════════════ -->
+<div class="page active" id="page-dashboard">
+  <div class="pg-header">
+    <div><div class="pg-title">Operations Dashboard</div><div class="pg-sub">Monday, May 4 · Baltimore Metro · Real-time data</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📊 Export Report</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('dispatch')">🗺 Live Dispatch →</button>
+    </div>
+  </div>
+
+  <!-- Critical Alerts Banner -->
+  <div class="alert alert-r" style="margin-bottom:16px">
+    <span style="font-size:18px">🚨</span>
+    <div class="alert-body"><strong>Zone F (Dundalk) SLA Critical:</strong> 71% compliance — only 1 active driver. 3 orders at risk.
+    <button class="btn btn-yellow btn-xs" style="margin-left:10px" onclick="surgeZone('F')">Deploy Surge →</button></div>
+    <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0">×</button>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">$4,820</div><div class="metric-lbl">Revenue Today</div><div class="metric-delta delta-up">↑ $614 vs yesterday</div></div>
+    <div class="metric"><div class="metric-val">47</div><div class="metric-lbl">Orders Today</div><div class="metric-delta delta-up">↑ 8 above daily avg</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">31 min</div><div class="metric-lbl">Avg Delivery</div><div class="metric-delta delta-up">↓ 4 min vs last week</div></div>
+    <div class="metric blue"><div class="metric-val">94%</div><div class="metric-lbl">SLA Compliance</div><div class="metric-delta delta-up">↑ 1.2% this week</div></div>
+    <div class="metric"><div class="metric-val" id="active-drivers-count">23</div><div class="metric-lbl">Drivers Online</div><div class="metric-delta delta-nt">3 in surge zone</div></div>
+    <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">3</div><div class="metric-lbl">SLA At Risk</div><div class="metric-delta delta-dn">Zone F critical</div></div>
+    <div class="metric purple"><div class="metric-val" style="color:var(--purple)">$142K</div><div class="metric-lbl">Monthly Run Rate</div><div class="metric-delta delta-up">↑ 28% MoM</div></div>
+    <div class="metric red"><div class="metric-val" style="color:var(--red)">2</div><div class="metric-lbl">P1 Active</div><div class="metric-delta delta-nt">Police + Fire units</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
+    <!-- Live Order Feed -->
+    <div class="card" style="grid-column:span 2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-family:var(--fd);font-weight:700;font-size:17px">Live Order Feed <span class="live-dot" style="width:6px;height:6px;display:inline-block;margin-left:5px"></span></div>
+        <button class="btn btn-ghost btn-xs" onclick="nav('orders')">View All →</button>
+      </div>
+      <div id="live-feed"></div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:17px;margin-bottom:14px">Quick Actions</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="openModal('dispatch-modal')">⚡ Emergency Dispatch</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="nav('zones');setTimeout(()=>surgeZone('A'),300)">🔥 Trigger Zone Surge</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="nav('drivers');setTimeout(()=>openModal('onboard-modal'),300)">🚗 Onboard Driver</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="nav('suppliers')">📡 Supplier Sync All</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="nav('billing')">💳 Process Refunds</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="exportReport()">📊 Export Daily Report</button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;font-size:12px" onclick="nav('health')">🖥 System Health</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zone Status + Driver Heatmap -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:17px;margin-bottom:14px">Zone Status</div>
+      <div id="zone-status-list"></div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:17px;margin-bottom:8px">Delivery Volume · 7-Day Heatmap</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Darker = higher volume</div>
+      <div id="heatmap" class="heat" style="gap:3px"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-family:var(--fm);font-size:9px;color:var(--muted)">MON</span>
+        <span style="font-family:var(--fm);font-size:9px;color:var(--muted)">SUN</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Breakdown -->
+  <div class="card">
+    <div style="font-family:var(--fd);font-weight:700;font-size:17px;margin-bottom:16px">Revenue Breakdown — May 2025</div>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">Local Shops — Delivery Fees</span><span style="font-family:var(--fd);font-weight:700">$84,200 <span style="font-size:11px;color:var(--muted)">59%</span></span></div><div class="pbar"><div class="pfill" style="width:59%;background:linear-gradient(90deg,var(--accent),var(--a2,#FFD600))"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">Municipal Contracts</span><span style="font-family:var(--fd);font-weight:700">$42,800 <span style="font-size:11px;color:var(--muted)">30%</span></span></div><div class="pbar"><div class="pfill" style="width:30%;background:linear-gradient(90deg,var(--blue),var(--bb))"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">Shop Pro Subscriptions</span><span style="font-family:var(--fd);font-weight:700">$15,600 <span style="font-size:11px;color:var(--muted)">11%</span></span></div><div class="pbar"><div class="pfill" style="width:11%;background:var(--green)"></div></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div><div style="font-family:var(--fd);font-weight:900;font-size:20px;color:var(--green)">$142K</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">MRR</div></div>
+      <div><div style="font-family:var(--fd);font-weight:900;font-size:20px">$1.7M</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">ARR Projected</div></div>
+      <div><div style="font-family:var(--fd);font-weight:900;font-size:20px">68%</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">Gross Margin</div></div>
+      <div><div style="font-family:var(--fd);font-weight:900;font-size:20px;color:var(--yellow)">$18.2K</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">Referral Payouts</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ ORDERS ════════════════════ -->
+<div class="page" id="page-orders">
+  <div class="pg-header">
+    <div><div class="pg-title">Order Management</div><div class="pg-sub">All orders — filter, inspect, intervene in real time</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📥 Export CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('new-order-modal')">+ Create Order</button>
+    </div>
+  </div>
+  <div class="form-row" style="margin-bottom:16px">
+    <select class="select" style="flex:none;width:150px" id="ord-filter-status" onchange="renderOrders()"><option value="">All Statuses</option><option>En Route</option><option>Dispatching</option><option>Priority P1</option><option>Delivered</option><option>Cancelled</option></select>
+    <select class="select" style="flex:none;width:150px" id="ord-filter-type" onchange="renderOrders()"><option value="">All Types</option><option>Shop</option><option>Municipal</option></select>
+    <select class="select" style="flex:none;width:140px" id="ord-filter-zone" onchange="renderOrders()"><option value="">All Zones</option><option>Zone A</option><option>Zone B</option><option>Zone C</option><option>Zone D</option><option>Zone E</option><option>Zone F</option></select>
+    <input class="input" placeholder="Search order ID, part, shop..." style="flex:2" id="ord-search" oninput="renderOrders()"/>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ord-search').value='';renderOrders()">Clear</button>
+  </div>
+  <div class="metric-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="metric"><div class="metric-val">47</div><div class="metric-lbl">Total Today</div></div>
+    <div class="metric"><div class="metric-val" style="color:var(--aw)">12</div><div class="metric-lbl">In Flight</div></div>
+    <div class="metric red"><div class="metric-val" style="color:var(--red)">2</div><div class="metric-lbl">P1 Active</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">29</div><div class="metric-lbl">Delivered</div></div>
+    <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">3</div><div class="metric-lbl">SLA At Risk</div></div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Order ID</th><th>Part</th><th>Shop / Customer</th><th>Driver</th><th>Zone</th><th>Priority</th><th>ETA</th><th>Revenue</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="orders-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- ════════════════════ DISPATCH CENTER ════════════════════ -->
+<div class="page" id="page-dispatch">
+  <div class="pg-header">
+    <div><div class="pg-title">Dispatch Center</div><div class="pg-sub">Real-time driver assignment · Zone heat · SLA watchdog</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-yellow btn-sm" onclick="openModal('dispatch-modal')">⚡ Emergency Dispatch</button>
+      <button class="btn btn-primary btn-sm" onclick="surgeAll()">🔥 Surge All Zones</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+    <!-- Dispatch Map Sim -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:var(--fd);font-weight:700;font-size:16px">Live Dispatch Map</div>
+        <span class="badge bg"><span class="live-dot" style="width:5px;height:5px;margin-right:4px"></span>7 DRIVERS ACTIVE</span>
+      </div>
+      <div style="position:relative;height:260px;background:var(--s2)">
+        <div style="position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:26px 26px;opacity:.4"></div>
+        <svg id="dispatch-map" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"></svg>
+        <!-- Zone labels -->
+        <div style="position:absolute;top:14px;left:14px;background:rgba(5,7,15,.8);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+          <div id="dispatch-legend" style="display:flex;flex-direction:column;gap:4px;font-family:var(--fm);font-size:9px"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Active P1/P2 Orders -->
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Priority Queue</div>
+      <div id="priority-queue"></div>
+    </div>
+  </div>
+  <!-- Driver Grid -->
+  <div class="card">
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Active Driver Roster</div>
+    <div id="driver-dispatch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+  </div>
+</div>
+
+<!-- ════════════════════ DRIVER OPS ════════════════════ -->
+<div class="page" id="page-drivers">
+  <div class="pg-header">
+    <div><div class="pg-title">Driver Operations</div><div class="pg-sub">Onboard · assign · monitor · pay</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📥 Export</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('onboard-modal')">+ Onboard Driver</button>
+    </div>
+  </div>
+  <div class="section-tabs">
+    <button class="stab active" onclick="stab(this,'drv-roster')">Roster</button>
+    <button class="stab" onclick="stab(this,'drv-earnings')">Earnings</button>
+    <button class="stab" onclick="stab(this,'drv-ratings')">Ratings</button>
+    <button class="stab" onclick="stab(this,'drv-onboarding')">Onboarding Queue</button>
+  </div>
+  <div class="stab-panel active" id="drv-roster">
+    <div class="metric-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="metric green"><div class="metric-val" style="color:var(--green)">23</div><div class="metric-lbl">Online Now</div></div>
+      <div class="metric"><div class="metric-val">7</div><div class="metric-lbl">Offline</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--aw)">11</div><div class="metric-lbl">En Route</div></div>
+      <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">4.82★</div><div class="metric-lbl">Avg Rating</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--green)">$142</div><div class="metric-lbl">Avg Day Earn</div></div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Driver</th><th>Zone</th><th>Status</th><th>Current Job</th><th>Deliveries Today</th><th>Earnings</th><th>Rating</th><th>Surge Pay</th><th>Actions</th></tr></thead>
+      <tbody id="drivers-tbody"></tbody>
+    </table></div>
+  </div>
+  <div class="stab-panel" id="drv-earnings">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Driver</th><th>This Week</th><th>This Month</th><th>All-Time</th><th>Deliveries</th><th>Avg Per Run</th><th>Pending Payout</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>David W.</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$1,386</td><td>$5,544</td><td>$62,100</td><td>63</td><td>$22</td><td style="color:var(--yellow)">$198</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Payout sent to David W.')">Pay Now</button></div></td></tr>
+        <tr><td>Marcus D.</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$994</td><td>$3,976</td><td>$47,800</td><td>45</td><td>$22.09</td><td style="color:var(--yellow)">$142</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Payout sent to Marcus D.')">Pay Now</button></div></td></tr>
+        <tr><td>Keisha M.</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$826</td><td>$3,304</td><td>$29,400</td><td>37</td><td>$22.32</td><td style="color:var(--yellow)">$118</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Payout sent to Keisha M.')">Pay Now</button></div></td></tr>
+        <tr><td>Rosa L.</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$588</td><td>$2,352</td><td>$18,900</td><td>27</td><td>$21.78</td><td style="color:var(--yellow)">$84</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Payout sent to Rosa L.')">Pay Now</button></div></td></tr>
+      </tbody>
+    </table></div>
+    <div style="margin-top:14px;display:flex;gap:10px">
+      <button class="btn btn-green btn-sm" onclick="toast('Batch payout initiated for all drivers — $542 total')">💸 Batch Payout All Pending</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📊 Earnings Report</button>
+    </div>
+  </div>
+  <div class="stab-panel" id="drv-ratings">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Driver</th><th>Rating</th><th>Reviews</th><th>On-Time Rate</th><th>Complaints</th><th>Trend</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>David W.</td><td><span style="color:var(--yellow)">⭐ 4.95</span></td><td>412</td><td><span class="badge bg">98.2%</span></td><td>0</td><td style="color:var(--green)">↑ 0.05</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View Reviews</button></div></td></tr>
+        <tr><td>Marcus D.</td><td><span style="color:var(--yellow)">⭐ 4.90</span></td><td>387</td><td><span class="badge bg">97.1%</span></td><td>1</td><td style="color:var(--green)">↑ 0.02</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View Reviews</button></div></td></tr>
+        <tr><td>Keisha M.</td><td><span style="color:var(--yellow)">⭐ 4.80</span></td><td>244</td><td><span class="badge bg">95.8%</span></td><td>2</td><td style="color:var(--muted)">→ 0.00</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View Reviews</button></div></td></tr>
+        <tr><td>James K.</td><td><span style="color:var(--yellow)">⭐ 4.60</span></td><td>98</td><td><span class="badge by">88.4%</span></td><td>5</td><td style="color:var(--red)">↓ 0.12</td><td><div class="row-actions"><button class="btn btn-yellow btn-xs" onclick="toast('Warning issued to James K.')">⚠ Issue Warning</button></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="stab-panel" id="drv-onboarding">
+    <div class="alert alert-b"><span style="font-size:16px">ℹ️</span><div class="alert-body"><strong>4 drivers</strong> pending background check approval. <strong>2</strong> pending document verification.</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Applicant</th><th>Zone</th><th>Applied</th><th>Background</th><th>Documents</th><th>Vehicle</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>T. Johnson</td><td>Zone A</td><td>May 2</td><td><span class="badge bg">Cleared</span></td><td><span class="badge bg">Verified</span></td><td>2020 Honda Civic</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('T. Johnson approved and activated!')">✓ Approve</button><button class="btn btn-red btn-xs" onclick="toast('T. Johnson application rejected.')">Reject</button></div></td></tr>
+        <tr><td>M. Garcia</td><td>Zone C</td><td>May 1</td><td><span class="badge by">Pending</span></td><td><span class="badge bg">Verified</span></td><td>2019 Toyota Camry</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">Check Status</button></div></td></tr>
+        <tr><td>R. Smith</td><td>Zone F</td><td>Apr 30</td><td><span class="badge bg">Cleared</span></td><td><span class="badge by">Pending</span></td><td>2018 Ford Focus</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">Review Docs</button></div></td></tr>
+        <tr><td>A. Patel</td><td>Zone B</td><td>Apr 29</td><td><span class="badge bg">Cleared</span></td><td><span class="badge bg">Verified</span></td><td>2021 Hyundai Elantra</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('A. Patel approved and activated!')">✓ Approve</button><button class="btn btn-red btn-xs" onclick="toast('A. Patel application rejected.')">Reject</button></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ════════════════════ SUPPLIER OPS ════════════════════ -->
+<div class="page" id="page-suppliers">
+  <div class="pg-header">
+    <div><div class="pg-title">Supplier Operations</div><div class="pg-sub">Catalog sync · reliability · inventory health</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-yellow btn-sm" onclick="syncAll()">🔄 Sync All Feeds</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('supplier-modal')">+ Add Supplier</button>
+    </div>
+  </div>
+  <div class="metric-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">214</div><div class="metric-lbl">Active Suppliers</div></div>
+    <div class="metric"><div class="metric-val">15.2M</div><div class="metric-lbl">SKUs Indexed</div></div>
+    <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">2</div><div class="metric-lbl">Sync Warnings</div></div>
+    <div class="metric"><div class="metric-val" style="color:var(--green)">92s</div><div class="metric-lbl">Avg Sync Cycle</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">0.8%</div><div class="metric-lbl">Stale Stock Rate</div></div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Supplier</th><th>Zone</th><th>SKUs</th><th>Orders/Mo</th><th>Avg Pickup</th><th>Reliability</th><th>Last Sync</th><th>Sync Status</th><th>Actions</th></tr></thead>
+    <tbody id="suppliers-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- ════════════════════ SHOP ACCOUNTS ════════════════════ -->
+<div class="page" id="page-shops">
+  <div class="pg-header">
+    <div><div class="pg-title">Shop Accounts</div><div class="pg-sub">Manage local repair shop relationships</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📥 Export</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('new-shop-modal')">+ Add Shop</button>
+    </div>
+  </div>
+  <div class="section-tabs">
+    <button class="stab active" onclick="stab(this,'shops-all')">All Accounts</button>
+    <button class="stab" onclick="stab(this,'shops-pro')">Shop Pro (34)</button>
+    <button class="stab" onclick="stab(this,'shops-free')">Free Tier (89)</button>
+    <button class="stab" onclick="stab(this,'shops-churn')">At Risk</button>
+  </div>
+  <div class="stab-panel active" id="shops-all">
+    <div class="form-row"><input class="input" placeholder="Search shop name, address..." style="flex:3"/><select class="select" style="flex:1"><option>All Plans</option><option>Shop Pro</option><option>Pay-As-You-Go</option><option>Municipal</option></select><select class="select" style="flex:1"><option>All Zones</option><option>Zone A</option><option>Zone B</option><option>Zone C</option></select></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Shop</th><th>Plan</th><th>Zone</th><th>Orders/Mo</th><th>MRR</th><th>Avg Delivery</th><th>Last Order</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr onclick="openModal('shop-detail-modal')"><td><strong>Eastside Auto Repair</strong><br><span style="font-size:10px;color:var(--muted)">1402 E Baltimore St · Zone A</span></td><td><span class="badge bo">Shop Pro</span></td><td>A</td><td>176</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$5,600</td><td>29 min</td><td>2 min ago</td><td><span class="badge bg">Active</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-ghost btn-xs">Email</button></div></td></tr>
+        <tr onclick="openModal('shop-detail-modal')"><td><strong>Precision Imports</strong><br><span style="font-size:10px;color:var(--muted)">876 Light St · Zone A</span></td><td><span class="badge bo">Shop Pro</span></td><td>A</td><td>94</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$3,200</td><td>33 min</td><td>1 hr ago</td><td><span class="badge bg">Active</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-ghost btn-xs">Email</button></div></td></tr>
+        <tr onclick="openModal('shop-detail-modal')"><td><strong>Fleet Plus</strong><br><span style="font-size:10px;color:var(--muted)">2201 E Fayette St · Zone B</span></td><td><span class="badge bo">Shop Pro</span></td><td>B</td><td>142</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$4,800</td><td>31 min</td><td>3 hr ago</td><td><span class="badge bg">Active</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-ghost btn-xs">Email</button></div></td></tr>
+        <tr onclick="openModal('shop-detail-modal')"><td><strong>Highlandtown Tire</strong><br><span style="font-size:10px;color:var(--muted)">3400 Eastern Ave · Zone B</span></td><td><span class="badge by">Pay-As-You-Go</span></td><td>B</td><td>34</td><td style="color:var(--yellow);font-family:var(--fd);font-weight:700">$680</td><td>44 min</td><td>Yesterday</td><td><span class="badge by">Low Usage</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-yellow btn-xs" onclick="toast('Upgrade email sent to Highlandtown Tire')">Upsell</button></div></td></tr>
+        <tr onclick="openModal('shop-detail-modal')"><td><strong>Dundalk Auto Care</strong><br><span style="font-size:10px;color:var(--muted)">7800 Wise Ave · Zone F</span></td><td><span class="badge by">Pay-As-You-Go</span></td><td>F</td><td>12</td><td style="color:var(--yellow);font-family:var(--fd);font-weight:700">$240</td><td>58 min</td><td>4 days ago</td><td><span class="badge br">At Risk</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-yellow btn-xs" onclick="toast('Re-engagement email sent to Dundalk Auto Care')">Re-engage</button></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="stab-panel" id="shops-pro"><div class="alert alert-g"><span>📈</span><div class="alert-body"><strong>34 active Shop Pro accounts</strong> generating $149/mo each. Combined subscription MRR: <strong>$5,066</strong>. Renewal cohort next 30 days: 8 shops.</div></div></div>
+  <div class="stab-panel" id="shops-free"><div class="alert alert-b"><span>💡</span><div class="alert-body"><strong>89 free tier shops</strong> with conversion opportunity. Top 10 by order volume are using 40+ orders/mo — prime upsell targets for Shop Pro.</div></div><button class="btn btn-primary btn-sm" onclick="toast('Upsell campaign launched for top 10 free users')">🚀 Launch Upsell Campaign</button></div>
+  <div class="stab-panel" id="shops-churn"><div class="alert alert-r"><span>⚠️</span><div class="alert-body"><strong>6 shops</strong> haven't ordered in 7+ days. Risk of churn. Automated re-engagement available.</div></div><button class="btn btn-yellow btn-sm" onclick="toast('Re-engagement sequence started for 6 at-risk shops')">📧 Start Re-engagement Sequence</button></div>
+</div>
+
+<!-- ════════════════════ MUNICIPAL HQ ════════════════════ -->
+<div class="page" id="page-municipal">
+  <div class="pg-header">
+    <div><div class="pg-title">Municipal HQ</div><div class="pg-sub">City fleet contracts · department management · SLA enforcement</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📊 SLA Report</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('contract-modal')">+ New Contract</button>
+    </div>
+  </div>
+  <div class="metric-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="metric blue"><div class="metric-val" style="color:var(--bb)">3</div><div class="metric-lbl">Active Contracts</div></div>
+    <div class="metric"><div class="metric-val">287</div><div class="metric-lbl">Orders This Month</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">94%</div><div class="metric-lbl">SLA Compliance</div></div>
+    <div class="metric"><div class="metric-val" style="color:var(--blue)">$8,420</div><div class="metric-lbl">Spend This Month</div></div>
+    <div class="metric"><div class="metric-val" style="color:var(--red)">2</div><div class="metric-lbl">P1 Active Now</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Active Contracts</div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="card-sm" style="border-left:3px solid var(--blue)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <div style="font-family:var(--fd);font-weight:700">Baltimore City — BPD + Fire + DPW</div>
+            <span class="badge bg">Active</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Direct Contract · P1: 20min · P2: 40min · PO Required</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">DELIVERY RATE</span><div style="font-family:var(--fd);font-weight:700">$16.00 flat</div></div>
+            <div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">MONTHLY CAP</span><div style="font-family:var(--fd);font-weight:700">$12,000</div></div>
+            <div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">CURRENT SPEND</span><div style="font-family:var(--fd);font-weight:700;color:var(--green)">$8,420</div></div>
+          </div>
+          <div class="pbar" style="margin-top:8px"><div class="pfill" style="width:70%;background:linear-gradient(90deg,var(--blue),var(--bb))"></div></div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:3px">70% of monthly cap used</div>
+        </div>
+        <div class="card-sm" style="border-left:3px solid var(--purple)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <div style="font-family:var(--fd);font-weight:700">Sourcewell Cooperative — 3 municipalities</div>
+            <span class="badge bp">Sourcewell</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Cooperative Purchasing · Contract #190201</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">DISCOUNT</span><div style="font-family:var(--fd);font-weight:700">12% off list</div></div>
+            <div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">MEMBERS</span><div style="font-family:var(--fd);font-weight:700">3 cities</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">SLA Compliance by Department</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px">Police (BPD)</span><span style="font-family:var(--fm);font-size:11px;color:var(--green)">97%</span></div><div class="pbar"><div class="pfill" style="width:97%;background:var(--green)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px">Fire &amp; EMS</span><span style="font-family:var(--fm);font-size:11px;color:var(--green)">94%</span></div><div class="pbar"><div class="pfill" style="width:94%;background:var(--green)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px">Public Works</span><span style="font-family:var(--fm);font-size:11px;color:var(--yellow)">88%</span></div><div class="pbar"><div class="pfill" style="width:88%;background:var(--yellow)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px">Parks &amp; Recreation</span><span style="font-family:var(--fm);font-size:11px;color:var(--green)">96%</span></div><div class="pbar"><div class="pfill" style="width:96%;background:var(--green)"></div></div></div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="exportReport()">📊 Export Full SLA Report</button>
+        <button class="btn btn-blue btn-sm btn-ghost" onclick="toast('Compliance report emailed to city procurement officer')">📧 Email to City</button>
+      </div>
+    </div>
+  </div>
+  <!-- Fleet Status -->
+  <div class="card">
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Fleet Vehicle Status</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Unit ID</th><th>Department</th><th>Vehicle</th><th>Status</th><th>Active Order</th><th>Last Service</th><th>Mileage</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td class="td-mono">PD-2241</td><td>BPD</td><td>Ford Police Interceptor</td><td><span class="badge br">OUT OF SERVICE</span></td><td>Parts ETA 8 min</td><td>Mar 15</td><td>84,200</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+        <tr><td class="td-mono">PD-1892</td><td>BPD</td><td>Dodge Charger</td><td><span class="badge by">MAINT DUE</span></td><td>—</td><td>Feb 28</td><td>102,400</td><td><div class="row-actions"><button class="btn btn-yellow btn-xs" onclick="toast('Maintenance order created for PD-1892')">Order Parts</button></div></td></tr>
+        <tr><td class="td-mono">PD-0554</td><td>BPD</td><td>Ford Explorer K9</td><td><span class="badge bg">OPERATIONAL</span></td><td>—</td><td>Apr 2</td><td>67,100</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+        <tr><td class="td-mono">FD-0012</td><td>Fire EMS</td><td>Pierce Aerial Truck</td><td><span class="badge by">PARTS ORDERED</span></td><td>Brake pads ETA 22 min</td><td>Jan 10</td><td>44,800</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">Track Order</button></div></td></tr>
+        <tr><td class="td-mono">DPW-0847</td><td>DPW</td><td>Ford F-550 Road Crew</td><td><span class="badge bg">OPERATIONAL</span></td><td>—</td><td>Apr 18</td><td>91,300</td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ════════════════════ BILLING & REVENUE ════════════════════ -->
+<div class="page" id="page-billing">
+  <div class="pg-header">
+    <div><div class="pg-title">Billing & Revenue</div><div class="pg-sub">Invoices · refunds · Stripe reconciliation · payouts</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📊 Revenue Report</button>
+      <button class="btn btn-yellow btn-sm" onclick="processRefunds()">💸 Process Pending Refunds</button>
+    </div>
+  </div>
+  <div class="section-tabs">
+    <button class="stab active" onclick="stab(this,'bill-overview')">Overview</button>
+    <button class="stab" onclick="stab(this,'bill-invoices')">Invoices</button>
+    <button class="stab" onclick="stab(this,'bill-refunds')">Refunds <span style="background:var(--rd);color:var(--red);padding:1px 5px;border-radius:3px;font-size:9px;margin-left:4px">3</span></button>
+    <button class="stab" onclick="stab(this,'bill-stripe')">Stripe Ledger</button>
+  </div>
+  <div class="stab-panel active" id="bill-overview">
+    <div class="metric-grid">
+      <div class="metric green"><div class="metric-val" style="color:var(--green)">$142K</div><div class="metric-lbl">Monthly Run Rate</div><div class="metric-delta delta-up">↑ 28% MoM</div></div>
+      <div class="metric purple"><div class="metric-val" style="color:var(--purple)">$1.7M</div><div class="metric-lbl">ARR Projected</div></div>
+      <div class="metric"><div class="metric-val">68%</div><div class="metric-lbl">Gross Margin</div><div class="metric-delta delta-up">↑ 3pts</div></div>
+      <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">$18.2K</div><div class="metric-lbl">Referral Payouts/Mo</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--green)">$0</div><div class="metric-lbl">SLA Refunds Pending</div></div>
+      <div class="metric"><div class="metric-val">$5,066</div><div class="metric-lbl">Subscription MRR</div></div>
+    </div>
+    <div class="g2">
+      <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:15px;margin-bottom:12px">Revenue by Stream</div><div style="display:flex;flex-direction:column;gap:9px"><div><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:12px">Delivery Fees</span><span style="font-family:var(--fd);font-weight:700">$84,200</span></div><div class="pbar"><div class="pfill" style="width:59%;background:linear-gradient(90deg,var(--accent),#FFD600)"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:12px">Municipal</span><span style="font-family:var(--fd);font-weight:700">$42,800</span></div><div class="pbar"><div class="pfill" style="width:30%;background:linear-gradient(90deg,var(--blue),var(--bb))"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:12px">Subscriptions</span><span style="font-family:var(--fd);font-weight:700">$15,600</span></div><div class="pbar"><div class="pfill" style="width:11%;background:var(--green)"></div></div></div></div></div>
+      <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:15px;margin-bottom:12px">Payment Health</div><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">Stripe success rate</span><span style="font-family:var(--fd);font-weight:700;color:var(--green)">99.2%</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">Failed payments (30d)</span><span style="font-family:var(--fd);font-weight:700;color:var(--red)">3</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">Pending payouts (drivers)</span><span style="font-family:var(--fd);font-weight:700;color:var(--yellow)">$542</span></div><div style="display:flex;justify-content:space-between;padding:8px 0"><span style="font-size:12px">Avg charge: $89</span><span style="font-family:var(--fd);font-weight:700">2.9% Stripe fee</span></div></div></div>
+    </div>
+  </div>
+  <div class="stab-panel" id="bill-invoices">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Invoice</th><th>Shop</th><th>Period</th><th>Orders</th><th>Amount</th><th>Stripe PI</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td class="td-mono">INV-2025-0481</td><td>Baltimore City (BPD)</td><td>May 2025</td><td>287</td><td style="font-family:var(--fd);font-weight:700">$8,420</td><td class="td-mono" style="font-size:10px">pi_3P...</td><td><span class="badge bg">Paid</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">PDF</button></div></td></tr>
+        <tr><td class="td-mono">INV-2025-0480</td><td>Eastside Auto Repair</td><td>May 2025</td><td>176</td><td style="font-family:var(--fd);font-weight:700">$5,600</td><td class="td-mono" style="font-size:10px">pi_3P...</td><td><span class="badge bg">Paid</span></td><td><div class="row-actions"><button class="btn btn-ghost btn-xs">PDF</button></div></td></tr>
+        <tr><td class="td-mono">INV-2025-0479</td><td>Fleet Plus</td><td>May 2025</td><td>142</td><td style="font-family:var(--fd);font-weight:700">$4,800</td><td class="td-mono" style="font-size:10px">pi_3P...</td><td><span class="badge by">Pending</span></td><td><div class="row-actions"><button class="btn btn-yellow btn-xs" onclick="toast('Payment reminder sent to Fleet Plus')">Remind</button></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="stab-panel" id="bill-refunds">
+    <div class="alert alert-y"><span>⚠️</span><div class="alert-body"><strong>3 SLA breach refunds pending.</strong> Total exposure: $54.00. Auto-refund trigger is enabled — these require manual review due to dispute flags.</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Order</th><th>Shop</th><th>SLA Missed By</th><th>Refund Amount</th><th>Reason</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td class="td-mono">#PF-4711</td><td>Dundalk Auto Care</td><td>18 min over</td><td style="color:var(--red);font-family:var(--fd);font-weight:700">$18.00</td><td>Zone F driver shortage</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Refund of $18 issued to Dundalk Auto Care')">✓ Issue Refund</button><button class="btn btn-red btn-xs" onclick="toast('Refund denied — disputed')">Deny</button></div></td></tr>
+        <tr><td class="td-mono">#PF-4698</td><td>Highlandtown Tire</td><td>9 min over</td><td style="color:var(--red);font-family:var(--fd);font-weight:700">$18.00</td><td>Supplier pickup delay</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Refund of $18 issued to Highlandtown Tire')">✓ Issue Refund</button><button class="btn btn-red btn-xs" onclick="toast('Refund denied — disputed')">Deny</button></div></td></tr>
+        <tr><td class="td-mono">#PF-4682</td><td>Fleet Plus</td><td>4 min over</td><td style="color:var(--red);font-family:var(--fd);font-weight:700">$18.00</td><td>Traffic incident</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('Refund of $18 issued to Fleet Plus')">✓ Issue Refund</button><button class="btn btn-red btn-xs" onclick="toast('Refund denied — disputed')">Deny</button></div></td></tr>
+      </tbody>
+    </table></div>
+    <button class="btn btn-green btn-sm" style="margin-top:12px" onclick="processRefunds()">💸 Approve All 3 Refunds ($54 total)</button>
+  </div>
+  <div class="stab-panel" id="bill-stripe">
+    <div class="alert alert-g"><span>✅</span><div class="alert-body"><strong>Stripe Connect reconciliation:</strong> Last run 4 minutes ago. All transfers matched. 99.2% success rate this month.</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Time</th><th>Type</th><th>Description</th><th>Amount</th><th>Stripe ID</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:var(--fm);font-size:10px">11:42 AM</td><td><span class="badge bg">Charge</span></td><td>Order #PF-4821 — Eastside Auto</td><td style="color:var(--green)">+$89.00</td><td class="td-mono" style="font-size:10px">pi_3P9x...</td><td><span class="badge bg">Success</span></td></tr>
+        <tr><td style="font-family:var(--fm);font-size:10px">11:42 AM</td><td><span class="badge bc">Transfer</span></td><td>Driver pay — Marcus D.</td><td style="color:var(--aw)">-$69.42</td><td class="td-mono" style="font-size:10px">tr_3P9x...</td><td><span class="badge bg">Success</span></td></tr>
+        <tr><td style="font-family:var(--fm);font-size:10px">11:42 AM</td><td><span class="badge bp">Transfer</span></td><td>Referral — T. Rodriguez (Ignition)</td><td style="color:var(--aw)">-$3.50</td><td class="td-mono" style="font-size:10px">tr_3P9y...</td><td><span class="badge bg">Success</span></td></tr>
+        <tr><td style="font-family:var(--fm);font-size:10px">11:38 AM</td><td><span class="badge bg">Charge</span></td><td>Order #PF-4820 — Precision Imports</td><td style="color:var(--green)">+$156.00</td><td class="td-mono" style="font-size:10px">pi_3P8x...</td><td><span class="badge bg">Success</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ════════════════════ REFERRAL HQ ════════════════════ -->
+<div class="page" id="page-referrals">
+  <div class="pg-header">
+    <div><div class="pg-title">Referral HQ</div><div class="pg-sub">Manage tiers · track commissions · process payouts</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-green btn-sm" onclick="toast('Batch referral payouts initiated — $18,200 total')">💸 Batch Payout All</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('referrer-modal')">+ Add Referrer</button>
+    </div>
+  </div>
+  <div class="metric-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">142</div><div class="metric-lbl">Active Referrers</div></div>
+    <div class="metric"><div class="metric-val">38</div><div class="metric-lbl">Shops Referred</div></div>
+    <div class="metric blue"><div class="metric-val" style="color:var(--bb)">3</div><div class="metric-lbl">Municipal Referrals</div></div>
+    <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">$18.2K</div><div class="metric-lbl">Payouts / Month</div></div>
+    <div class="metric purple"><div class="metric-val" style="color:var(--purple)">$0</div><div class="metric-lbl">Disputed</div></div>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Referrer</th><th>Tier</th><th>Referred Shops</th><th>Deliveries/Mo</th><th>Monthly Payout</th><th>YTD Earned</th><th>Pending</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tanya R.</strong><br><span style="font-size:10px;color:var(--muted)">tanya@gmail.com</span></td><td><span class="badge bo">Accelerator</span></td><td>14</td><td>1,840</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$9,200</td><td>$52,400</td><td style="color:var(--yellow)">$9,200</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('$9,200 paid to Tanya R. via Stripe')">Pay</button><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+      <tr><td><strong>James O.</strong><br><span style="font-size:10px;color:var(--muted)">Fleet Manager (BPD)</span></td><td><span class="badge bb">Municipal Connector</span></td><td>1 dept</td><td>287</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$1,435</td><td>$8,610</td><td style="color:var(--yellow)">$1,435</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('$1,435 paid to James O. via Stripe')">Pay</button><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+      <tr><td><strong>Marcus T.</strong><br><span style="font-size:10px;color:var(--muted)">marcus@eastside.com</span></td><td><span class="badge by">Ignition</span></td><td>6</td><td>420</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$1,470</td><td>$6,820</td><td style="color:var(--yellow)">$1,470</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('$1,470 paid to Marcus T. via Stripe')">Pay</button><button class="btn btn-ghost btn-xs">History</button></div></td></tr>
+      <tr><td><strong>Lisa P.</strong><br><span style="font-size:10px;color:var(--muted)">lisa@autogroup.com</span></td><td><span class="badge bg">Spark</span></td><td>2</td><td>84</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$168</td><td>$420</td><td style="color:var(--yellow)">$168</td><td><div class="row-actions"><button class="btn btn-green btn-xs" onclick="toast('$168 paid to Lisa P. via Stripe')">Pay</button></div></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ════════════════════ ZONE CONTROL ════════════════════ -->
+<div class="page" id="page-zones">
+  <div class="pg-header">
+    <div><div class="pg-title">Zone Control</div><div class="pg-sub">Surge · driver deployment · SLA management</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-yellow btn-sm" onclick="surgeAll()">🔥 Surge All Zones</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetAllSurge()">↺ Reset Surge</button>
+    </div>
+  </div>
+  <div id="zone-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:18px"></div>
+  <div class="card">
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Surge Configuration</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Standard SLA (min)</label><input class="input" value="60" id="cfg-sla-std"/></div>
+      <div class="form-group"><label class="form-label">P2 Urgent (min)</label><input class="input" value="40" id="cfg-sla-p2"/></div>
+      <div class="form-group"><label class="form-label">P1 Emergency (min)</label><input class="input" value="20" id="cfg-sla-p1"/></div>
+      <div class="form-group"><label class="form-label">Max Surge Multiplier</label><input class="input" value="2.0" id="cfg-surge-max"/></div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="saveSurgeConfig()">Save Zone Configuration</button>
+  </div>
+</div>
+
+<!-- ════════════════════ PRICING CONFIG ════════════════════ -->
+<div class="page" id="page-pricing">
+  <div class="pg-header">
+    <div><div class="pg-title">Pricing Configuration</div><div class="pg-sub">Live fee rules · referral rates · municipal overrides</div></div>
+    <div class="pg-actions"><button class="btn btn-primary btn-sm" onclick="savePricing()">💾 Save &amp; Apply All</button></div>
+  </div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Delivery Fees</div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Base Delivery Fee ($)</label><input class="input" value="18.00" id="fee-base"/></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Service / Platform Fee ($)</label><input class="input" value="4.00" id="fee-service"/></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">P2 Priority Add-On ($)</label><input class="input" value="8.00" id="fee-p2"/></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">P1 Rush Add-On ($)</label><input class="input" value="18.00" id="fee-p1"/></div>
+      <div class="form-group"><label class="form-label">Driver Pay Share (%)</label><input class="input" value="78" id="fee-driver-share"/></div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Surge Multiplier Rules</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);width:100px">0–60% load</span><input class="input" value="1.0x" style="flex:1"/><span class="badge bg">Normal</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);width:100px">60–75% load</span><input class="input" value="1.2x" style="flex:1"/><span class="badge bg">Light</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);width:100px">75–85% load</span><input class="input" value="1.4x" style="flex:1"/><span class="badge by">Moderate</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);width:100px">85–92% load</span><input class="input" value="1.6x" style="flex:1"/><span class="badge br">High</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:var(--muted);width:100px">92–100% load</span><input class="input" value="2.0x" style="flex:1"/><span class="badge br">Critical</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Referral Rates</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge bg" style="width:80px;justify-content:center">Spark</span><input class="input" placeholder="Activation $" value="50" style="flex:1"/><input class="input" placeholder="$/delivery" value="2.00" style="flex:1"/></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge bo" style="width:80px;justify-content:center">Ignition</span><input class="input" placeholder="Activation $" value="75" style="flex:1"/><input class="input" placeholder="$/delivery" value="3.50" style="flex:1"/></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge by" style="width:80px;justify-content:center">Accelerator</span><input class="input" placeholder="Activation $" value="100" style="flex:1"/><input class="input" placeholder="$/delivery" value="5.00" style="flex:1"/></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge bb" style="width:80px;justify-content:center">Municipal</span><input class="input" placeholder="Pilot Bonus $" value="500" style="flex:1"/><input class="input" placeholder="% yr-1" value="2" style="flex:1"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Municipal Contract Rates</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Baltimore City — Flat Rate ($/delivery)</label><input class="input" value="16.00"/></div>
+        <div class="form-group"><label class="form-label">Sourcewell Discount (%)</label><input class="input" value="12"/></div>
+        <div class="form-group"><label class="form-label">Invoice Terms (days)</label><input class="input" value="30"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--border)">
+          <span style="font-size:12px">PO Required for Municipal Orders</span>
+          <label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+          <span style="font-size:12px">Auto-refund on SLA Breach</span>
+          <label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="alert alert-y"><span>⚠️</span><div class="alert-body"><strong>Changes apply immediately to all new orders.</strong> Existing orders in-flight are not affected. Price changes are logged to the immutable audit trail.</div></div>
+</div>
+
+<!-- ════════════════════ ALERTS & SLA ════════════════════ -->
+<div class="page" id="page-alerts">
+  <div class="pg-header">
+    <div><div class="pg-title">Alerts &amp; SLA</div><div class="pg-sub">Active alerts · SLA breach history · notification rules</div></div>
+    <div class="pg-actions"><button class="btn btn-ghost btn-sm" onclick="clearAlerts()">✓ Mark All Read</button></div>
+  </div>
+  <div id="alerts-list"></div>
+  <div class="divider"></div>
+  <div style="font-family:var(--fd);font-weight:700;font-size:17px;margin-bottom:14px">Alert Rules Configuration</div>
+  <div class="g2">
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:14px;margin-bottom:12px">SLA Thresholds</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">Warn at % of SLA ceiling</span><input class="input" value="80" style="width:70px;text-align:center"/></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">P1 unacked alert (immediate)</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">Zone F coverage alert</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">Auto-refund on breach</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:14px;margin-bottom:12px">Notification Channels</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">Slack — #ops-alerts</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">SMS — Ops Manager</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">Email digest (hourly)</span><label class="toggle"><input type="checkbox"/><span class="slider"></span></label></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">PagerDuty P1 escalation</span><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ AUDIT LOG ════════════════════ -->
+<div class="page" id="page-audit">
+  <div class="pg-header">
+    <div><div class="pg-title">Audit Log</div><div class="pg-sub">Immutable record of all platform actions · 7-year retention</div></div>
+    <div class="pg-actions"><button class="btn btn-ghost btn-sm" onclick="exportReport()">📥 Export Log</button></div>
+  </div>
+  <div class="form-row" style="margin-bottom:16px">
+    <select class="select" style="flex:none;width:150px"><option>All Actions</option><option>Orders</option><option>Pricing Changes</option><option>Driver Actions</option><option>Auth Events</option><option>Refunds</option></select>
+    <select class="select" style="flex:none;width:150px"><option>All Users</option><option>System</option><option>Admin</option><option>Driver</option><option>Shop</option></select>
+    <input class="input" placeholder="Search log..." style="flex:2"/>
+    <input class="input" type="date" style="flex:none;width:150px"/>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Timestamp</th><th>Action</th><th>Actor</th><th>Entity</th><th>Details</th><th>IP</th></tr></thead>
+    <tbody id="audit-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- ════════════════════ SYSTEM HEALTH ════════════════════ -->
+<div class="page" id="page-health">
+  <div class="pg-header">
+    <div><div class="pg-title">System Health</div><div class="pg-sub">Service status · latency · Kafka · Redis · database</div></div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost btn-sm" onclick="refreshHealth()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div class="metric-grid">
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">99.9%</div><div class="metric-lbl">Overall Uptime</div><div class="metric-delta delta-up">30-day SLO</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">94ms</div><div class="metric-lbl">Inventory P95</div><div class="metric-delta delta-up">↓ 18ms vs last week</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">612ms</div><div class="metric-lbl">Dispatch P95</div><div class="metric-delta delta-up">Under 800ms SLO ✓</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">38ms</div><div class="metric-lbl">Pricing P95</div><div class="metric-delta delta-up">Under 50ms SLO ✓</div></div>
+    <div class="metric yellow"><div class="metric-val" style="color:var(--yellow)">1,240</div><div class="metric-lbl">Kafka Lag</div><div class="metric-delta delta-nt">Approaching warn</div></div>
+    <div class="metric green"><div class="metric-val" style="color:var(--green)">62%</div><div class="metric-lbl">Redis Memory</div><div class="metric-delta delta-up">Under 75% warn ✓</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Service Status</div>
+      <div id="service-status" style="display:flex;flex-direction:column;gap:9px"></div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Recent Incidents</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Resolved: Zone F Driver Shortage</div><div class="tl-d">2 surge drivers deployed. SLA recovering.</div><div class="tl-t">Today 10:22 AM</div></div>
+        <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Resolved: PartsTech API Latency</div><div class="tl-d">Cache fallback activated. Latency normalized after 4 min.</div><div class="tl-t">May 3, 2:14 PM</div></div>
+        <div class="tl-item"><div class="tl-dot done"></div><div class="tl-h">Resolved: Kafka Consumer Lag Spike</div><div class="tl-d">Added 2 normalizer pods. Lag cleared in 8 min.</div><div class="tl-t">May 2, 8:41 AM</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-bottom:14px">Datadog Alert Monitors</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Monitor</th><th>Threshold</th><th>Current</th><th>Status</th><th>Last Alert</th></tr></thead>
+      <tbody>
+        <tr><td>inventory_query_p95</td><td>&gt;150ms WARN</td><td style="color:var(--green)">94ms</td><td><span class="badge bg">OK</span></td><td>Never</td></tr>
+        <tr><td>dispatch_decision_p95</td><td>&gt;1000ms WARN</td><td style="color:var(--green)">612ms</td><td><span class="badge bg">OK</span></td><td>May 2</td></tr>
+        <tr><td>sla_compliance_pct</td><td>&lt;90% WARN</td><td style="color:var(--green)">94%</td><td><span class="badge bg">OK</span></td><td>Never</td></tr>
+        <tr><td>kafka_consumer_lag</td><td>&gt;1000 WARN</td><td style="color:var(--yellow)">1,240</td><td><span class="badge by">WARN</span></td><td>Now</td></tr>
+        <tr><td>redis_memory_pct</td><td>&gt;75% WARN</td><td style="color:var(--green)">62%</td><td><span class="badge bg">OK</span></td><td>Apr 28</td></tr>
+        <tr><td>active_p1_unacked</td><td>&gt;0 CRIT</td><td style="color:var(--green)">0</td><td><span class="badge bg">OK</span></td><td>Today 9:14 AM</td></tr>
+        <tr><td>inventory_stale_pct</td><td>&gt;5% WARN</td><td style="color:var(--green)">0.8%</td><td><span class="badge bg">OK</span></td><td>Never</td></tr>
+        <tr><td>stripe_webhook_fail_rate</td><td>&gt;1% WARN</td><td style="color:var(--green)">0.8%</td><td><span class="badge bg">OK</span></td><td>Never</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /body-wrap -->
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="dispatch-modal">
+  <div class="modal">
+    <div class="modal-h">⚡ Emergency Dispatch</div>
+    <div class="modal-sub">Bypass queue — assign driver immediately to P1 order</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Department / Shop</label><select class="select"><option>Baltimore Police Dept</option><option>Baltimore Fire EMS</option><option>Eastside Auto Repair</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Part Description</label><input class="input" placeholder="e.g. Police Interceptor alternator belt"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Assign Driver</label><select class="select"><option>Auto-assign nearest</option><option>David W. (Zone A — 0.4mi from supplier)</option><option>Marcus D. (Zone A — 1.2mi)</option></select></div><div class="form-group"><label class="form-label">Override SLA</label><select class="select"><option>P1 — 20 min max</option><option>P2 — 40 min max</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Notes</label><input class="input" placeholder="Unit out of service, patrol gap..."/></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('dispatch-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('dispatch-modal');toast('⚡ Emergency dispatch created — driver assigned in 00:12')">Dispatch Now →</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="new-order-modal">
+  <div class="modal">
+    <div class="modal-h">+ Create Manual Order</div>
+    <div class="modal-sub">Place an order on behalf of a shop or municipal department</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Customer</label><select class="select"><option>Eastside Auto Repair</option><option>Precision Imports</option><option>BPD Fleet</option><option>DPW Garage</option></select></div><div class="form-group"><label class="form-label">Priority</label><select class="select"><option>P3 — Standard</option><option>P2 — Urgent</option><option>P1 — Emergency</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Part / SKU</label><input class="input" placeholder="Part name or SKU number..."/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Supplier</label><select class="select"><option>Auto-select best</option><option>O'Reilly — Catonsville</option><option>Advance Auto — Towson</option><option>NAPA — Essex</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('new-order-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('new-order-modal');toast('Order created and dispatched — ETA 28 min')">Create Order →</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="onboard-modal">
+  <div class="modal">
+    <div class="modal-h">🚗 Onboard New Driver</div>
+    <div class="modal-sub">Add driver to the platform and assign zone</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Full Name</label><input class="input" placeholder="Driver full name"/></div><div class="form-group"><label class="form-label">Phone</label><input class="input" placeholder="(410) 555-0100" type="tel"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="input" placeholder="driver@email.com" type="email"/></div><div class="form-group"><label class="form-label">Assign Zone</label><select class="select"><option>Zone A — Downtown</option><option>Zone B — East Side</option><option>Zone C — Catonsville</option><option>Zone D — Towson</option><option>Zone E — Essex</option><option>Zone F — Dundalk</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Vehicle</label><input class="input" placeholder="Year Make Model"/></div><div class="form-group"><label class="form-label">License Plate</label><input class="input" placeholder="MD-XXXXXX"/></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('onboard-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('onboard-modal');toast('Driver onboarding started — background check initiated')">Send Onboarding →</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="supplier-modal">
+  <div class="modal">
+    <div class="modal-h">+ Add Supplier</div>
+    <div class="modal-sub">Connect a new parts supplier to the catalog network</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Business Name</label><input class="input" placeholder="e.g. AutoZone – Essex"/></div><div class="form-group"><label class="form-label">Zone</label><select class="select"><option>Zone A</option><option>Zone B</option><option>Zone C</option><option>Zone D</option><option>Zone E</option><option>Zone F</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Address</label><input class="input" placeholder="Full street address"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">PartsTech Supplier ID</label><input class="input" placeholder="PT-XXXXX"/></div><div class="form-group"><label class="form-label">Feed Type</label><select class="select"><option>PartsTech API</option><option>EDI / CSV</option><option>Webhook Push</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('supplier-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('supplier-modal');toast('Supplier added — initial catalog sync started')">Add &amp; Sync →</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="contract-modal">
+  <div class="modal">
+    <div class="modal-h">+ New Municipal Contract</div>
+    <div class="modal-sub">Create a direct or Sourcewell cooperative purchasing agreement</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Entity Name</label><input class="input" placeholder="e.g. City of Annapolis"/></div><div class="form-group"><label class="form-label">Contract Type</label><select class="select"><option>Direct</option><option>Sourcewell Cooperative</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Delivery Rate ($)</label><input class="input" placeholder="e.g. 16.00"/></div><div class="form-group"><label class="form-label">Monthly Cap ($)</label><input class="input" placeholder="e.g. 12000"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">P1 SLA (min)</label><input class="input" value="20"/></div><div class="form-group"><label class="form-label">P2 SLA (min)</label><input class="input" value="40"/></div><div class="form-group"><label class="form-label">Invoice Terms</label><select class="select"><option>Net 30</option><option>Net 15</option><option>COD</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('contract-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('contract-modal');toast('Municipal contract created — PDF sent for signature')">Create Contract →</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shop-detail-modal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-h">Eastside Auto Repair</div>
+    <div class="modal-sub">1402 E Baltimore St, Baltimore MD 21231 · Zone A · Shop Pro since Jan 2025</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:16px">
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--fd);font-weight:900;font-size:22px">176</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">ORDERS/MO</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--fd);font-weight:900;font-size:22px;color:var(--green)">$5,600</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">MRR</div></div>
+      <div class="card-sm" style="text-align:center"><div style="font-family:var(--fd);font-weight:900;font-size:22px">29 min</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">AVG DELIVERY</div></div>
+    </div>
+    <div style="margin-bottom:14px"><div style="font-family:var(--fd);font-weight:700;margin-bottom:8px">Plan &amp; Billing</div><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">Plan</span><span class="badge bo">Shop Pro $149/mo</span></div><div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">Stripe Customer</span><span class="td-mono" style="font-size:11px">cus_P9x...</span></div><div style="display:flex;justify-content:space-between;padding:7px 0"><span style="font-size:12px">Renewal</span><span style="font-size:12px">May 25, 2025</span></div></div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <div style="display:flex;gap:8px"><button class="btn btn-yellow btn-sm" onclick="closeModal('shop-detail-modal');toast('Upgrade email sent to Eastside Auto')">Upsell</button><button class="btn btn-red btn-sm" onclick="closeModal('shop-detail-modal');toast('Account suspended — shop notified')">Suspend</button></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="closeModal('shop-detail-modal')">Close</button><button class="btn btn-primary" onclick="closeModal('shop-detail-modal');toast('Email sent to Eastside Auto Repair')">📧 Email Shop</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="referrer-modal">
+  <div class="modal">
+    <div class="modal-h">+ Add Referrer</div>
+    <div class="modal-sub">Register a new referral partner and generate their link</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Full Name</label><input class="input" placeholder="Referrer name"/></div><div class="form-group"><label class="form-label">Email</label><input class="input" placeholder="email@example.com" type="email"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Starting Tier</label><select class="select"><option>Spark</option><option>Ignition</option><option>Accelerator</option><option>Municipal Connector</option></select></div><div class="form-group"><label class="form-label">Referral Code</label><input class="input" placeholder="Auto-generated if blank"/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Stripe Account ID (for payouts)</label><input class="input" placeholder="acct_..."/></div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('referrer-modal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('referrer-modal');toast('Referrer added — welcome email &amp; link sent')">Add Referrer →</button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid var(--border2);
+  border-radius:8px;padding:12px 18px;font-size:13px;color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.5);
+  z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:340px;display:flex;gap:10px;align-items:center"></div>
+
+<script>
+/* ── STATE ── */
+const ZONES = [
+  {id:'A',name:'Downtown',drivers:9,orders:18,surge:1.4,sla:96,status:'hot'},
+  {id:'B',name:'East Side',drivers:6,orders:9,surge:1.0,sla:97,status:'normal'},
+  {id:'C',name:'Catonsville',drivers:4,orders:6,surge:1.0,sla:95,status:'normal'},
+  {id:'D',name:'Towson',drivers:3,orders:5,surge:1.0,sla:94,status:'normal'},
+  {id:'E',name:'Essex',drivers:2,orders:5,surge:1.2,sla:88,status:'warn'},
+  {id:'F',name:'Dundalk',drivers:1,orders:4,surge:1.6,sla:71,status:'critical'},
+];
+const ORDERS_DATA=[
+  {id:'#PF-4821',part:'Wagner Brake Pads',shop:'Eastside Auto',driver:'Marcus D.',zone:'A',priority:'P3',eta:'8 min',rev:'$89',status:'en-route',type:'Shop'},
+  {id:'#PF-4820',part:'Bosch Alternator',shop:'Precision Imports',driver:'Keisha M.',zone:'A',priority:'P3',eta:'14 min',rev:'$156',status:'en-route',type:'Shop'},
+  {id:'#PF-4819',part:'Police Interceptor Belt',shop:'BPD Fleet',driver:'David W.',zone:'A',priority:'P1',eta:'Rush',rev:'$94',status:'priority',type:'Municipal'},
+  {id:'#PF-4818',part:'ACDelco Battery',shop:'Fleet Plus',driver:'Rosa L.',zone:'B',priority:'P3',eta:'Delivered',rev:'$112',status:'delivered',type:'Shop'},
+  {id:'#PF-4815',part:'Fire Engine Pads',shop:'BFEMS Fleet',driver:'James K.',zone:'A',priority:'P2',eta:'22 min',rev:'$148',status:'en-route',type:'Municipal'},
+  {id:'#PF-4810',part:'Starter Motor',shop:'Highlandtown Tire',driver:'—',zone:'F',priority:'P3',eta:'58 min',rev:'$178',status:'dispatching',type:'Shop'},
+  {id:'#PF-4808',part:'Radiator Hose',shop:'Dundalk Auto',driver:'—',zone:'F',priority:'P3',eta:'62 min',rev:'$64',status:'dispatching',type:'Shop'},
+];
+const DRIVERS_DATA=[
+  {name:'David W.',zone:'A',status:'en-route',job:'#PF-4819',del:11,earn:'$198',rating:4.95,surge:true},
+  {name:'Marcus D.',zone:'A',status:'active',job:'—',del:9,earn:'$142',rating:4.90,surge:false},
+  {name:'Keisha M.',zone:'B',status:'en-route',job:'#PF-4820',del:7,earn:'$118',rating:4.80,surge:false},
+  {name:'Rosa L.',zone:'C',status:'active',job:'—',del:5,earn:'$84',rating:4.70,surge:false},
+  {name:'James K.',zone:'A',status:'en-route',job:'#PF-4815',del:4,earn:'$76',rating:4.60,surge:true},
+  {name:'T. Brown',zone:'D',status:'active',job:'—',del:6,earn:'$108',rating:4.85,surge:false},
+];
+const SUPPLIERS_DATA=[
+  {name:"O'Reilly – Catonsville",zone:'C',skus:42800,orders:312,pickup:'4.2 min',reliability:94,sync:'42s ago',syncStatus:'ok'},
+  {name:'Advance Auto – Towson',zone:'D',skus:38200,orders:241,pickup:'6.8 min',reliability:88,sync:'88s ago',syncStatus:'ok'},
+  {name:'NAPA – Essex',zone:'E',skus:29500,orders:178,pickup:'8.1 min',reliability:91,sync:'71s ago',syncStatus:'ok'},
+  {name:'Parts Authority – Dundalk',zone:'F',skus:51000,orders:389,pickup:'3.9 min',reliability:96,sync:'112s ago',syncStatus:'warn'},
+  {name:'AutoZone – Towson',zone:'D',skus:33400,orders:204,pickup:'5.4 min',reliability:89,sync:'99s ago',syncStatus:'warn'},
+];
+const AUDIT_DATA=[
+  {ts:'11:42:08',action:'ORDER_CREATED',actor:'System',entity:'#PF-4821',detail:'Brake pads — Eastside Auto — $89'},
+  {ts:'11:41:52',action:'DRIVER_ASSIGNED',actor:'System',entity:'Marcus D.',detail:'Assigned to #PF-4819 (P1)'},
+  {ts:'11:40:33',action:'PRICE_CALCULATED',actor:'Pricing Engine',entity:'#PF-4820',detail:'Surge 1.4x — $156 total'},
+  {ts:'11:39:14',action:'PAYMENT_CHARGED',actor:'Stripe',entity:'cus_EastsideAuto',detail:'$89.00 — pi_3P9x...'},
+  {ts:'11:38:01',action:'ORDER_DELIVERED',actor:'David W.',entity:'#PF-4818',detail:'Delivered to Fleet Plus'},
+  {ts:'11:37:44',action:'PAYOUT_TRANSFERRED',actor:'Stripe Connect',entity:'David W.',detail:'$69.42 — tr_3P8x...'},
+  {ts:'11:36:22',action:'SLA_ALERT',actor:'SLA Watchdog',entity:'Zone F',detail:'Compliance below 75% — escalating'},
+  {ts:'11:35:01',action:'SURGE_ACTIVATED',actor:'Admin',entity:'Zone A',detail:'1.4x surge — 9 drivers, 18 orders'},
+  {ts:'11:34:11',action:'SUPPLIER_SYNC',actor:'System',entity:'Parts Authority',detail:'52,400 SKUs updated — 1 stale flagged'},
+  {ts:'11:33:00',action:'LOGIN',actor:'admin@partsflow.com',entity:'Back Office',detail:'Login from 192.168.1.10'},
+  {ts:'11:30:48',action:'PRICING_UPDATED',actor:'admin@partsflow.com',entity:'Fee Config',detail:'Base delivery $18→$18, P1 add-on confirmed $18'},
+  {ts:'11:28:19',action:'REFUND_ISSUED',actor:'System',entity:'#PF-4698',detail:'$18.00 refund — SLA breach 9 min'},
+];
+const ALERTS_DATA=[
+  {type:'critical',icon:'🚨',title:'Zone F SLA Critical',body:'71% SLA compliance. Only 1 active driver. 3 orders at risk of breach.',action:'Deploy Surge →',actionFn:"surgeZone('F');nav('zones')"},
+  {type:'warn',icon:'⚠️',title:'Kafka Consumer Lag',body:'Current lag: 1,240 — approaching WARN threshold of 1,000. Inventory normalizer may slow.',action:'View Health →',actionFn:"nav('health')"},
+  {type:'warn',icon:'📡',title:'2 Supplier Feeds Stale',body:'Parts Authority and AutoZone – Towson feeds are >100s since last successful sync.',action:'Force Sync →',actionFn:'syncAll()'},
+];
+const SERVICES=[
+  {name:'Inventory Service',status:'healthy',latency:'94ms',pods:'3/3'},
+  {name:'Logistics Engine',status:'healthy',latency:'612ms',pods:'3/3'},
+  {name:'Pricing Engine',status:'healthy',latency:'38ms',pods:'2/2'},
+  {name:'AI Search Service',status:'healthy',latency:'1.1s',pods:'2/2'},
+  {name:'WebSocket Hub',status:'healthy',latency:'—',pods:'2/2'},
+  {name:'SLA Watchdog',status:'healthy',latency:'—',pods:'1/1'},
+  {name:'Notification Service',status:'healthy',latency:'—',pods:'2/2'},
+  {name:'Kafka Cluster',status:'warn',latency:'lag:1240',pods:'3 brokers'},
+  {name:'Redis Cache',status:'healthy',latency:'1ms',pods:'cluster'},
+  {name:'PostgreSQL',status:'healthy',latency:'8ms',pods:'primary+2r'},
+  {name:'Elasticsearch',status:'healthy',latency:'22ms',pods:'3 nodes'},
+  {name:'PartsTech API',status:'healthy',latency:'210ms',pods:'ext'},
+  {name:'Stripe Connect',status:'healthy',latency:'—',pods:'ext'},
+];
+
+/* ── NAV ── */
+function nav(id){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.nav-item[onclick*="'${id}'"]`)?.classList.add('active');
+  document.getElementById('page-'+id)?.classList.add('active');
+  if(id==='dispatch')renderDispatch();
+}
+
+/* ── SECTION TABS ── */
+function stab(btn,id){
+  const wrap=btn.closest('.page')||btn.closest('.modal');
+  wrap.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  wrap.querySelectorAll('.stab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id)?.classList.add('active');
+}
+
+/* ── MODALS ── */
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+/* ── TOAST ── */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML='<span style="font-size:16px">✓</span>'+msg;
+  t.style.transform='translateY(0)';t.style.opacity='1';
+  t.style.borderColor='var(--accent)';
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3200);
+}
+
+/* ── RENDER DASHBOARD ── */
+function renderLiveFeed(){
+  const feed=document.getElementById('live-feed');
+  if(!feed)return;
+  const items=[
+    {icon:'📦',bg:'var(--ag)',title:'#PF-4821 dispatched — Marcus D. en route',meta:'Wagner Brake Pads · Zone A · 8 min ETA',t:'Just now',badge:'<span class="badge bo">EN ROUTE</span>'},
+    {icon:'🚨',bg:'var(--rd)',title:'P1 EMERGENCY — Police Interceptor belt',meta:'Unit PD-2241 · BPD District 3 · David W. assigned',t:'2 min ago',badge:'<span class="badge br">P1 ACTIVE</span>'},
+    {icon:'✅',bg:'var(--gd)',title:'#PF-4818 delivered — ACDelco Battery',meta:'Fleet Plus · 31 min delivery · SLA met',t:'8 min ago',badge:'<span class="badge bg">DELIVERED</span>'},
+    {icon:'⚡',bg:'var(--yd)',title:'Zone F SLA alert — 3 orders at risk',meta:'Only 1 active driver · Dundalk area',t:'14 min ago',badge:'<span class="badge by">ACTION NEEDED</span>'},
+    {icon:'💰',bg:'var(--pd)',title:'$198 payout — David W. (11 deliveries)',meta:'Stripe Connect transfer · tr_3P8x...',t:'22 min ago',badge:'<span class="badge bp">PAID</span>'},
+  ];
+  feed.innerHTML=items.map(i=>`<div class="feed-item"><div class="feed-icon" style="background:${i.bg}">${i.icon}</div><div class="feed-body"><div class="feed-title">${i.title}</div><div class="feed-meta">${i.meta} · ${i.t}</div></div><div class="feed-action">${i.badge}</div></div>`).join('');
+}
+function renderZoneStatus(){
+  const el=document.getElementById('zone-status-list');
+  if(!el)return;
+  el.innerHTML=ZONES.map(z=>{
+    const col=z.status==='critical'?'var(--red)':z.status==='warn'?'var(--yellow)':z.status==='hot'?'var(--aw)':'var(--green)';
+    const dot=z.status==='critical'?'red':z.status==='warn'?'yellow':'green';
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="sdot ${dot}"></div>
+      <div style="flex:1"><div style="font-family:var(--fd);font-weight:700;font-size:14px">Zone ${z.id} — ${z.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${z.drivers} drivers · ${z.orders} orders · ${z.sla}% SLA</div></div>
+      <div style="text-align:right"><div style="font-family:var(--fd);font-weight:700;color:${col}">${z.surge}x</div>
+      <div style="font-family:var(--fm);font-size:9px;color:var(--muted)">SURGE</div></div>
+      ${z.status==='critical'?`<button class="btn btn-red btn-xs" onclick="surgeZone('${z.id}')">Fix →</button>`:''}
+    </div>`}).join('');
+}
+function renderHeatmap(){
+  const el=document.getElementById('heatmap');if(!el)return;
+  const hours=Array.from({length:24*7},(_,i)=>Math.random());
+  const colors=['rgba(255,106,0,','rgba(255,152,0,','rgba(255,214,0,'];
+  el.innerHTML=hours.map(v=>{
+    const opacity=0.08+v*0.85;
+    const ci=v>0.66?0:v>0.33?1:2;
+    return`<div class="heat-cell" style="background:${colors[ci]}${opacity})" title="${Math.round(v*30)} orders"></div>`;
+  }).join('');
+}
+
+/* ── ORDERS ── */
+function renderOrders(){
+  const search=(document.getElementById('ord-search')?.value||'').toLowerCase();
+  const fStatus=document.getElementById('ord-filter-status')?.value||'';
+  const fType=document.getElementById('ord-filter-type')?.value||'';
+  const fZone=document.getElementById('ord-filter-zone')?.value||'';
+  const filtered=ORDERS_DATA.filter(o=>{
+    if(fStatus&&!({
+      'En Route':'en-route','Dispatching':'dispatching','Priority P1':'priority','Delivered':'delivered','Cancelled':'cancelled'
+    }[fStatus]===o.status))return false;
+    if(fType&&o.type!==fType)return false;
+    if(fZone&&`Zone ${o.zone}`!==fZone)return false;
+    if(search&&!JSON.stringify(o).toLowerCase().includes(search))return false;
+    return true;
+  });
+  const tbody=document.getElementById('orders-tbody');
+  if(!tbody)return;
+  const statusMap={
+    'en-route':'<span class="badge bo">EN ROUTE</span>',
+    'dispatching':'<span class="badge by">DISPATCHING</span>',
+    'priority':'<span class="badge br">P1 PRIORITY</span>',
+    'delivered':'<span class="badge bg">DELIVERED</span>',
+    'cancelled':'<span class="badge" style="background:var(--s3);color:var(--muted)">CANCELLED</span>',
+  };
+  const prioMap={'P1':'<span class="badge br">P1</span>','P2':'<span class="badge by">P2</span>','P3':'<span class="badge bg">P3</span>'};
+  tbody.innerHTML=filtered.map(o=>`<tr>
+    <td class="td-mono">${o.id}</td><td>${o.part}</td>
+    <td>${o.shop}<br><span style="font-size:10px;color:var(--muted)">${o.type}</span></td>
+    <td>${o.driver}</td><td>Zone ${o.zone}</td>
+    <td>${prioMap[o.priority]}</td>
+    <td style="color:${o.eta.includes('min')&&parseInt(o.eta)<15?'var(--green)':'var(--t2)'}">${o.eta}</td>
+    <td style="font-family:var(--fd);font-weight:700">${o.rev}</td>
+    <td>${statusMap[o.status]||o.status}</td>
+    <td><div class="row-actions">
+      <button class="btn btn-ghost btn-xs" onclick="toast('Order ${o.id} details loaded')">View</button>
+      ${o.status!=='delivered'?`<button class="btn btn-yellow btn-xs" onclick="toast('Manual intervention on ${o.id}')">Intervene</button>`:''}
+    </div></td>
+  </tr>`).join('');
+}
+
+/* ── DISPATCH ── */
+function renderDispatch(){
+  renderDispatchMap();renderPriorityQueue();renderDriverGrid();
+}
+function renderDispatchMap(){
+  const svg=document.getElementById('dispatch-map');if(!svg)return;
+  const legend=document.getElementById('dispatch-legend');
+  const driverPositions=[
+    {x:'20%',y:'28%',col:'var(--green)',label:'Marcus D.',order:null},
+    {x:'68%',y:'22%',col:'var(--red)',label:'David W.',order:'P1'},
+    {x:'14%',y:'68%',col:'var(--blue)',label:'Rosa L.',order:null},
+    {x:'78%',y:'58%',col:'var(--green)',label:'T. Brown',order:null},
+    {x:'44%',y:'42%',col:'var(--aw)',label:'Keisha M.',order:'P2'},
+  ];
+  svg.innerHTML=`
+    <line x1="20%" y1="28%" x2="48%" y2="52%" stroke="var(--green)" stroke-width="1" stroke-dasharray="4,3" opacity=".5"/>
+    <line x1="68%" y1="22%" x2="48%" y2="52%" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="4,3" opacity=".7"/>
+    <line x1="44%" y1="42%" x2="72%" y2="70%" stroke="var(--aw)" stroke-width="1" stroke-dasharray="4,3" opacity=".5"/>
+    <circle cx="48%" cy="52%" r="14" fill="rgba(30,144,255,.1)" stroke="var(--blue)" stroke-width="1.5"/>
+    <text x="48%" y="55%" text-anchor="middle" fill="var(--bb)" font-size="12">🏛</text>
+    <circle cx="72%" cy="70%" r="12" fill="rgba(255,106,0,.1)" stroke="var(--accent)" stroke-width="1.5"/>
+    <text x="72%" y="73%" text-anchor="middle" fill="var(--aw)" font-size="11">🔧</text>
+    ${driverPositions.map(d=>`
+      <circle cx="${d.x}" cy="${d.y}" r="8" fill="${d.col}" opacity=".9" style="filter:drop-shadow(0 0 4px ${d.col})"/>
+      ${d.order?`<text x="${d.x}" y="${parseFloat(d.y)-14}%" text-anchor="middle" fill="${d.col}" font-size="8" font-weight="bold">${d.order}</text>`:''}
+    `).join('')}
+  `;
+  legend.innerHTML=`
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:7px;height:7px;border-radius:50%;background:var(--green)"></div><span style="color:var(--muted)">Available</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:7px;height:7px;border-radius:50%;background:var(--aw)"></div><span style="color:var(--muted)">En Route</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><div style="width:7px;height:7px;border-radius:50%;background:var(--red)"></div><span style="color:var(--muted)">P1 Priority</span></div>
+  `;
+}
+function renderPriorityQueue(){
+  const el=document.getElementById('priority-queue');if(!el)return;
+  const pOrders=ORDERS_DATA.filter(o=>o.status==='priority'||o.status==='en-route'||o.status==='dispatching').slice(0,4);
+  el.innerHTML=pOrders.map(o=>{
+    const bc=o.priority==='P1'?'var(--red)':o.priority==='P2'?'var(--yellow)':'var(--green)';
+    const bg=o.priority==='P1'?'var(--rd)':o.priority==='P2'?'var(--yd)':'var(--gd)';
+    return`<div style="background:${bg};border:1px solid ${bc};border-radius:8px;padding:12px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div><div style="font-family:var(--fd);font-weight:700;font-size:14px">${o.part}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${o.shop} · Driver: ${o.driver}</div></div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:var(--fd);font-weight:900;font-size:20px;color:${bc}">${o.eta}</div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--muted)">${o.priority}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderDriverGrid(){
+  const el=document.getElementById('driver-dispatch-grid');if(!el)return;
+  el.innerHTML=DRIVERS_DATA.map(d=>{
+    const sc=d.status==='en-route'?'var(--aw)':d.status==='active'?'var(--green)':'var(--muted)';
+    const sb=d.status==='en-route'?'bo':d.status==='active'?'bg':'';
+    return`<div class="card-sm" style="border-left:3px solid ${sc}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-family:var(--fd);font-weight:700;font-size:14px">${d.name}</div>
+        <span class="badge ${sb}">${d.status.toUpperCase().replace('-',' ')}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Zone ${d.zone} · ${d.rating}★ · ${d.del} runs today</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:var(--fd);font-weight:700;color:var(--green)">${d.earn}</div>
+        ${d.surge?'<span class="badge by">🔥 SURGE</span>':''}
+        <button class="btn btn-ghost btn-xs" onclick="toast('${d.name} — direct message sent')">Msg</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── DRIVERS TABLE ── */
+function renderDriversTable(){
+  const tbody=document.getElementById('drivers-tbody');if(!tbody)return;
+  tbody.innerHTML=DRIVERS_DATA.map(d=>{
+    const sc=d.status==='en-route'?'bo':d.status==='active'?'bg':'';
+    return`<tr>
+      <td><strong>${d.name}</strong></td>
+      <td>Zone ${d.zone}</td>
+      <td><span class="badge ${sc}">${d.status.toUpperCase().replace('-',' ')}</span></td>
+      <td class="td-mono">${d.job}</td>
+      <td>${d.del}</td>
+      <td style="color:var(--green);font-family:var(--fd);font-weight:700">${d.earn}</td>
+      <td><span style="color:var(--yellow)">⭐ ${d.rating}</span></td>
+      <td>${d.surge?'<span class="badge by">🔥 Surge</span>':'—'}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-ghost btn-xs" onclick="toast('Messaging ${d.name}')">Msg</button>
+        <button class="btn btn-yellow btn-xs" onclick="toast('${d.name} reassigned to Zone F')">Reassign</button>
+        <button class="btn btn-red btn-xs" onclick="toast('${d.name} taken offline')">Offline</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── SUPPLIERS TABLE ── */
+function renderSuppliers(){
+  const tbody=document.getElementById('suppliers-tbody');if(!tbody)return;
+  tbody.innerHTML=SUPPLIERS_DATA.map(s=>{
+    const sw=s.syncStatus==='warn'?'<span class="badge by">SLOW SYNC</span>':'<span class="badge bg">OK</span>';
+    return`<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>Zone ${s.zone}</td>
+      <td class="td-mono">${s.skus.toLocaleString()}</td>
+      <td>${s.orders}</td>
+      <td style="color:${parseFloat(s.pickup)<5?'var(--green)':'var(--t2)'}">${s.pickup}</td>
+      <td><div style="display:flex;align-items:center;gap:7px">
+        <div class="pbar" style="flex:1;margin:0"><div class="pfill" style="width:${s.reliability}%;background:${s.reliability>92?'var(--green)':s.reliability>85?'var(--yellow)':'var(--red)'}"></div></div>
+        <span class="td-mono" style="font-size:10px">${s.reliability}%</span>
+      </div></td>
+      <td class="td-mono" style="font-size:10px">${s.sync}</td>
+      <td>${sw}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-ghost btn-xs" onclick="toast('Syncing ${s.name}...')">Sync Now</button>
+        <button class="btn btn-ghost btn-xs" onclick="toast('Viewing catalog for ${s.name}')">Catalog</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── ZONE CARDS ── */
+function renderZoneCards(){
+  const el=document.getElementById('zone-cards');if(!el)return;
+  el.innerHTML=ZONES.map(z=>{
+    const sc=z.status==='critical'?'var(--red)':z.status==='warn'?'var(--yellow)':z.status==='hot'?'var(--aw)':'var(--green)';
+    const bg=z.status==='critical'?'var(--rd)':z.status==='warn'?'var(--yd)':z.status==='hot'?'var(--ag)':'var(--gd)';
+    const load=Math.round((z.orders/(z.drivers*3||1))*100);
+    return`<div class="card" style="border-left:4px solid ${sc}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div><div style="font-family:var(--fd);font-weight:900;font-size:20px">Zone ${z.id} — ${z.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">SLA: ${z.sla}% compliance</div></div>
+        <div style="font-family:var(--fd);font-weight:900;font-size:28px;color:${sc}">${z.surge}x</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+        <div class="card-sm" style="text-align:center;padding:8px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">${z.drivers}</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">DRIVERS</div></div>
+        <div class="card-sm" style="text-align:center;padding:8px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">${z.orders}</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">ORDERS</div></div>
+        <div class="card-sm" style="text-align:center;padding:8px"><div style="font-family:var(--fd);font-weight:700;font-size:18px;color:${sc}">${load}%</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted)">LOAD</div></div>
+      </div>
+      <div class="pbar" style="margin-bottom:12px"><div class="pfill" style="width:${z.sla}%;background:${sc}"></div></div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-yellow btn-sm" onclick="surgeZone('${z.id}')">🔥 Surge</button>
+        <button class="btn btn-ghost btn-sm" onclick="toast('Deploy request sent for Zone ${z.id}')">+ Driver</button>
+        ${z.status==='critical'?`<button class="btn btn-red btn-sm" onclick="toast('Emergency escalation — Zone ${z.id}')">🚨 Escalate</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── ALERTS ── */
+function renderAlerts(){
+  const el=document.getElementById('alerts-list');if(!el)return;
+  if(ALERTS_DATA.length===0){el.innerHTML='<div class="alert alert-g"><span>✅</span><div class="alert-body"><strong>No active alerts.</strong> All systems nominal.</div></div>';return;}
+  el.innerHTML=ALERTS_DATA.map((a,i)=>{
+    const cls=a.type==='critical'?'alert-r':a.type==='warn'?'alert-y':'alert-b';
+    return`<div class="alert ${cls}" id="alert-${i}">
+      <span style="font-size:20px">${a.icon}</span>
+      <div class="alert-body"><strong>${a.title}:</strong> ${a.body}
+        ${a.action?`<button class="btn btn-ghost btn-xs" style="margin-left:10px" onclick="${a.actionFn}">${a.action}</button>`:''}
+      </div>
+      <button onclick="dismissAlert(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0;flex-shrink:0">×</button>
+    </div>`;
+  }).join('');
+}
+function dismissAlert(i){
+  document.getElementById('alert-'+i)?.remove();
+  const count=parseInt(document.getElementById('alert-count').textContent)-1;
+  document.getElementById('alert-count').textContent=count;
+  document.getElementById('nb-alerts').textContent=count;
+  if(count===0)toast('All alerts cleared');
+}
+function clearAlerts(){ALERTS_DATA.length=0;renderAlerts();document.getElementById('alert-count').textContent='0';document.getElementById('nb-alerts').textContent='0';toast('All alerts marked as read');}
+
+/* ── AUDIT ── */
+function renderAudit(){
+  const tbody=document.getElementById('audit-tbody');if(!tbody)return;
+  const actionColors={ORDER_CREATED:'bo',DRIVER_ASSIGNED:'bc',PRICE_CALCULATED:'by',PAYMENT_CHARGED:'bg',ORDER_DELIVERED:'bg',PAYOUT_TRANSFERRED:'bp',SLA_ALERT:'br',SURGE_ACTIVATED:'by',SUPPLIER_SYNC:'bt',LOGIN:'',PRICING_UPDATED:'bp',REFUND_ISSUED:'br'};
+  tbody.innerHTML=AUDIT_DATA.map(a=>`<tr>
+    <td class="td-mono" style="color:var(--muted)">${a.ts}</td>
+    <td><span class="badge ${actionColors[a.action]||''}">${a.action}</span></td>
+    <td style="font-size:11px">${a.actor}</td>
+    <td class="td-mono" style="font-size:11px">${a.entity}</td>
+    <td style="font-size:11px;color:var(--muted);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.detail}</td>
+    <td class="td-mono" style="font-size:10px;color:var(--muted)">192.168.1.10</td>
+  </tr>`).join('');
+}
+
+/* ── SERVICE HEALTH ── */
+function renderHealth(){
+  const el=document.getElementById('service-status');if(!el)return;
+  el.innerHTML=SERVICES.map(s=>{
+    const dot=s.status==='healthy'?'green':s.status==='warn'?'yellow':'red';
+    return`<div style="display:flex;align-items:center;gap:10px">
+      <div class="sdot ${dot}"></div>
+      <div style="flex:1;font-size:12px">${s.name}</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${s.latency}</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${s.pods}</div>
+      <span class="badge ${s.status==='healthy'?'bg':s.status==='warn'?'by':'br'}">${s.status.toUpperCase()}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── ZONE ACTIONS ── */
+function surgeZone(id){
+  const z=ZONES.find(z=>z.id===id);if(!z)return;
+  z.surge=Math.min(z.surge+0.2,2.0).toFixed(1)*1;
+  z.drivers=Math.min(z.drivers+2,12);
+  z.status=z.sla<75?'warn':'hot';
+  renderZoneCards();renderZoneStatus();
+  toast(`🔥 Zone ${id} surge increased to ${z.surge}x — 2 drivers deployed`);
+}
+function surgeAll(){ZONES.forEach(z=>{z.surge=Math.min(z.surge+0.2,2.0).toFixed(1)*1;});renderZoneCards();renderZoneStatus();toast('🔥 All zones surged — drivers alerted');}
+function resetAllSurge(){ZONES.forEach(z=>{z.surge=1.0;});renderZoneCards();renderZoneStatus();toast('↺ All surge multipliers reset to 1.0x');}
+function saveSurgeConfig(){toast('✓ Zone configuration saved and applied to all new orders');}
+function savePricing(){toast('✓ Pricing configuration saved — live on all new orders. Changes logged to audit trail.');}
+function syncAll(){
+  SUPPLIERS_DATA.forEach(s=>s.sync='3s ago');
+  renderSuppliers();
+  toast('🔄 All supplier feeds synced — 15.2M SKUs refreshed');
+}
+function processRefunds(){toast('💸 3 SLA refunds processed — $54 total returned via Stripe');}
+function exportReport(){toast('📊 Report generated — downloading CSV/PDF');}
+function refreshHealth(){renderHealth();toast('✓ Health status refreshed');}
+
+/* ── LIVE TICKER ── */
+let tickInterval;
+function startLiveTicker(){
+  tickInterval=setInterval(()=>{
+    const rev=document.getElementById('ts-rev');
+    const orders=document.getElementById('ts-orders');
+    if(rev){const v=parseInt(rev.textContent.replace(/[$,]/g,''));rev.textContent='$'+(v+Math.floor(Math.random()*40+10)).toLocaleString();}
+    if(orders){const v=parseInt(orders.textContent);if(Math.random()>.7)orders.textContent=v+1;}
+  },8000);
+}
+
+/* ── INIT ── */
+function init(){
+  renderLiveFeed();renderZoneStatus();renderHeatmap();
+  renderOrders();renderDriversTable();renderSuppliers();
+  renderZoneCards();renderAlerts();renderAudit();renderHealth();
+  startLiveTicker();
+}
+init();
+</script>
+</body>
+</html>

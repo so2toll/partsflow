@@ -52,7 +52,6 @@ const stats = data.stats || {
       <a href="/app/profile2" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Profile2</a>
        <a href="/app/profile3" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#edf2f7] text-[#4a5568] text-decoration-none hover:bg-[#e2e8f0] transition-colors">Profile3</a>
        <a href="/app/profile4" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#DFFF00] text-[#000000] text-decoration-none hover:bg-[#c8e600] transition-colors">Profile4</a>
-      <button id="dashboard-logout-button" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#fed7d7] text-[#c53030] border-none cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed ml-auto">Logout</button>
     </div>
 
     <!-- Stats -->
@@ -185,32 +184,6 @@ const stats = data.stats || {
   </main>
 </div>
 </Layout>
-
-<script>
-  // Client-side logout
-  document.getElementById('dashboard-logout-button')?.addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    console.log('[Dashboard] Client-side logout initiated');
-
-    const button = e.target;
-    button.disabled = true;
-    button.textContent = 'Logging out...';
-
-    try {
-      const { logout } = await import('../../lib/auth/auth-client');
-      await logout();
-
-      localStorage.clear();
-      sessionStorage.clear();
-
-      window.location.href = '/auth/login';
-    } catch (error) {
-      console.error('[Dashboard] Logout error:', error);
-      window.location.href = '/auth/login';
-    }
-  });
-</script>
 
 <style>
   /* Note: Global layout styles (background, padding, max-width) handled by AppLayout */

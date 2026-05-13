@@ -1,0 +1,442 @@
+---
+/**
+ * Onboarding Completion Page
+ *
+ * Success page shown after completing onboarding.
+ * Shows different content for Shop Owner vs Driver.
+ *
+ * Route: /onboard/complete?type=shop_owner|driver&token=xxx
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+// Get params from URL
+const type = Astro.url.searchParams.get('type');
+const isShopOwner = type === 'shop_owner';
+const isDriver = type === 'driver';
+---
+
+<Layout title="Welcome to MotoFlow!">
+  <div class="complete-page">
+    <!-- Header -->
+    <header class="complete-header">
+      <a href="/" class="brand-logo">MOTOFLOW</a>
+    </header>
+
+    <main class="complete-main">
+      <div class="complete-container">
+        <!-- Success Animation -->
+        <div class="success-animation">
+          <div class="success-circle">
+            <span class="material-symbols-outlined success-check">check</span>
+          </div>
+          <div class="confetti" id="confetti"></div>
+        </div>
+
+        <h1 class="complete-title">You're all set!</h1>
+        <p class="complete-description">
+          {isShopOwner && "Your shop is now registered with MotoFlow. You can start searching for parts and placing orders immediately."}
+          {isDriver && "Your driver account is ready. You can start accepting deliveries once you log in and set your status to available."}
+        </p>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+          <h2 class="steps-title">What's Next?</h2>
+
+          {isShopOwner && (
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">login</span>
+                </div>
+                <div class="step-content">
+                  <h3>Log in to your dashboard</h3>
+                  <p>Access your shop dashboard to manage orders and track deliveries.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">search</span>
+                </div>
+                <div class="step-content">
+                  <h3>Search for parts</h3>
+                  <p>Use our AI-powered search to find parts across 200+ local suppliers.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">local_shipping</span>
+                </div>
+                <div class="step-content">
+                  <h3>Get 30-60 min delivery</h3>
+                  <p>Parts delivered directly to your shop with real-time tracking.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isDriver && (
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">login</span>
+                </div>
+                <div class="step-content">
+                  <h3>Log in to your driver app</h3>
+                  <p>Access your driver dashboard to view and manage deliveries.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">toggle_on</span>
+                </div>
+                <div class="step-content">
+                  <h3>Set yourself as available</h3>
+                  <p>When you're ready to drive, toggle your status to receive delivery requests.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-icon">
+                  <span class="material-symbols-outlined">payments</span>
+                </div>
+                <div class="step-content">
+                  <h3>Start earning</h3>
+                  <p>Complete deliveries and earn competitive pay plus tips.</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-buttons">
+          <a href="/auth/login" class="btn btn-primary btn-lg">
+            <span class="material-symbols-outlined">login</span>
+            Log In Now
+          </a>
+          <a href="/" class="btn btn-secondary btn-lg">
+            Return to Home
+          </a>
+        </div>
+
+        <!-- Support -->
+        <div class="support-notice">
+          <span class="material-symbols-outlined">support_agent</span>
+          <span>Need help? Contact <a href="mailto:support@motoflow.io">support@motoflow.io</a></span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="complete-footer">
+      <p>&copy; 2025 MotoFlow. All rights reserved.</p>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .complete-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #0B1117 0%, #152030 100%);
+  }
+
+  .complete-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 1000;
+  }
+
+  .brand-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff5c00;
+    text-decoration: none;
+  }
+
+  .complete-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 88px 24px 24px;
+  }
+
+  .complete-container {
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Success Animation */
+  .success-animation {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  .success-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    animation: scaleIn 0.5s ease-out;
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.4);
+  }
+
+  .success-check {
+    font-size: 48px;
+    color: white;
+    animation: checkIn 0.3s ease-out 0.2s both;
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes checkIn {
+    from {
+      transform: scale(0) rotate(-45deg);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .complete-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 12px;
+  }
+
+  .complete-description {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0 0 40px;
+  }
+
+  /* Next Steps */
+  .next-steps {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+
+  .steps-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #ff5c00;
+    margin: 0 0 24px;
+  }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 16px;
+  }
+
+  .step-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background-color: rgba(255, 92, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-icon .material-symbols-outlined {
+    font-size: 22px;
+    color: #ff5c00;
+  }
+
+  .step-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 4px;
+  }
+
+  .step-content p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* CTA Buttons */
+  .cta-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  @media (min-width: 480px) {
+    .cta-buttons {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 200ms;
+    border: none;
+  }
+
+  .btn-lg {
+    min-width: 180px;
+  }
+
+  .btn-primary {
+    background-color: #ff5c00;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #e05000;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .btn .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  /* Support Notice */
+  .support-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .support-notice .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .support-notice a {
+    color: #ff5c00;
+    text-decoration: none;
+  }
+
+  .support-notice a:hover {
+    text-decoration: underline;
+  }
+
+  /* Footer */
+  .complete-footer {
+    padding: 24px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .complete-footer p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+  }
+</style>
+
+<script>
+  // Simple confetti animation
+  function createConfetti() {
+    const container = document.getElementById('confetti');
+    if (!container) return;
+
+    const colors = ['#ff5c00', '#22c55e', '#3b82f6', '#f59e0b', '#ec4899'];
+
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background-color: ${colors[Math.floor(Math.random() * colors.length)]};
+          left: 50%;
+          top: 50%;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+          animation: confettiFall ${2 + Math.random() * 2}s ease-out forwards;
+          transform: translate(${(Math.random() - 0.5) * 400}px, ${(Math.random() - 0.5) * 100}px);
+        `;
+        container.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 4000);
+      }, i * 30);
+    }
+  }
+
+  // Add confetti animation keyframes
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes confettiFall {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx, 100px), 300px) rotate(720deg);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Trigger confetti on load
+  setTimeout(createConfetti, 300);
+</script>

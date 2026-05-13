@@ -69,7 +69,7 @@ const authInstance = betterAuth({
       role: {
         type: "string",
         required: false,
-        defaultValue: "User", // Valid roles: SuperAdmin, Admin, User, Viewer
+        defaultValue: "User", // Valid roles: SuperAdmin | User (all non-superadmin are "User")
       },
       organizationId: {
         type: "string",
@@ -158,7 +158,7 @@ export function isAdmin(session: Session | null): boolean {
 /**
  * Check if user has at least User role (not Viewer)
  * @param session User session
- * @returns true if user is Admin or User
+ * @returns true if user is Admin or User (includes Drivers who are "User" in auth.db)
  */
 export function canEdit(session: Session | null): boolean {
   const role = session?.user?.role;
@@ -168,19 +168,40 @@ export function canEdit(session: Session | null): boolean {
 /**
  * Check if user has specific permission based on role
  * @param session User session
- * @param requiredRole Minimum required role
+ * @param requiredRole Minimum required role (only SuperAdmin | User in auth.db)
  * @returns true if user has required role
+ *
+ * NOTE: Driver and other worker types are determined in app.db, not auth.db
+ * Use app.db queries to check User.workerType or relationships for real roles
  */
 export function hasRole(
   session: Session | null,
-  requiredRole: "SuperAdmin" | "Admin" | "User" | "Viewer"
+  requiredRole: "SuperAdmin" | "User"
 ): boolean {
-  const roleHierarchy = { SuperAdmin: 4, Admin: 3, User: 2, Viewer: 1 };
-  const userRole = session?.user?.role as "SuperAdmin" | "Admin" | "User" | "Viewer" | undefined;
+  // Simple hierarchy: SuperAdmin > User
+  // All other roles (Driver, ShopOwner, etc.) live in app.db
+  const roleHierarchy = { SuperAdmin: 2, User: 1 };
+  const userRole = session?.user?.role as "SuperAdmin" | "User" | undefined;
 
   if (!userRole) return false;
 
   return (roleHierarchy[userRole] || 0) >= (roleHierarchy[requiredRole] || 0);
+}
+
+/**
+ * Check if user is a Driver
+ * @param session User session
+ * @returns true if user is a Driver
+ *
+ * DEPRECATED: This now returns false since Drivers have role "User" in auth.db
+ * Use app.db queries for driver detection:
+ * - Check User.workerType === "Driver"
+ * - Check if User -[IS_DRIVER]-> Driver relationship exists
+ */
+export function isDriver(session: Session | null): boolean {
+  // Drivers are now "User" role in auth.db
+  // Real driver detection happens in app.db via workerType or relationships
+  return false;
 }
 
 /**

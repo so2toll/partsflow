@@ -20,10 +20,16 @@ export type {
 } from "./ProjectRepository";
 
 export { organizationRepository, OrganizationRepository } from "./OrganizationRepository";
-export type { Organization } from "./OrganizationRepository";
+export type { Organization, OrganizationType } from "./OrganizationRepository";
+
+export { shopRepository, ShopRepository } from "./ShopRepository";
+export type { Shop, CreateShopData } from "./ShopRepository";
 
 export { userSubscriptionRepository } from "./UserSubscriptionRepository";
 export type { UserSubscription, User } from "./UserSubscriptionRepository";
 
 export { paymentRepository, PaymentRepository } from "./PaymentRepository";
 export type { PaymentEvent, CreatePaymentEventData } from "./PaymentRepository";
+
+export { inviteRepository, InviteRepository } from "./InviteRepository";
+export type { Invite, InviteType, InviteStatus, CreateInviteData, ListInvitesOptions } from "./InviteRepository";

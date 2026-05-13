@@ -1,5 +1,5 @@
 /**
- * Data3D Video AI Content Studio - Type Definitions
+ * MotoFlow Video AI Content Studio - Type Definitions
  *
  * Central export point for all type definitions used across the application.
  * This barrel file provides convenient imports for error types and video types.

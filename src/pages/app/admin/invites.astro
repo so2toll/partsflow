@@ -1,28 +1,24 @@
 ---
 /**
- * App Dashboard Test Page - MotoFlow Operations Dashboard
+ * Admin Invite Management Page
  *
- * Standard page template following the app pattern:
- * 1. Get session
- * 2. Set currentPage
- * 3. Fetch data via unified getPageData()
- * 4. Validate role access
- * 5. Render RBACComponent
+ * SuperAdmin page for managing platform invite links
+ * Route: /app/admin/invites
  */
 
-import { getSession } from "../../lib/auth/session-adapter";
-import { getLoginUrl } from "../../lib/auth/feature-flag";
-import { RBAC_CONFIG } from "../../lib/configs/rbacConfig.js";
-import RBACComponent from "../../components/RBAC/RBACComponent.astro";
-import { getPageData } from "../../lib/data/appPageData";
+import { getSession } from "../../../lib/auth/session-adapter";
+import { getLoginUrl } from "../../../lib/auth/feature-flag";
+import { RBAC_CONFIG } from "../../../lib/configs/rbacConfig.js";
+import RBACComponent from "../../../components/RBAC/RBACComponent.astro";
+import { getPageData } from "../../../lib/data/appPageData";
 
 // ========================================================================
-// PAGE CONFIGURATION - Only this changes per page!
+// PAGE CONFIGURATION
 // ========================================================================
-const currentPage = 'appDashboardTest';
+const currentPage = 'adminInvites';
 
 // ========================================================================
-// STANDARD PAGE LOGIC - Copy-paste for all app pages
+// STANDARD PAGE LOGIC
 // ========================================================================
 
 // Get session
@@ -39,7 +35,7 @@ const userRole = user?.role;
 const organizationId = user?.organizationId;
 
 // ========================================================================
-// DATA FETCHING - Uses unified getPageData() function
+// DATA FETCHING
 // ========================================================================
 
 const data = await getPageData(currentPage, userId, userRole, organizationId);
