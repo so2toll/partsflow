@@ -44,7 +44,7 @@ export function RecruiterSidebar({ currentPath = '/' }: RecruiterSidebarProps) {
           <Group mb="xl" justify={collapsed ? 'center' : 'space-between'}>
             {!collapsed && (
               <Text fw={600} size="lg" style={{ fontFamily: 'var(--font-heading)' }}>
-                Data3D
+                MotoFlow
               </Text>
             )}
             <ActionIcon
@@ -116,7 +116,7 @@ export function RecruiterSidebar({ currentPath = '/' }: RecruiterSidebarProps) {
                   Recruiter
                 </Text>
                 <Text size="xs" c="dimmed" lineClamp={1}>
-                  recruiter@data3d.com
+                  recruiter@MotoFlow.com
                 </Text>
               </Box>
             )}

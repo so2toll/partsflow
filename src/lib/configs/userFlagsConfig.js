@@ -35,7 +35,7 @@
 //         sideNav: Blank,
 //         content: AgencyOnboardContent,
 //         footer: Blank,
-//         title: "Data3D | Onboard",
+//         title: "MotoFlow | Onboard",
 //         description: "Insight3d Onboard",
 //       },
 //       workspace_not_set: {
@@ -43,7 +43,7 @@
 //         sideNav: SideNav,
 //         content: AgencyDashboardContent,
 //         footer: Footer,
-//         title: "Data3D | Dashboard",
+//         title: "MotoFlow | Dashboard",
 //         description: "Insight3d Dashboard",
 //       },
 //       document: {
@@ -51,7 +51,7 @@
 //         sideNav: SideNav,
 //         content: AgencyDashboardContent,
 //         footer: Footer,
-//         title: "Data3D | Document",
+//         title: "MotoFlow | Document",
 //         description: "Insight3d Document",
 //       },
 //       // ... other pages for agency

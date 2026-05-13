@@ -1,8 +1,8 @@
 /**
- * Domain Entities and Core Types for Data3D Expert Reasoning Engine
+ * Domain Entities and Core Types for MotoFlow Expert Reasoning Engine
  *
  * This file contains all shared domain entities, enums, and core types used
- * across the Data3D application. These types form the foundation of the event
+ * across the MotoFlow application. These types form the foundation of the event
  * sourcing system and are referenced by all services.
  *
  * @module types/contracts
@@ -76,7 +76,7 @@ export type AxiomCategory =
  * User role in the system (RBAC)
  */
 export type UserRole =
-  | 'Admin'      // Data3D staff — full access
+  | 'Admin'      // MotoFlow staff — full access
   | 'Recruiter'  // Client staff — review/annotate
   | 'Partner'    // Affiliate — submit only
   | 'Candidate'; // Expert — interview portal only

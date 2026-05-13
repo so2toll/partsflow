@@ -1,0 +1,960 @@
+---
+/**
+ * Shop Owner Onboarding Flow
+ *
+ * Multi-step onboarding for Shop Owners:
+ * Step 1: Business Details (shop name, address, phone, email)
+ * Step 2: Account Setup (owner name, email, password)
+ * Step 3: Review & Complete
+ *
+ * Route: /onboard/shop?token=xxx
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import { inviteRepository } from '../../lib/db/repositories/InviteRepository';
+
+// Get token from URL
+const token = Astro.url.searchParams.get('token');
+
+// Validate token
+let invite = null;
+let error = null;
+
+if (!token) {
+  error = 'missing_token';
+} else {
+  try {
+    invite = await inviteRepository.validateToken(token);
+    if (!invite) {
+      error = 'invalid_token';
+    } else if (invite.type !== 'shop_owner') {
+      error = 'wrong_type';
+    }
+  } catch (e) {
+    console.error('[Onboard/Shop] Error validating token:', e);
+    error = 'server_error';
+  }
+}
+---
+
+<Layout title="Shop Owner Registration - MotoFlow">
+  <div class="onboard-page">
+    <!-- Header -->
+    <header class="onboard-header">
+      <a href="/" class="brand-logo">MOTOFLOW</a>
+    </header>
+
+    <main class="onboard-main">
+      {error ? (
+        <div class="error-container">
+          <div class="error-card">
+            <span class="material-symbols-outlined error-icon">error</span>
+            <h1 class="error-title">
+              {error === 'missing_token' && 'Missing Invite Link'}
+              {error === 'invalid_token' && 'Invalid or Expired Invite'}
+              {error === 'wrong_type' && 'Wrong Invite Type'}
+              {error === 'server_error' && 'Something Went Wrong'}
+            </h1>
+            <p class="error-description">
+              {error === 'missing_token' && 'Please use the invite link provided by your administrator.'}
+              {error === 'invalid_token' && 'This invite link is no longer valid. Please contact your administrator.'}
+              {error === 'wrong_type' && 'This invite link is for drivers, not shop owners. Please use the correct link.'}
+              {error === 'server_error' && 'Please try again or contact support.'}
+            </p>
+            <a href="/" class="btn btn-secondary">Return Home</a>
+          </div>
+        </div>
+      ) : (
+        <div class="onboard-container">
+          <!-- Progress Steps -->
+          <div class="progress-steps">
+            <div class="step active" data-step="1">
+              <div class="step-number">1</div>
+              <div class="step-label">Business Details</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+              <div class="step-number">2</div>
+              <div class="step-label">Account Setup</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+              <div class="step-number">3</div>
+              <div class="step-label">Complete</div>
+            </div>
+          </div>
+
+          <!-- Form Container -->
+          <div class="form-container">
+            <form id="onboard-form" data-token={token}>
+              <!-- Step 1: Business Details -->
+              <div class="form-step active" data-step="1">
+                <div class="form-header">
+                  <span class="material-symbols-outlined form-icon">storefront</span>
+                  <h1 class="form-title">Tell us about your shop</h1>
+                  <p class="form-description">We'll use this information to set up your account and help drivers find you.</p>
+                </div>
+
+                <div class="form-fields">
+                  <div class="field-group">
+                    <label for="shop-name" class="field-label">Shop Name</label>
+                    <input
+                      type="text"
+                      id="shop-name"
+                      name="shopName"
+                      class="field-input"
+                      placeholder="e.g., Baltimore Auto Repair"
+                      required
+                    />
+                  </div>
+
+                  <div class="field-group">
+                    <label for="shop-address" class="field-label">Shop Address</label>
+                    <input
+                      type="text"
+                      id="shop-address"
+                      name="shopAddress"
+                      class="field-input"
+                      placeholder="e.g., 123 Main St, Baltimore, MD 21201"
+                      required
+                    />
+                  </div>
+
+                  <div class="field-row">
+                    <div class="field-group">
+                      <label for="shop-phone" class="field-label">Phone Number</label>
+                      <input
+                        type="tel"
+                        id="shop-phone"
+                        name="shopPhone"
+                        class="field-input"
+                        placeholder="(410) 555-0123"
+                        required
+                      />
+                    </div>
+
+                    <div class="field-group">
+                      <label for="shop-email" class="field-label">Business Email</label>
+                      <input
+                        type="email"
+                        id="shop-email"
+                        name="shopEmail"
+                        class="field-input"
+                        placeholder="shop@example.com"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <a href={`/onboard?token=${token}`} class="btn btn-ghost">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Back
+                  </a>
+                  <button type="button" class="btn btn-primary" data-next="2">
+                    Continue
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 2: Account Setup -->
+              <div class="form-step" data-step="2">
+                <div class="form-header">
+                  <span class="material-symbols-outlined form-icon">person_add</span>
+                  <h1 class="form-title">Create your account</h1>
+                  <p class="form-description">This will be your login for managing orders and tracking deliveries.</p>
+                </div>
+
+                <div class="form-fields">
+                  <div class="field-group">
+                    <label for="user-name" class="field-label">Your Full Name</label>
+                    <input
+                      type="text"
+                      id="user-name"
+                      name="userName"
+                      class="field-input"
+                      placeholder="e.g., John Smith"
+                      required
+                    />
+                  </div>
+
+                  <div class="field-group">
+                    <label for="user-email" class="field-label">Email Address</label>
+                    <input
+                      type="email"
+                      id="user-email"
+                      name="userEmail"
+                      class="field-input"
+                      placeholder="john@example.com"
+                      required
+                    />
+                    <p class="field-hint">You'll use this email to log in</p>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="user-password" class="field-label">Password</label>
+                    <div class="password-field">
+                      <input
+                        type="password"
+                        id="user-password"
+                        name="userPassword"
+                        class="field-input"
+                        placeholder="Create a strong password"
+                        minlength="8"
+                        required
+                      />
+                      <button type="button" class="password-toggle" data-target="user-password">
+                        <span class="material-symbols-outlined">visibility</span>
+                      </button>
+                    </div>
+                    <p class="field-hint">Minimum 8 characters</p>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="user-password-confirm" class="field-label">Confirm Password</label>
+                    <div class="password-field">
+                      <input
+                        type="password"
+                        id="user-password-confirm"
+                        name="userPasswordConfirm"
+                        class="field-input"
+                        placeholder="Confirm your password"
+                        minlength="8"
+                        required
+                      />
+                      <button type="button" class="password-toggle" data-target="user-password-confirm">
+                        <span class="material-symbols-outlined">visibility</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-ghost" data-prev="1">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Back
+                  </button>
+                  <button type="button" class="btn btn-primary" data-next="3">
+                    Review
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 3: Review & Complete -->
+              <div class="form-step" data-step="3">
+                <div class="form-header">
+                  <span class="material-symbols-outlined form-icon">fact_check</span>
+                  <h1 class="form-title">Review your information</h1>
+                  <p class="form-description">Please confirm everything looks correct before creating your account.</p>
+                </div>
+
+                <div class="review-section">
+                  <h3 class="review-title">Shop Details</h3>
+                  <div class="review-grid">
+                    <div class="review-item">
+                      <span class="review-label">Shop Name</span>
+                      <span class="review-value" id="review-shop-name">-</span>
+                    </div>
+                    <div class="review-item">
+                      <span class="review-label">Address</span>
+                      <span class="review-value" id="review-shop-address">-</span>
+                    </div>
+                    <div class="review-item">
+                      <span class="review-label">Phone</span>
+                      <span class="review-value" id="review-shop-phone">-</span>
+                    </div>
+                    <div class="review-item">
+                      <span class="review-label">Business Email</span>
+                      <span class="review-value" id="review-shop-email">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="review-section">
+                  <h3 class="review-title">Account Details</h3>
+                  <div class="review-grid">
+                    <div class="review-item">
+                      <span class="review-label">Your Name</span>
+                      <span class="review-value" id="review-user-name">-</span>
+                    </div>
+                    <div class="review-item">
+                      <span class="review-label">Login Email</span>
+                      <span class="review-value" id="review-user-email">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="terms-notice">
+                  <span class="material-symbols-outlined">info</span>
+                  <span>By creating an account, you agree to our Terms of Service and Privacy Policy.</span>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-ghost" data-prev="2">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Back
+                  </button>
+                  <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loading" style="display: none;">
+                      <span class="spinner"></span>
+                      Creating...
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message" style="display: none;">
+              <span class="material-symbols-outlined">error</span>
+              <span id="error-text"></span>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+
+    <!-- Footer -->
+    <footer class="onboard-footer">
+      <p>&copy; 2025 MotoFlow. All rights reserved.</p>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .onboard-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+  }
+
+  /* Header */
+  .onboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: #0B1117;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 1000;
+  }
+
+  .brand-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff5c00;
+    text-decoration: none;
+  }
+
+  /* Main */
+  .onboard-main {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 88px 24px 24px;
+  }
+
+  /* Error Container */
+  .error-container {
+    max-width: 480px;
+    width: 100%;
+    margin-top: 48px;
+  }
+
+  .error-card {
+    background-color: white;
+    padding: 48px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .error-icon {
+    font-size: 64px;
+    color: #ef4444;
+    margin-bottom: 24px;
+  }
+
+  .error-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 12px;
+  }
+
+  .error-description {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0 0 32px;
+  }
+
+  /* Onboard Container */
+  .onboard-container {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  /* Progress Steps */
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    gap: 8px;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    transition: all 200ms;
+  }
+
+  .step.active .step-number,
+  .step.completed .step-number {
+    background-color: #ff5c00;
+    color: white;
+  }
+
+  .step.completed .step-number {
+    background-color: #22c55e;
+  }
+
+  .step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    transition: all 200ms;
+  }
+
+  .step.active .step-label {
+    color: #1a202c;
+  }
+
+  .step-connector {
+    width: 48px;
+    height: 2px;
+    background-color: #e5e7eb;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 480px) {
+    .step-label {
+      display: none;
+    }
+    .step-connector {
+      margin-bottom: 0;
+    }
+  }
+
+  /* Form Container */
+  .form-container {
+    background-color: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-step {
+    display: none;
+  }
+
+  .form-step.active {
+    display: block;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .form-icon {
+    font-size: 48px;
+    color: #ff5c00;
+    margin-bottom: 16px;
+  }
+
+  .form-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 8px;
+  }
+
+  .form-description {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* Form Fields */
+  .form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .field-input {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #1a202c;
+    transition: all 200ms;
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: #ff5c00;
+    box-shadow: 0 0 0 3px rgba(255, 92, 0, 0.1);
+  }
+
+  .field-input::placeholder {
+    color: #9ca3af;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+  }
+
+  .password-field {
+    position: relative;
+  }
+
+  .password-field .field-input {
+    padding-right: 48px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .password-toggle:hover {
+    color: #6b7280;
+  }
+
+  /* Review Section */
+  .review-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .review-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff5c00;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 16px;
+  }
+
+  .review-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .review-label {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  .review-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
+    text-align: right;
+  }
+
+  .terms-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px;
+    background-color: rgba(255, 92, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .terms-notice .material-symbols-outlined {
+    font-size: 18px;
+    color: #ff5c00;
+    flex-shrink: 0;
+  }
+
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 200ms;
+    border: none;
+  }
+
+  .btn-primary {
+    background-color: #ff5c00;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #e05000;
+  }
+
+  .btn-primary:disabled {
+    background-color: #fed7aa;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f3f4f6;
+    color: #1a202c;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e5e7eb;
+  }
+
+  .btn-ghost {
+    background: none;
+    color: #6b7280;
+  }
+
+  .btn-ghost:hover {
+    background-color: #f3f4f6;
+  }
+
+  .btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .btn-submit {
+    min-width: 160px;
+    justify-content: center;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Error Message */
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    margin-top: 16px;
+    color: #dc2626;
+    font-size: 14px;
+  }
+
+  .error-message .material-symbols-outlined {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  .onboard-footer {
+    padding: 24px;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .onboard-footer p {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('onboard-form') as HTMLFormElement;
+  const token = form?.dataset.token;
+  const steps = document.querySelectorAll('.form-step');
+  const progressSteps = document.querySelectorAll('.progress-steps .step');
+  const submitBtn = document.getElementById('submit-btn');
+  const errorMessage = document.getElementById('error-message');
+  const errorText = document.getElementById('error-text');
+
+  let currentStep = 1;
+
+  // Navigation buttons
+  document.querySelectorAll('[data-next]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nextStep = parseInt((btn as HTMLElement).dataset.next || '1');
+      if (validateStep(currentStep)) {
+        goToStep(nextStep);
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-prev]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prevStep = parseInt((btn as HTMLElement).dataset.prev || '1');
+      goToStep(prevStep);
+    });
+  });
+
+  // Password toggle
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = (btn as HTMLElement).dataset.target;
+      const input = document.getElementById(targetId!) as HTMLInputElement;
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (input && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.textContent = 'visibility_off';
+        } else {
+          input.type = 'password';
+          icon.textContent = 'visibility';
+        }
+      }
+    });
+  });
+
+  function goToStep(step: number) {
+    // Update form steps
+    steps.forEach(s => {
+      s.classList.toggle('active', parseInt((s as HTMLElement).dataset.step || '1') === step);
+    });
+
+    // Update progress indicators
+    progressSteps.forEach(s => {
+      const stepNum = parseInt((s as HTMLElement).dataset.step || '1');
+      s.classList.toggle('active', stepNum === step);
+      s.classList.toggle('completed', stepNum < step);
+    });
+
+    currentStep = step;
+
+    // Update review values on step 3
+    if (step === 3) {
+      updateReview();
+    }
+
+    // Hide error message
+    if (errorMessage) {
+      errorMessage.style.display = 'none';
+    }
+  }
+
+  function validateStep(step: number): boolean {
+    const stepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+    if (!stepEl) return false;
+
+    const inputs = stepEl.querySelectorAll('input[required]');
+    let valid = true;
+
+    inputs.forEach(input => {
+      const el = input as HTMLInputElement;
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        valid = false;
+      } else {
+        el.classList.remove('error');
+      }
+
+      // Email validation
+      if (el.type === 'email' && el.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(el.value)) {
+          el.classList.add('error');
+          valid = false;
+        }
+      }
+    });
+
+    // Password match validation for step 2
+    if (step === 2) {
+      const password = (document.getElementById('user-password') as HTMLInputElement)?.value;
+      const confirm = (document.getElementById('user-password-confirm') as HTMLInputElement)?.value;
+      if (password !== confirm) {
+        showError('Passwords do not match');
+        valid = false;
+      }
+      if (password && password.length < 8) {
+        showError('Password must be at least 8 characters');
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
+  function updateReview() {
+    const getValue = (id: string) => (document.getElementById(id) as HTMLInputElement)?.value || '-';
+
+    const reviewFields = [
+      ['review-shop-name', 'shop-name'],
+      ['review-shop-address', 'shop-address'],
+      ['review-shop-phone', 'shop-phone'],
+      ['review-shop-email', 'shop-email'],
+      ['review-user-name', 'user-name'],
+      ['review-user-email', 'user-email'],
+    ];
+
+    reviewFields.forEach(([reviewId, inputId]) => {
+      const el = document.getElementById(reviewId);
+      if (el) {
+        el.textContent = getValue(inputId);
+      }
+    });
+  }
+
+  function showError(message: string) {
+    if (errorMessage && errorText) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'flex';
+    }
+  }
+
+  // Form submission
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!validateStep(3)) return;
+
+    // Show loading state
+    const btnText = submitBtn?.querySelector('.btn-text');
+    const btnLoading = submitBtn?.querySelector('.btn-loading');
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoading) btnLoading.style.display = 'flex';
+    if (submitBtn) submitBtn.disabled = true;
+
+    const formData = {
+      token,
+      shop: {
+        name: (document.getElementById('shop-name') as HTMLInputElement)?.value,
+        address: (document.getElementById('shop-address') as HTMLInputElement)?.value,
+        phone: (document.getElementById('shop-phone') as HTMLInputElement)?.value,
+        email: (document.getElementById('shop-email') as HTMLInputElement)?.value,
+      },
+      user: {
+        name: (document.getElementById('user-name') as HTMLInputElement)?.value,
+        email: (document.getElementById('user-email') as HTMLInputElement)?.value,
+        password: (document.getElementById('user-password') as HTMLInputElement)?.value,
+      },
+    };
+
+    try {
+      const response = await fetch('/api/onboard/shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Redirect to completion page
+        window.location.href = `/onboard/complete?type=shop_owner&token=${token}`;
+      } else {
+        showError(data.error || 'Failed to create account');
+        // Reset button state
+        if (btnText) btnText.style.display = 'inline';
+        if (btnLoading) btnLoading.style.display = 'none';
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      showError('Something went wrong. Please try again.');
+      // Reset button state
+      if (btnText) btnText.style.display = 'inline';
+      if (btnLoading) btnLoading.style.display = 'none';
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+</script>

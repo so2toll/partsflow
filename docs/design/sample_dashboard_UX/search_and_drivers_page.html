@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PartsFlow – Baltimore's Parts Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--s1:#101010;--s2:#181818;--s3:#222;
+  --border:#2a2a2a;--accent:#FF5500;--accent2:#FFD000;
+  --text:#F2F2F2;--muted:#888;--green:#22c55e;
+  --fd:'Barlow Condensed',sans-serif;
+  --fb:'Barlow',sans-serif;
+  --fm:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden}
+
+/* ── SCREEN SYSTEM ── */
+.screen{display:none;min-height:calc(100vh - 60px);animation:fadeUp .35s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,8,8,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  height:60px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;
+}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.logo-box{
+  width:34px;height:34px;background:var(--accent);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:900;color:#fff;font-size:15px;letter-spacing:-1px
+}
+.logo-text{font-family:var(--fd);font-weight:900;font-size:20px;letter-spacing:1px;color:var(--text);text-transform:uppercase}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-btn{background:none;border:none;color:var(--muted);font-family:var(--fd);font-size:14px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:color .2s;padding:0}
+.nav-btn:hover,.nav-btn.active{color:var(--text)}
+.btn-primary{
+  background:var(--accent);color:#fff;border:none;
+  padding:11px 22px;font-family:var(--fd);font-size:16px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  border-radius:4px;transition:background .2s,transform .1s;display:inline-block
+}
+.btn-primary:hover{background:#ff6a1a;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{
+  background:transparent;color:var(--text);border:1px solid var(--border);
+  padding:11px 22px;font-family:var(--fd);font-size:16px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;
+  transition:border-color .2s,color .2s
+}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── INPUTS ── */
+.input{
+  width:100%;background:var(--s2);border:1px solid var(--border);
+  color:var(--text);padding:13px 15px;font-family:var(--fb);font-size:15px;
+  border-radius:4px;outline:none;transition:border-color .2s
+}
+.input:focus{border-color:var(--accent)}
+.input::placeholder{color:var(--muted)}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:20px}
+.card-hover{transition:border-color .2s}
+.card-hover:hover{border-color:#3a3a3a}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:2px;
+  font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-orange{background:rgba(255,85,0,.15);color:var(--accent)}
+
+/* ── SECTION LABEL ── */
+.label{font-family:var(--fm);font-size:11px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+
+/* ── TICKER ── */
+.ticker{background:var(--accent);overflow:hidden;padding:10px 0;white-space:nowrap}
+.ticker-inner{display:inline-flex;animation:tick 22s linear infinite}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:#fff;padding:0 28px;border-right:1px solid rgba(255,255,255,.3)}
+
+/* ── HERO ── */
+.hero{min-height:calc(100vh - 60px);display:flex;flex-direction:column;
+  justify-content:center;padding:60px 20px 40px;position:relative;overflow:hidden}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--s2) 1px,transparent 1px),
+    linear-gradient(90deg,var(--s2) 1px,transparent 1px);
+  background-size:55px 55px;opacity:.4;pointer-events:none
+}
+.hero-glow{
+  position:absolute;top:15%;left:55%;width:450px;height:450px;
+  background:radial-gradient(circle,rgba(255,85,0,.12) 0%,transparent 70%);
+  pointer-events:none
+}
+.hero-num{
+  font-family:var(--fd);font-size:clamp(68px,14vw,130px);
+  font-weight:900;line-height:.87;letter-spacing:-2px;color:var(--text)
+}
+.hero-outline{-webkit-text-stroke:2px var(--text);color:transparent}
+.hero-accent{color:var(--accent)}
+.hero-sub{font-family:var(--fb);font-size:17px;color:var(--muted);
+  max-width:480px;line-height:1.65;margin:24px 0 36px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-stats{margin-top:44px;display:flex;gap:24px;flex-wrap:wrap}
+.stat{border-left:2px solid var(--accent);padding-left:14px}
+.stat-n{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--text)}
+.stat-l{font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* ── SECTIONS ── */
+.section{padding:70px 20px;max-width:880px;margin:0 auto}
+.section-dark{background:var(--s1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 20px}
+.section-dark-inner{max-width:880px;margin:0 auto}
+.h2{font-family:var(--fd);font-weight:900;font-size:clamp(30px,5vw,52px);
+  color:var(--text);line-height:1;margin-bottom:16px}
+.body-muted{font-family:var(--fb);font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:40px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.feature-icon{width:44px;height:44px;background:rgba(255,85,0,.1);border:1px solid rgba(255,85,0,.3);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.feat-title{font-family:var(--fd);font-weight:700;font-size:18px;color:var(--text);margin-bottom:8px}
+.feat-desc{font-family:var(--fb);font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── HOW IT WORKS ── */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0}
+.step-col{padding:24px;border-right:1px solid var(--border)}
+.step-col:last-child{border-right:none}
+.step-num{font-family:var(--fm);font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:14px}
+.step-icon{font-size:28px;margin-bottom:10px}
+.step-title{font-family:var(--fd);font-weight:700;font-size:18px;color:var(--text);margin-bottom:8px}
+.step-desc{font-family:var(--fb);font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── PRICING ── */
+.price-card{border-radius:8px;padding:26px;position:relative}
+.price-name{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--muted);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.price-num{font-family:var(--fd);font-weight:900;font-size:38px;color:var(--text);line-height:1}
+.price-sub{font-family:var(--fm);font-size:11px;color:var(--muted);margin-bottom:22px}
+.price-feature{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.price-feature span{font-family:var(--fb);font-size:13px;color:var(--muted)}
+.popular-tag{
+  position:absolute;top:-12px;left:20px;background:var(--accent);color:#fff;
+  font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:3px 10px;border-radius:2px
+}
+
+/* ── QUOTE ── */
+.quote-card .quote-text{font-family:var(--fb);font-size:14px;color:var(--text);
+  line-height:1.7;margin-bottom:18px;font-style:italic}
+.quote-name{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--accent)}
+.quote-role{font-family:var(--fm);font-size:10px;color:var(--muted)}
+
+/* ── CTA SECTION ── */
+.cta-section{background:var(--accent);padding:70px 20px;text-align:center}
+.cta-h{font-family:var(--fd);font-weight:900;font-size:clamp(34px,7vw,68px);
+  color:#fff;line-height:.9;margin-bottom:20px}
+.cta-sub{font-family:var(--fb);font-size:16px;color:rgba(255,255,255,.75);margin-bottom:32px}
+.cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-input{max-width:280px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.3);color:#fff;
+  padding:13px 15px;font-family:var(--fb);font-size:15px;border-radius:4px;outline:none}
+.cta-input::placeholder{color:rgba(255,255,255,.5)}
+
+/* ── FOOTER ── */
+footer{background:var(--s1);border-top:1px solid var(--border);padding:36px 20px}
+.footer-inner{max-width:880px;margin:0 auto;display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:14px}
+.footer-copy{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.footer-links{display:flex;gap:18px}
+.footer-link{font-family:var(--fm);font-size:10px;color:var(--muted);cursor:pointer}
+
+/* ── APP SCREENS ── */
+.app-wrap{max-width:680px;margin:0 auto;padding:28px 16px}
+.back-btn{background:none;border:none;color:var(--muted);font-family:var(--fb);
+  font-size:14px;cursor:pointer;padding:0;margin-bottom:24px;display:flex;align-items:center;gap:6px}
+.back-btn:hover{color:var(--text)}
+
+/* SEARCH */
+.tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{flex:1;padding:10px;background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--muted);font-family:var(--fd);font-size:14px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:color .2s,border-color .2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.search-row{display:flex;gap:10px;margin-bottom:12px}
+.quick-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.quick-tag{background:var(--s2);border:1px solid var(--border);color:var(--muted);
+  padding:4px 12px;border-radius:20px;font-family:var(--fb);font-size:13px;cursor:pointer;
+  transition:border-color .2s,color .2s}
+.quick-tag:hover{border-color:var(--accent);color:var(--accent)}
+
+/* RESULTS */
+.results-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.sort-row{display:flex;gap:8px;align-items:center}
+.sort-btn{padding:4px 10px;border-radius:2px;font-family:var(--fm);font-size:10px;
+  font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);
+  background:var(--s2);color:var(--muted);transition:all .2s}
+.sort-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.part-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px;background:var(--s1);border:1px solid var(--border);
+  border-radius:6px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,background .2s
+}
+.part-row:hover{border-color:var(--accent)}
+.part-row.selected{border-color:var(--accent);background:rgba(255,85,0,.06)}
+.part-brand{font-family:var(--fd);font-weight:700;font-size:16px;color:var(--text)}
+.part-sku{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.part-loc{font-family:var(--fb);font-size:12px;color:var(--muted);margin-top:4px}
+.part-price{font-family:var(--fd);font-weight:900;font-size:24px;color:var(--text);text-align:right}
+.part-eta{font-family:var(--fm);font-size:10px;text-align:right}
+.part-stock{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
+.order-panel{
+  background:rgba(255,85,0,.06);border:1px solid var(--accent);
+  border-radius:8px;padding:18px;margin-top:6px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;animation:fadeUp .3s ease
+}
+.order-info-title{font-family:var(--fd);font-weight:700;font-size:16px;color:var(--text)}
+.order-info-sub{font-family:var(--fb);font-size:13px;color:var(--muted)}
+.order-eta{font-family:var(--fm);font-size:11px;color:var(--green);margin-top:4px}
+
+/* CHECKOUT */
+.co-summary{margin-bottom:20px}
+.co-row{display:flex;justify-content:space-between;padding:8px 0}
+.co-label{font-family:var(--fb);font-size:14px;color:var(--muted)}
+.co-val{font-family:var(--fm);font-size:14px;color:var(--text)}
+.co-total-row{display:flex;justify-content:space-between;border-top:1px solid var(--border);
+  padding-top:12px;margin-top:4px}
+.co-total-label{font-family:var(--fd);font-weight:700;font-size:18px;color:var(--text)}
+.co-total-val{font-family:var(--fd);font-weight:900;font-size:22px;color:var(--accent)}
+.form-label{font-family:var(--fm);font-size:10px;color:var(--muted);display:block;
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.form-group{margin-bottom:14px}
+.pay-btn{width:100%;margin-top:18px;font-size:18px;padding:17px;letter-spacing:2px}
+.secure-note{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center;margin-top:10px}
+
+/* TRACKING */
+.eta-banner{
+  background:var(--accent);border-radius:8px;padding:22px;margin-bottom:20px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px
+}
+.eta-label{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.7);letter-spacing:2px;margin-bottom:4px}
+.eta-number{font-family:var(--fd);font-weight:900;font-size:52px;color:#fff;line-height:1}
+.driver-name{font-family:var(--fd);font-weight:700;font-size:20px;color:#fff}
+.driver-meta{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.7)}
+.map-box{
+  width:100%;height:190px;background:var(--s2);border-radius:8px;
+  position:relative;overflow:hidden;border:1px solid var(--border);margin-bottom:20px
+}
+.map-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:28px 28px
+}
+.map-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 55% 60%,rgba(255,85,0,.08),transparent 60%)
+}
+.map-dot{
+  position:absolute;width:13px;height:13px;background:var(--accent);
+  border-radius:50%;box-shadow:0 0 0 4px rgba(255,85,0,.2);
+  animation:pulse 1.5s infinite
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(255,85,0,.2)}50%{box-shadow:0 0 0 8px rgba(255,85,0,.05)}}
+.map-pin{
+  position:absolute;background:var(--s3);border:1px solid var(--border);
+  border-radius:4px;padding:3px 8px;
+  font-family:var(--fm);font-size:9px;color:var(--muted)
+}
+.map-pin-accent{background:var(--accent);border:none;color:#fff}
+.track-list{margin-bottom:20px}
+.track-step{display:flex;align-items:center;gap:12px;padding:13px 0;
+  border-bottom:1px solid var(--border)}
+.track-step:last-child{border-bottom:none}
+.step-circle{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0;
+  border:2px solid var(--border)
+}
+.step-circle.done{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.step-circle.pending{background:var(--s2);color:var(--muted)}
+.step-name{font-family:var(--fd);font-weight:700;font-size:15px;flex:1}
+.step-name.done{color:var(--text)}
+.step-name.pending{color:var(--muted)}
+.step-time{font-family:var(--fm);font-size:10px}
+.step-time.done{color:var(--green)}
+.step-time.pending{color:var(--muted)}
+.track-btns{display:flex;gap:10px}
+
+/* DRIVER */
+.earnings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.earn-cell{background:var(--s2);padding:18px 12px;text-align:center}
+.earn-num{font-family:var(--fd);font-weight:900;font-size:28px;line-height:1;margin-bottom:4px}
+.earn-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.status-row{display:flex;gap:10px;margin-bottom:20px}
+.status-btn{flex:1;padding:12px;border:1px solid var(--border);border-radius:6px;
+  background:transparent;color:var(--muted);font-family:var(--fd);font-weight:700;
+  font-size:15px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.status-btn.on{border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green)}
+.status-btn.off{border-color:var(--muted);color:var(--muted)}
+.job-alert{
+  background:rgba(255,85,0,.06);border:2px solid var(--accent);
+  border-radius:8px;padding:18px;margin-bottom:20px;animation:fadeUp .3s ease
+}
+.job-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.job-title{font-family:var(--fd);font-weight:700;font-size:17px;color:var(--text)}
+.job-loc{font-family:var(--fb);font-size:13px;color:var(--muted);margin-top:3px}
+.job-earn{font-family:var(--fd);font-weight:900;font-size:28px;color:var(--green)}
+.job-time{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.job-btns{display:flex;gap:10px}
+.delivery-item{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border)}
+.delivery-item:last-child{border-bottom:none}
+.del-part{font-family:var(--fb);font-size:14px;color:var(--text)}
+.del-meta{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.del-earn{font-family:var(--fd);font-weight:700;font-size:18px;color:var(--green)}
+.driver-note{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center;margin-top:14px}
+
+/* ── SPINNER ── */
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MOBILE ── */
+@media(max-width:480px){
+  .nav-links .nav-btn{display:none}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .step-col{border-right:none;border-bottom:1px solid var(--border)}
+  .step-col:last-child{border-bottom:none}
+  .hero-num{font-size:clamp(60px,16vw,100px)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav>
+  <div class="logo" onclick="show('landing')">
+    <div class="logo-box">PF</div>
+    <span class="logo-text">PartsFlow</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nav-landing" onclick="show('landing')">Home</button>
+    <button class="nav-btn" id="nav-search" onclick="show('search')">App</button>
+    <button class="nav-btn" id="nav-driver" onclick="show('driver')">Drivers</button>
+    <button class="btn-primary" style="padding:10px 18px;font-size:14px" onclick="show('search')">Get Parts Now</button>
+  </div>
+</nav>
+
+<!-- ══════════ LANDING ══════════ -->
+<div class="screen active" id="screen-landing">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div style="position:relative;max-width:880px;margin:0 auto;width:100%">
+      <div class="label" style="margin-bottom:22px">Baltimore · Washington DC · Now Launching</div>
+      <div class="hero-num">
+        Parts.<br>
+        <span class="hero-outline">Delivered.</span><br>
+        <span class="hero-accent">Fast.</span>
+      </div>
+      <p class="hero-sub">The real-time parts sourcing and delivery network built for repair shops. Multi-supplier search. 30–60 minute delivery. Guaranteed SLA.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" style="font-size:17px;padding:15px 32px" onclick="show('search')">🔧 Search Parts Now</button>
+        <button class="btn-ghost" onclick="show('search')">View Live Demo →</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-n">30–60</div><div class="stat-l">Min Delivery SLA</div></div>
+        <div class="stat"><div class="stat-n">200+</div><div class="stat-l">Baltimore Suppliers</div></div>
+        <div class="stat"><div class="stat-n">15M+</div><div class="stat-l">Parts in Network</div></div>
+        <div class="stat"><div class="stat-n">$0</div><div class="stat-l">Shop Signup Fee</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">30–60 Min Delivery</span>
+      <span class="ticker-item">Multi-Supplier Matching</span>
+      <span class="ticker-item">Live Inventory</span>
+      <span class="ticker-item">Baltimore's Fastest Parts Network</span>
+      <span class="ticker-item">Guaranteed ETA or Refund</span>
+      <span class="ticker-item">30–60 Min Delivery</span>
+      <span class="ticker-item">Multi-Supplier Matching</span>
+      <span class="ticker-item">Live Inventory</span>
+      <span class="ticker-item">Baltimore's Fastest Parts Network</span>
+      <span class="ticker-item">Guaranteed ETA or Refund</span>
+    </div>
+  </div>
+
+  <!-- Problem -->
+  <div class="section">
+    <div class="label">The Problem</div>
+    <div class="h2">Every minute a car sits on<br>a lift, money bleeds out.</div>
+    <p class="body-muted">A six-bay shop loses $600–$900 per hour in idle capacity waiting on parts. Delivery drivers are underpaid and routing blind. The supply chain is fragmented across a dozen disconnected phone calls.</p>
+    <div class="grid-2">
+      <div class="card card-hover"><div style="font-size:26px;margin-bottom:10px">⏱</div><div class="feat-title">Delivery Delays</div><div class="feat-desc">9 drivers at a single location still can't meet demand during peak hours.</div></div>
+      <div class="card card-hover"><div style="font-size:26px;margin-bottom:10px">📱</div><div class="feat-title">Fragmented Lookup</div><div class="feat-desc">Shops call 4–6 suppliers separately. No unified availability view.</div></div>
+      <div class="card card-hover"><div style="font-size:26px;margin-bottom:10px">💸</div><div class="feat-title">Driver Economics</div><div class="feat-desc">$15/hr flat pay creates high turnover, low accountability, and dead hours.</div></div>
+      <div class="card card-hover"><div style="font-size:26px;margin-bottom:10px">📦</div><div class="feat-title">No Real-Time Visibility</div><div class="feat-desc">No live tracking. No ETA guarantee. No dispatch optimization.</div></div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section-dark">
+    <div class="section-dark-inner">
+      <div class="label">How PartsFlow Works</div>
+      <div class="h2" style="margin-bottom:40px">Search. Order. Delivered.</div>
+      <div class="steps-grid">
+        <div class="step-col"><div class="step-num">STEP 01</div><div class="step-icon">🔍</div><div class="step-title">Search All Suppliers</div><div class="step-desc">Enter your part number, VIN, or vehicle. See live inventory and real pricing from every supplier in your area — simultaneously.</div></div>
+        <div class="step-col"><div class="step-num">STEP 02</div><div class="step-icon">⚡</div><div class="step-title">Choose Speed or Price</div><div class="step-desc">Pick the fastest delivery or lowest cost. Sort by ETA, price, or supplier rating. One click to order.</div></div>
+        <div class="step-col"><div class="step-num">STEP 03</div><div class="step-icon">🚗</div><div class="step-title">Driver Dispatched</div><div class="step-desc">Our algorithm assigns the closest available driver with surge incentives. Real-time GPS tracking from pickup to drop-off.</div></div>
+        <div class="step-col"><div class="step-num">STEP 04</div><div class="step-icon">✅</div><div class="step-title">Parts on Your Lift</div><div class="step-desc">30–60 minutes, guaranteed. Repeat ordering with one tap for your preferred parts and vehicles.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <div class="label">Platform Features</div>
+    <div class="h2" style="margin-bottom:40px">Built for shops.<br>Not for Amazon.</div>
+    <div class="grid-3">
+      <div class="card card-hover"><div class="feature-icon">🧠</div><div class="feat-title">Smart VIN Lookup</div><div class="feat-desc">Decode any VIN in seconds. Vehicle-specific fitment filter. No wrong parts.</div></div>
+      <div class="card card-hover"><div class="feature-icon">📡</div><div class="feat-title">Live Inventory Feed</div><div class="feat-desc">Real-time stock from 200+ Baltimore-area suppliers. Updated every 90 seconds.</div></div>
+      <div class="card card-hover"><div class="feature-icon">🗺</div><div class="feat-title">Zone-Based Dispatch</div><div class="feat-desc">Driver matched by proximity to supplier. Fastest pickup = fastest drop-off.</div></div>
+      <div class="card card-hover"><div class="feature-icon">📊</div><div class="feat-title">Shop Analytics</div><div class="feat-desc">Ordering history, most-ordered parts, and total time saved per month.</div></div>
+      <div class="card card-hover"><div class="feature-icon">💬</div><div class="feat-title">SMS Integration</div><div class="feat-desc">Order, track, and confirm delivery without opening an app. Built for technicians.</div></div>
+      <div class="card card-hover"><div class="feature-icon">🔄</div><div class="feat-title">One-Tap Reorder</div><div class="feat-desc">Saved vehicles and saved parts for common repairs. Estimate-to-order in 20 seconds.</div></div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="section-dark">
+    <div class="section-dark-inner">
+      <div class="label">Pricing</div>
+      <div class="h2" style="margin-bottom:40px">No games. No subscription required.</div>
+      <div class="grid-3">
+        <div class="price-card" style="background:var(--s2);border:1px solid var(--border)">
+          <div class="price-name">Pay-As-You-Go</div>
+          <div class="price-num">Free</div>
+          <div class="price-sub">+ $15–22 per delivery</div>
+          <div style="border-top:1px solid var(--border);padding-top:18px">
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Unlimited part searches</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Live inventory access</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>SMS delivery alerts</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>All Baltimore suppliers</span></div>
+          </div>
+        </div>
+        <div class="price-card" style="background:rgba(255,85,0,.06);border:1px solid var(--accent);position:relative">
+          <div class="popular-tag">Most Popular</div>
+          <div class="price-name">Shop Pro</div>
+          <div class="price-num">$149</div>
+          <div class="price-sub">per month</div>
+          <div style="border-top:1px solid var(--border);padding-top:18px">
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Everything in Free</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Priority dispatch queue</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Dedicated account rep</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Analytics dashboard</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>API + SMS integration</span></div>
+          </div>
+        </div>
+        <div class="price-card" style="background:var(--s2);border:1px solid var(--border)">
+          <div class="price-name">Fleet Enterprise</div>
+          <div class="price-num">Custom</div>
+          <div class="price-sub">contact us</div>
+          <div style="border-top:1px solid var(--border);padding-top:18px">
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Everything in Pro</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Multi-location mgmt</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Volume delivery pricing</span></div>
+            <div class="price-feature"><span style="color:var(--accent);font-weight:700">→</span><span>Custom SLA agreements</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="section">
+    <div class="label">Early Feedback</div>
+    <div class="h2" style="margin-bottom:36px">What shops are saying.</div>
+    <div class="grid-3">
+      <div class="card quote-card"><div class="quote-text">"I spend 45 minutes a day just calling parts stores. If PartsFlow cuts that in half, I'd pay for it twice over."</div><div class="quote-name">Marcus T.</div><div class="quote-role">Owner, Eastside Auto Repair</div></div>
+      <div class="card quote-card"><div class="quote-text">"The car-on-lift problem is real. Every 20 minutes I'm on hold costs me money. This is the right answer."</div><div class="quote-name">Deja W.</div><div class="quote-role">Service Manager, Fleet Plus</div></div>
+      <div class="card quote-card"><div class="quote-text">"Fastest I ever got a part was 22 minutes from Parts Authority. I need that to be the norm, not the exception."</div><div class="quote-name">Carlos R.</div><div class="quote-role">Master Tech, Precision Imports</div></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="label" style="color:rgba(255,255,255,.55)">Baltimore Launch · Early Access</div>
+    <div class="cta-h">First 50 shops<br>get priority access.</div>
+    <p class="cta-sub">Free onboarding. No commitment. Be the fastest shop in your zip code.</p>
+    <div class="cta-row">
+      <input class="cta-input" placeholder="Your email address" type="email"/>
+      <button class="btn-primary" style="background:#000" onclick="show('search')">Request Early Access</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="logo"><div class="logo-box">PF</div><span class="logo-text">PartsFlow</span></div>
+      <div class="footer-copy">© 2025 PartsFlow · Baltimore, MD · hello@partsflow.com</div>
+      <div class="footer-links">
+        <span class="footer-link">Terms</span>
+        <span class="footer-link">Privacy</span>
+        <span class="footer-link">Careers</span>
+        <span class="footer-link">Contact</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════ SEARCH ══════════ -->
+<div class="screen" id="screen-search">
+  <div class="app-wrap">
+    <div class="label">Parts Search</div>
+    <h1 style="font-family:var(--fd);font-weight:900;font-size:36px;color:var(--text);margin-bottom:20px">Find Any Part, Instantly</h1>
+
+    <div class="tab-row">
+      <button class="tab active" id="tab-part" onclick="switchTab('part')">🔧 Part Name / Number</button>
+      <button class="tab" id="tab-vin" onclick="switchTab('vin')">🔑 VIN Lookup</button>
+    </div>
+
+    <div id="search-part" class="search-row">
+      <input class="input" id="part-input" placeholder="e.g. brake pads, alternator, ACDelco 17D1449..." onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="btn-primary" onclick="doSearch()">Search</button>
+    </div>
+    <div id="search-vin" class="search-row" style="display:none">
+      <input class="input" id="vin-input" placeholder="Enter 17-character VIN..." style="font-family:var(--fm);letter-spacing:2px" onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="btn-primary" onclick="doSearch()">Decode</button>
+    </div>
+
+    <div class="quick-tags">
+      <span style="font-family:var(--fm);font-size:10px;color:var(--muted);align-self:center">Try:</span>
+      <button class="quick-tag" onclick="quickSearch('Brake Pads')">Brake Pads</button>
+      <button class="quick-tag" onclick="quickSearch('Alternator')">Alternator</button>
+      <button class="quick-tag" onclick="quickSearch('Battery')">Battery</button>
+      <button class="quick-tag" onclick="quickSearch('Starter Motor')">Starter Motor</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results-area" style="display:none;margin-top:28px">
+      <div class="results-header">
+        <div>
+          <span style="font-family:var(--fd);font-weight:700;font-size:18px;color:var(--text)" id="results-count">4 suppliers found</span>
+          <span style="font-family:var(--fb);font-size:14px;color:var(--muted)" id="results-query"> for "Brake Pads"</span>
+        </div>
+        <div class="sort-row">
+          <span style="font-family:var(--fm);font-size:10px;color:var(--muted)">Sort:</span>
+          <button class="sort-btn active" id="sort-eta" onclick="sortResults('eta')">⚡ Fastest</button>
+          <button class="sort-btn" id="sort-price" onclick="sortResults('price')">💰 Cheapest</button>
+        </div>
+      </div>
+      <div id="parts-list"></div>
+      <div id="order-panel" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CHECKOUT ══════════ -->
+<div class="screen" id="screen-checkout">
+  <div class="app-wrap">
+    <button class="back-btn" onclick="show('search')">← Back to results</button>
+    <div class="label">Order Checkout</div>
+    <h1 style="font-family:var(--fd);font-weight:900;font-size:36px;color:var(--text);margin-bottom:24px">Confirm & Dispatch</h1>
+
+    <div class="card co-summary" style="margin-bottom:20px">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">ORDER SUMMARY</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div id="co-brand" style="font-family:var(--fd);font-weight:700;font-size:18px;color:var(--text)">Wagner ThermoQuiet</div>
+          <div id="co-sku" style="font-family:var(--fm);font-size:10px;color:var(--muted)">SKU QC1449</div>
+          <div id="co-supplier" style="font-family:var(--fb);font-size:13px;color:var(--muted);margin-top:6px">📍 O'Reilly – Catonsville</div>
+          <div style="margin-top:10px"><span class="badge badge-green" id="co-eta">⚡ 19 min ETA</span></div>
+        </div>
+        <div style="text-align:right">
+          <div id="co-price" style="font-family:var(--fd);font-weight:900;font-size:28px;color:var(--text)">$71</div>
+          <div style="font-family:var(--fb);font-size:12px;color:var(--muted)">part price</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px">
+        <div class="co-row"><span class="co-label">Part price</span><span class="co-val" id="co-part-price">$71.00</span></div>
+        <div class="co-row"><span class="co-label">Delivery fee</span><span class="co-val">$18.00</span></div>
+        <div class="co-row"><span class="co-label">Service fee</span><span class="co-val">$4.00</span></div>
+        <div class="co-total-row">
+          <span class="co-total-label">Total</span>
+          <span class="co-total-val" id="co-total">$93</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">DELIVERY DETAILS</div>
+      <div class="form-group">
+        <label class="form-label">Shop / Business Name</label>
+        <input class="input" placeholder="e.g. Eastside Auto Repair"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Address</label>
+        <input class="input" placeholder="1234 Baltimore Ave, Baltimore MD 21201"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone (SMS Updates)</label>
+        <input class="input" placeholder="(410) 555-0100" type="tel"/>
+      </div>
+    </div>
+
+    <button class="btn-primary pay-btn" id="pay-btn" onclick="placeOrder()">💳 Pay & Dispatch Driver →</button>
+    <div class="secure-note">🔒 Secured by Stripe · Delivery guaranteed or full refund</div>
+  </div>
+</div>
+
+<!-- ══════════ TRACKING ══════════ -->
+<div class="screen" id="screen-tracking">
+  <div class="app-wrap">
+    <div class="label">Live Tracking</div>
+    <h1 style="font-family:var(--fd);font-weight:900;font-size:36px;color:var(--text);margin-bottom:6px">Driver En Route</h1>
+    <p style="font-family:var(--fb);font-size:15px;color:var(--muted);margin-bottom:24px">
+      Your <strong id="track-part" style="color:var(--text)">Wagner ThermoQuiet</strong> is on its way
+    </p>
+
+    <div class="eta-banner">
+      <div>
+        <div class="eta-label">ESTIMATED ARRIVAL</div>
+        <div class="eta-number" id="eta-display">19 MIN</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.7);margin-bottom:4px">Driver</div>
+        <div class="driver-name">Marcus D.</div>
+        <div class="driver-meta">⭐ 4.9 · 412 deliveries</div>
+      </div>
+    </div>
+
+    <div class="map-box">
+      <div class="map-grid"></div>
+      <div class="map-glow"></div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%">
+        <line x1="30%" y1="30%" x2="60%" y2="65%" stroke="#FF5500" stroke-width="2" stroke-dasharray="6,4" opacity=".6"/>
+        <circle cx="30%" cy="30%" r="5" fill="#222" stroke="#2a2a2a" stroke-width="2"/>
+        <circle cx="60%" cy="65%" r="5" fill="#FF5500"/>
+      </svg>
+      <div class="map-dot" style="left:50%;top:50%"></div>
+      <div class="map-pin" style="left:22%;top:18%">📦 O'Reilly</div>
+      <div class="map-pin map-pin-accent" style="left:58%;top:62%">🔧 Your Shop</div>
+    </div>
+
+    <div class="card track-list" id="track-steps"></div>
+
+    <div class="track-btns">
+      <button class="btn-ghost" style="flex:1" onclick="show('search')">New Order</button>
+      <button class="btn-primary" style="flex:2" id="advance-btn" onclick="advanceStep()">Advance Status ⟶ (Demo)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DRIVER ══════════ -->
+<div class="screen" id="screen-driver">
+  <div class="app-wrap">
+    <div class="label">Driver Mode</div>
+    <h1 style="font-family:var(--fd);font-weight:900;font-size:36px;color:var(--text);margin-bottom:6px">Driver Dashboard</h1>
+    <p style="font-family:var(--fb);font-size:15px;color:var(--muted);margin-bottom:24px">Marcus D. · Baltimore Zone A</p>
+
+    <div class="earnings-grid">
+      <div class="earn-cell"><div class="earn-num" style="color:var(--green)">$142</div><div class="earn-lbl">Today's Earnings</div></div>
+      <div class="earn-cell"><div class="earn-num" style="color:var(--text)">9</div><div class="earn-lbl">Deliveries</div></div>
+      <div class="earn-cell"><div class="earn-num" style="color:var(--accent2)">4.9★</div><div class="earn-lbl">Avg Rating</div></div>
+    </div>
+
+    <div class="status-row">
+      <button class="status-btn on" id="btn-on" onclick="setDriverStatus('on')">🟢 Available</button>
+      <button class="status-btn" id="btn-off" onclick="setDriverStatus('off')">⚫ Offline</button>
+    </div>
+
+    <div id="job-alert">
+      <div class="job-alert">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:12px">🔔 INCOMING JOB</div>
+        <div class="job-header">
+          <div>
+            <div class="job-title">Brake Pads – Wagner ThermoQuiet</div>
+            <div class="job-loc">Pickup: O'Reilly – Catonsville</div>
+            <div class="job-loc">Drop: Eastside Auto Repair</div>
+          </div>
+          <div style="text-align:right">
+            <div class="job-earn">$18</div>
+            <div class="job-time">~22 min round trip</div>
+          </div>
+        </div>
+        <div class="job-btns">
+          <button class="btn-primary" style="flex:2" onclick="show('tracking')">Accept Job</button>
+          <button class="btn-ghost" style="flex:1" onclick="document.getElementById('job-alert').style.display='none'">Pass</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">RECENT DELIVERIES</div>
+      <div class="delivery-item"><div><div class="del-part">Alternator – Bosch</div><div class="del-meta">Precision Imports · 10:12 AM</div></div><div class="del-earn">$22</div></div>
+      <div class="delivery-item"><div><div class="del-part">Battery – Optima Red</div><div class="del-meta">Highlandtown Tire · 9:44 AM</div></div><div class="del-earn">$18</div></div>
+      <div class="delivery-item"><div><div class="del-part">Oil Filter (x6)</div><div class="del-meta">Fleet Plus · 8:55 AM</div></div><div class="del-earn">$26</div></div>
+    </div>
+    <div class="driver-note">PartsFlow drivers avg <strong style="color:var(--accent2)">$24–31/hr</strong> vs $15/hr industry standard</div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const PARTS = [
+  {id:1,brand:"Bosch QuietCast",sku:"BC1449",price:64,eta:28,dist:"2.1 mi",supplier:"Advance Auto – Towson",stock:8},
+  {id:2,brand:"Wagner ThermoQuiet",sku:"QC1449",price:71,eta:19,dist:"0.8 mi",supplier:"O'Reilly – Catonsville",stock:4},
+  {id:3,brand:"ACDelco Professional",sku:"17D1449MH",price:58,eta:44,dist:"4.3 mi",supplier:"NAPA – Essex",stock:12},
+  {id:4,brand:"PowerStop Z23",sku:"Z23-1449",price:89,eta:35,dist:"3.2 mi",supplier:"Parts Authority – Dundalk",stock:3},
+];
+const STEPS = [
+  {label:"Order Confirmed",    time:"10:42 AM",  icon:"✓"},
+  {label:"Supplier Located",   time:"10:43 AM",  icon:"✓"},
+  {label:"Driver Assigned",    time:"10:44 AM",  icon:"✓"},
+  {label:"Picked Up at Store", time:"10:51 AM",  icon:"✓"},
+  {label:"En Route to Shop",   time:"Est 11:09", icon:"🚗"},
+  {label:"Delivered",          time:"Est 11:14", icon:"📦"},
+];
+
+let currentSort = 'eta';
+let selectedPart = PARTS[1];
+let trackStep = 3;
+let activeTab = 'part';
+
+// ── NAVIGATION ──
+function show(screenName) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + screenName).classList.add('active');
+  const nb = document.getElementById('nav-' + screenName);
+  if (nb) nb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (screenName === 'tracking') renderSteps();
+  if (screenName === 'checkout') populateCheckout();
+}
+
+// ── TABS ──
+function switchTab(t) {
+  activeTab = t;
+  document.getElementById('tab-part').classList.toggle('active', t==='part');
+  document.getElementById('tab-vin').classList.toggle('active', t==='vin');
+  document.getElementById('search-part').style.display = t==='part'?'flex':'none';
+  document.getElementById('search-vin').style.display = t==='vin'?'flex':'none';
+}
+
+// ── SEARCH ──
+function quickSearch(q) {
+  document.getElementById('part-input').value = q;
+  doSearch(q);
+}
+function doSearch(forcedQ) {
+  const q = forcedQ || document.getElementById('part-input').value || document.getElementById('vin-input').value || 'Brake Pads';
+  document.getElementById('results-area').style.display = 'block';
+  document.getElementById('results-query').textContent = ' for "' + q + '"';
+  renderParts();
+}
+function sortResults(by) {
+  currentSort = by;
+  document.getElementById('sort-eta').classList.toggle('active', by==='eta');
+  document.getElementById('sort-price').classList.toggle('active', by==='price');
+  renderParts();
+}
+function renderParts() {
+  const sorted = [...PARTS].sort((a,b) => currentSort==='eta' ? a.eta - b.eta : a.price - b.price);
+  const list = document.getElementById('parts-list');
+  list.innerHTML = sorted.map((p,i) => `
+    <div class="part-row${selectedPart&&selectedPart.id===p.id?' selected':''}" onclick="selectPart(${p.id})">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
+          ${i===0?`<span class="badge ${currentSort==='eta'?'badge-green':'badge-orange'}">${currentSort==='eta'?'⚡ Fastest':'💰 Best Price'}</span>`:''}
+          <span class="part-brand">${p.brand}</span>
+        </div>
+        <div class="part-sku">SKU ${p.sku}</div>
+        <div class="part-loc">📍 ${p.supplier} · ${p.dist}</div>
+      </div>
+      <div style="flex-shrink:0;margin-left:14px">
+        <div class="part-price">$${p.price}</div>
+        <div class="part-eta" style="color:${p.eta<30?'var(--green)':'var(--muted)'}">${p.eta} min ETA</div>
+        <div class="part-stock">${p.stock} in stock</div>
+      </div>
+    </div>
+  `).join('');
+  renderOrderPanel();
+}
+function selectPart(id) {
+  selectedPart = PARTS.find(p=>p.id===id);
+  renderParts();
+}
+function renderOrderPanel() {
+  const panel = document.getElementById('order-panel');
+  if (!selectedPart) { panel.style.display='none'; return; }
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <div class="order-panel">
+      <div>
+        <div class="order-info-title">${selectedPart.brand}</div>
+        <div class="order-info-sub">$${selectedPart.price} part + $18 delivery = <strong style="color:var(--text)">$${selectedPart.price+18} total</strong></div>
+        <div class="order-eta">Estimated delivery: ${selectedPart.eta} minutes</div>
+      </div>
+      <button class="btn-primary" onclick="goCheckout()">Order Now →</button>
+    </div>
+  `;
+}
+function goCheckout() {
+  show('checkout');
+}
+
+// ── CHECKOUT ──
+function populateCheckout() {
+  if (!selectedPart) return;
+  document.getElementById('co-brand').textContent = selectedPart.brand;
+  document.getElementById('co-sku').textContent = 'SKU ' + selectedPart.sku;
+  document.getElementById('co-supplier').textContent = '📍 ' + selectedPart.supplier;
+  document.getElementById('co-eta').textContent = '⚡ ' + selectedPart.eta + ' min ETA';
+  document.getElementById('co-price').textContent = '$' + selectedPart.price;
+  document.getElementById('co-part-price').textContent = '$' + selectedPart.price + '.00';
+  document.getElementById('co-total').textContent = '$' + (selectedPart.price + 22);
+  document.getElementById('track-part').textContent = selectedPart.brand;
+  document.getElementById('eta-display').textContent = selectedPart.eta + ' MIN';
+}
+function placeOrder() {
+  const btn = document.getElementById('pay-btn');
+  btn.innerHTML = '<span class="spinner"></span> Dispatching Driver...';
+  btn.disabled = true;
+  setTimeout(() => {
+    trackStep = 3;
+    show('tracking');
+    btn.innerHTML = '💳 Pay & Dispatch Driver →';
+    btn.disabled = false;
+  }, 1600);
+}
+
+// ── TRACKING ──
+function renderSteps() {
+  const container = document.getElementById('track-steps');
+  container.innerHTML = STEPS.map((s,i) => {
+    const done = i <= trackStep;
+    return `
+      <div class="track-step">
+        <div class="step-circle ${done?'done':'pending'}">${done?'✓':s.icon}</div>
+        <div class="step-name ${done?'done':'pending'}">${s.label}</div>
+        <div class="step-time ${done?'done':'pending'}">${s.time}</div>
+      </div>`;
+  }).join('');
+  const advBtn = document.getElementById('advance-btn');
+  if (trackStep >= STEPS.length - 1) {
+    advBtn.textContent = '✅ Delivered! Order Again';
+    advBtn.onclick = () => show('search');
+    advBtn.style.background = 'var(--green)';
+  } else {
+    advBtn.textContent = 'Advance Status ⟶ (Demo)';
+    advBtn.onclick = advanceStep;
+    advBtn.style.background = 'var(--accent)';
+  }
+}
+function advanceStep() {
+  if (trackStep < STEPS.length - 1) {
+    trackStep++;
+    const etaNum = selectedPart ? Math.max(0, selectedPart.eta - trackStep * 6) : 0;
+    document.getElementById('eta-display').textContent = etaNum > 0 ? etaNum + ' MIN' : 'NOW';
+    renderSteps();
+  }
+}
+
+// ── DRIVER ──
+function setDriverStatus(s) {
+  document.getElementById('btn-on').classList.toggle('on', s==='on');
+  document.getElementById('btn-off').classList.toggle('on', s==='off');
+  document.getElementById('btn-off').style.borderColor = s==='off'?'var(--muted)':'var(--border)';
+  document.getElementById('job-alert').style.display = s==='on'?'block':'none';
+}
+
+// Init
+renderParts();
+</script>
+</body>
+</html>

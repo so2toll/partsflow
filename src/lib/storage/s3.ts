@@ -188,7 +188,7 @@
 //   metadata?: Record<string, string>
 // ): Promise<string> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new PutObjectCommand({
@@ -244,7 +244,7 @@
 //   expiresIn: number = 3600
 // ): Promise<string> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new PutObjectCommand({
@@ -285,7 +285,7 @@
 //   expiresIn: number = 3600
 // ): Promise<string> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new GetObjectCommand({
@@ -318,7 +318,7 @@
 //  */
 // export async function deleteFile(key: string): Promise<void> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new DeleteObjectCommand({
@@ -353,7 +353,7 @@
 //   maxKeys: number = 1000
 // ): Promise<string[]> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new ListObjectsV2Command({
@@ -388,7 +388,7 @@
 //  */
 // export async function fileExists(key: string): Promise<boolean> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new HeadObjectCommand({
@@ -426,7 +426,7 @@
 //   metadata: Record<string, string>;
 // }> {
 //   const client = getS3Client();
-//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "data3d-files";
+//   const bucket = import.meta.env.S3_FILES_BUCKET || process.env.S3_FILES_BUCKET || "MotoFlow-files";
 
 //   try {
 //     const command = new HeadObjectCommand({
@@ -460,7 +460,7 @@
 //  *
 //  * @example
 //  * ```typescript
-//  * const key = extractKeyFromUri("s3://data3d-files/resumes/cand_123/resume.pdf");
+//  * const key = extractKeyFromUri("s3://MotoFlow-files/resumes/cand_123/resume.pdf");
 //  * // Returns: "resumes/cand_123/resume.pdf"
 //  * ```
 //  */
@@ -488,8 +488,8 @@
 //  *
 //  * @example
 //  * ```typescript
-//  * const uri = buildS3Uri("data3d-files", "resumes/cand_123/resume.pdf");
-//  * // Returns: "s3://data3d-files/resumes/cand_123/resume.pdf"
+//  * const uri = buildS3Uri("MotoFlow-files", "resumes/cand_123/resume.pdf");
+//  * // Returns: "s3://MotoFlow-files/resumes/cand_123/resume.pdf"
 //  * ```
 //  */
 // export function buildS3Uri(bucket: string, key: string): string {

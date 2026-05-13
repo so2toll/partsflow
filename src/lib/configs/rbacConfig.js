@@ -41,6 +41,12 @@ import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
 import StitchTopNavOld from '../../layouts/Dashboard/StitchTopNavOld.astro';
 import StitchSideNavOld from '../../layouts/Dashboard/StitchSideNav_Old.astro';
 
+// Driver Navigation
+import DriverSideNav from '../../layouts/Dashboard/DriverSideNav.astro';
+
+// Admin Components
+import InviteManagement from '../../content-container/Admin/InviteManagement.astro';
+
 
 // rbacConfig.js
 export const RBAC_CONFIG = {
@@ -182,6 +188,15 @@ export const RBAC_CONFIG = {
         footer: Blank,
         title: "Operations Dashboard",
         description: "MotoFlow Operations Control Room - Test Page",
+      },
+      // Admin Invite Management (SuperAdmin only)
+      adminInvites: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: InviteManagement,
+        footer: Blank,
+        title: "Invite Management",
+        description: "Generate and manage invite links for Shop Owners and Drivers",
       },
     },
 
@@ -463,6 +478,36 @@ export const RBAC_CONFIG = {
       },
     },
 
+    // Driver Role - For delivery drivers
+    Driver: {
+      // Driver Dashboard - Main view for drivers
+      driverDashboard: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: Blank, // Will be replaced with DriverDashboard component
+        footer: Blank,
+        title: "Driver Dashboard",
+        description: "View and manage your deliveries",
+      },
+      // Driver Deliveries - List of assigned deliveries
+      driverDeliveries: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: Blank, // Will be replaced with DriverDeliveries component
+        footer: Blank,
+        title: "My Deliveries",
+        description: "View your assigned deliveries",
+      },
+      // Driver Profile - Personal profile settings
+      driverProfile: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: AppProfile,
+        footer: Blank,
+        title: "Profile",
+        description: "Manage your profile settings",
+      },
+    },
 
 
   };

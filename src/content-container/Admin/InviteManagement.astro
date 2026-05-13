@@ -1,0 +1,763 @@
+---
+/**
+ * Invite Management Content Component
+ *
+ * SuperAdmin page for managing platform invite links:
+ * - Generate new invite links (Shop Owner or Driver)
+ * - View all invites with status
+ * - Copy invite links to clipboard
+ * - Revoke pending invites
+ *
+ * @component Admin/InviteManagement
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import { inviteRepository } from '../../lib/db/repositories/InviteRepository';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+// Fetch invites server-side
+const { invites, total } = await inviteRepository.list({
+  limit: 50,
+  orderDir: "DESC",
+});
+
+// Generate URLs for each invite
+const baseUrl = import.meta.env.PUBLIC_APP_URL || "http://localhost:3000";
+const invitesWithUrls = invites.map((invite) => ({
+  ...invite,
+  url: `${baseUrl}/onboard?token=${invite.token}`,
+}));
+---
+
+<Layout title="Invite Management">
+  <div class="invite-management p-6">
+    <main class="main-content">
+      <!-- Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Invite Management</h1>
+          <p class="page-description">Generate and manage invite links for Shop Owners and Drivers</p>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{invites.filter(i => i.status === 'pending').length}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-success">{invites.filter(i => i.status === 'used').length}</div>
+          <div class="stat-label">Used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-warning">{invites.filter(i => i.status === 'expired').length}</div>
+          <div class="stat-label">Expired</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-muted">{invites.filter(i => i.status === 'revoked').length}</div>
+          <div class="stat-label">Revoked</div>
+        </div>
+      </div>
+
+      <!-- Generate Invite Card -->
+      <div class="section">
+        <h2 class="section-title">Generate New Invite</h2>
+        <div class="generate-card">
+          <div class="invite-type-selector">
+            <button
+              id="btn-shop-owner"
+              class="type-button active"
+              data-type="shop_owner"
+            >
+              <span class="material-symbols-outlined">storefront</span>
+              <span class="type-label">Shop Owner</span>
+              <span class="type-description">Auto shop businesses</span>
+            </button>
+            <button
+              id="btn-driver"
+              class="type-button"
+              data-type="driver"
+            >
+              <span class="material-symbols-outlined">local_shipping</span>
+              <span class="type-label">Driver</span>
+              <span class="type-description">Delivery drivers</span>
+            </button>
+          </div>
+
+          <div class="generate-options">
+            <label class="option-label">
+              Expires in
+              <select id="expires-select" class="expires-select">
+                <option value="1">1 day</option>
+                <option value="3">3 days</option>
+                <option value="7" selected>7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
+              </select>
+            </label>
+            <button id="generate-btn" class="btn btn-primary">
+              <span class="material-symbols-outlined">add_link</span>
+              Generate Invite Link
+            </button>
+          </div>
+
+          <!-- Generated Link Display -->
+          <div id="generated-link-container" class="generated-link-container" style="display: none;">
+            <div class="generated-link-header">
+              <span class="material-symbols-outlined success-icon">check_circle</span>
+              <span>Invite link generated!</span>
+            </div>
+            <div class="generated-link-box">
+              <input
+                type="text"
+                id="generated-link-input"
+                class="link-input"
+                readonly
+              />
+              <button id="copy-btn" class="btn btn-secondary">
+                <span class="material-symbols-outlined">content_copy</span>
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invites List -->
+      <div class="section">
+        <h2 class="section-title">All Invites ({total})</h2>
+
+        {invitesWithUrls.length === 0 ? (
+          <div class="empty-state">
+            <span class="material-symbols-outlined empty-icon">mail</span>
+            <p>No invites generated yet</p>
+            <p class="empty-hint">Generate your first invite using the form above</p>
+          </div>
+        ) : (
+          <div class="invites-table-container">
+            <table class="invites-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Token</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Expires</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invitesWithUrls.map((invite) => (
+                  <tr class={`invite-row ${invite.status}`} data-invite-id={invite.id}>
+                    <td>
+                      <span class={`type-badge ${invite.type}`}>
+                        <span class="material-symbols-outlined">
+                          {invite.type === 'shop_owner' ? 'storefront' : 'local_shipping'}
+                        </span>
+                        {invite.type === 'shop_owner' ? 'Shop Owner' : 'Driver'}
+                      </span>
+                    </td>
+                    <td class="token-cell">
+                      <code class="token-code">{invite.token.substring(0, 12)}...</code>
+                    </td>
+                    <td>
+                      <span class={`status-badge ${invite.status}`}>
+                        {invite.status}
+                      </span>
+                    </td>
+                    <td class="date-cell">
+                      {new Date(invite.createdAt).toLocaleDateString()}
+                    </td>
+                    <td class="date-cell">
+                      {new Date(invite.expiresAt).toLocaleDateString()}
+                    </td>
+                    <td class="actions-cell">
+                      {invite.status === 'pending' && (
+                        <>
+                          <button
+                            class="action-btn copy-action"
+                            data-url={invite.url}
+                            title="Copy link"
+                          >
+                            <span class="material-symbols-outlined">content_copy</span>
+                          </button>
+                          <button
+                            class="action-btn revoke-action"
+                            data-invite-id={invite.id}
+                            title="Revoke invite"
+                          >
+                            <span class="material-symbols-outlined">block</span>
+                          </button>
+                        </>
+                      )}
+                      {invite.status === 'used' && invite.usedBy && (
+                        <span class="used-by">Used by: {invite.usedBy.substring(0, 8)}...</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<style>
+  .invite-management {
+    max-width: 1200px;
+  }
+
+  /* Header */
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 8px 0;
+  }
+
+  .page-description {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ff5c00;
+    margin-bottom: 4px;
+  }
+
+  .stat-success { color: #22c55e; }
+  .stat-warning { color: #f59e0b; }
+  .stat-muted { color: #9ca3af; }
+
+  .stat-label {
+    font-size: 13px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0 0 16px 0;
+  }
+
+  /* Generate Card */
+  .generate-card {
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .invite-type-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .type-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .type-button:hover {
+    border-color: #ff5c00;
+    background-color: #fff8f6;
+  }
+
+  .type-button.active {
+    border-color: #ff5c00;
+    background-color: rgba(255, 92, 0, 0.05);
+  }
+
+  .type-button .material-symbols-outlined {
+    font-size: 32px;
+    color: #718096;
+  }
+
+  .type-button.active .material-symbols-outlined {
+    color: #ff5c00;
+  }
+
+  .type-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+  }
+
+  .type-description {
+    font-size: 12px;
+    color: #718096;
+  }
+
+  .generate-options {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #4a5568;
+  }
+
+  .expires-select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a202c;
+    background-color: white;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms;
+    border: none;
+  }
+
+  .btn-primary {
+    background-color: #ff5c00;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #e05000;
+  }
+
+  .btn-secondary {
+    background-color: #edf2f7;
+    color: #4a5568;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e2e8f0;
+  }
+
+  .btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  /* Generated Link Display */
+  .generated-link-container {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  .generated-link-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #22c55e;
+  }
+
+  .success-icon {
+    font-size: 20px;
+  }
+
+  .generated-link-box {
+    display: flex;
+    gap: 8px;
+  }
+
+  .link-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: monospace;
+    background-color: white;
+    color: #1a202c;
+  }
+
+  /* Invites Table */
+  .invites-table-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+
+  .invites-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .invites-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .invites-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #1a202c;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .invite-row:last-child td {
+    border-bottom: none;
+  }
+
+  .invite-row.revoked,
+  .invite-row.expired {
+    opacity: 0.5;
+  }
+
+  /* Type Badge */
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .type-badge.shop_owner {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
+  }
+
+  .type-badge.driver {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+  }
+
+  .type-badge .material-symbols-outlined {
+    font-size: 16px;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .status-badge.pending {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
+  }
+
+  .status-badge.used {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+  }
+
+  .status-badge.expired {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+  }
+
+  .status-badge.revoked {
+    background-color: rgba(156, 163, 175, 0.1);
+    color: #9ca3af;
+  }
+
+  /* Token Cell */
+  .token-code {
+    font-family: monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+    background-color: #f1f5f9;
+    border-radius: 4px;
+    color: #64748b;
+  }
+
+  /* Date Cell */
+  .date-cell {
+    color: #718096;
+    font-size: 13px;
+  }
+
+  /* Actions */
+  .actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background-color: #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .action-btn:hover {
+    background-color: #e2e8f0;
+  }
+
+  .action-btn.copy-action:hover {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
+  }
+
+  .action-btn.revoke-action:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+
+  .action-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .used-by {
+    font-size: 11px;
+    color: #9ca3af;
+  }
+
+  /* Empty State */
+  .empty-state {
+    background-color: white;
+    padding: 48px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    color: #718096;
+    margin: 0;
+  }
+
+  .empty-hint {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-top: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .invite-type-selector {
+      grid-template-columns: 1fr;
+    }
+
+    .generate-options {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .invites-table-container {
+      overflow-x: auto;
+    }
+  }
+</style>
+
+<script>
+  // Type selection
+  const shopOwnerBtn = document.getElementById('btn-shop-owner');
+  const driverBtn = document.getElementById('btn-driver');
+  let selectedType = 'shop_owner';
+
+  shopOwnerBtn?.addEventListener('click', () => {
+    shopOwnerBtn.classList.add('active');
+    driverBtn?.classList.remove('active');
+    selectedType = 'shop_owner';
+  });
+
+  driverBtn?.addEventListener('click', () => {
+    driverBtn.classList.add('active');
+    shopOwnerBtn?.classList.remove('active');
+    selectedType = 'driver';
+  });
+
+  // Generate invite
+  const generateBtn = document.getElementById('generate-btn');
+  const expiresSelect = document.getElementById('expires-select') as HTMLSelectElement;
+  const generatedContainer = document.getElementById('generated-link-container');
+  const generatedInput = document.getElementById('generated-link-input') as HTMLInputElement;
+  const copyBtn = document.getElementById('copy-btn');
+
+  generateBtn?.addEventListener('click', async () => {
+    try {
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Generating...';
+
+      const response = await fetch('/api/invites/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: selectedType,
+          expiresInDays: parseInt(expiresSelect?.value || '7'),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.invite) {
+        if (generatedContainer && generatedInput) {
+          generatedInput.value = data.invite.url;
+          generatedContainer.style.display = 'block';
+        }
+        // Refresh page to show new invite in table
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        alert('Failed to generate invite: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error generating invite:', error);
+      alert('Failed to generate invite');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = '<span class="material-symbols-outlined">add_link</span> Generate Invite Link';
+    }
+  });
+
+  // Copy generated link
+  copyBtn?.addEventListener('click', async () => {
+    if (generatedInput?.value) {
+      await navigator.clipboard.writeText(generatedInput.value);
+      copyBtn.innerHTML = '<span class="material-symbols-outlined">check</span> Copied!';
+      setTimeout(() => {
+        copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span> Copy';
+      }, 2000);
+    }
+  });
+
+  // Copy action buttons in table
+  document.querySelectorAll('.copy-action').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const url = (e.currentTarget as HTMLElement).dataset.url;
+      if (url) {
+        await navigator.clipboard.writeText(url);
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = 'check';
+          setTimeout(() => {
+            icon.textContent = 'content_copy';
+          }, 2000);
+        }
+      }
+    });
+  });
+
+  // Revoke action buttons
+  document.querySelectorAll('.revoke-action').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const inviteId = (e.currentTarget as HTMLElement).dataset.inviteId;
+      if (!inviteId) return;
+
+      if (!confirm('Are you sure you want to revoke this invite?')) return;
+
+      try {
+        const response = await fetch(`/api/invites/${inviteId}`, {
+          method: 'DELETE',
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert('Failed to revoke invite: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error revoking invite:', error);
+        alert('Failed to revoke invite');
+      }
+    });
+  });
+</script>

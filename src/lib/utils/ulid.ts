@@ -1,5 +1,5 @@
 /**
- * ULID Utility for Data3D Expert Reasoning Engine
+ * ULID Utility for MotoFlow Expert Reasoning Engine
  *
  * Generates ULIDs (Universally Unique Lexicographically Sortable Identifiers)
  * with entity-specific prefixes for all domain entities.

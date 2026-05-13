@@ -16,10 +16,16 @@ import type { Node } from "../graph";
 // Types
 // ============================================================================
 
+export type OrganizationType = 'shop' | 'supplier' | 'fleet' | 'other';
+
 export interface Organization {
   id: string;
   name: string;
+  orgType: OrganizationType;  // Renamed from 'type' to avoid JS reserved word conflicts
   domain?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
   settings: OrganizationSettings;
   createdAt: string;
   updatedAt: string;
@@ -77,7 +83,11 @@ export class OrganizationRepository {
    */
   async create(data: {
     name: string;
+    orgType?: OrganizationType;  // Renamed from 'type'
     domain?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
     settings?: Partial<OrganizationSettings>;
   }): Promise<Organization> {
     const orgId = `org_${ulid()}`;
@@ -89,7 +99,11 @@ export class OrganizationRepository {
       CREATE (o:Organization {
         id: $id,
         name: $name,
+        orgType: $orgType,
         domain: $domain,
+        address: $address,
+        phone: $phone,
+        email: $email,
         settings: $settings,
         createdAt: $now,
         updatedAt: $now
@@ -99,7 +113,11 @@ export class OrganizationRepository {
       {
         id: orgId,
         name: data.name,
+        orgType: data.orgType || 'other',
         domain: data.domain || null,
+        address: data.address || null,
+        phone: data.phone || null,
+        email: data.email || null,
         settings: JSON.stringify(data.settings || {}),
         now,
       }
@@ -161,6 +179,7 @@ export class OrganizationRepository {
   async list(options: {
     limit?: number;
     offset?: number;
+    orgType?: OrganizationType;  // Renamed from 'type'
     orderBy?: string;
     orderDir?: "ASC" | "DESC";
   } = {}): Promise<{ organizations: Organization[]; total: number }> {
@@ -178,9 +197,14 @@ export class OrganizationRepository {
       `
     );
 
-    const organizations = results
+    let organizations = results
       .filter((r) => r.o)
       .map((result) => this.mapNodeToOrganization(result.o));
+
+    // Filter by orgType if specified
+    if (options.orgType) {
+      organizations = organizations.filter(org => org.orgType === options.orgType);
+    }
 
     // Get total count
     const countResults = await graph.query<{ count: number }>(
@@ -193,6 +217,17 @@ export class OrganizationRepository {
     const total = countResults[0]?.count || 0;
 
     return { organizations, total };
+  }
+
+  /**
+   * Find organizations by orgType
+   *
+   * @param orgType Organization type
+   * @returns Organizations of the specified type
+   */
+  async findByType(orgType: OrganizationType): Promise<Organization[]> {
+    const { organizations } = await this.list({ orgType, limit: 1000 });
+    return organizations;
   }
 
   /**
@@ -326,7 +361,11 @@ export class OrganizationRepository {
     return {
       id,
       name: props?.name,
+      orgType: props?.orgType || props?.type || 'other',  // Support both orgType and legacy type
       domain: props?.domain,
+      address: props?.address,
+      phone: props?.phone,
+      email: props?.email,
       settings:
         typeof props?.settings === "string"
           ? JSON.parse(props.settings)

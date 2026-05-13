@@ -1,5 +1,5 @@
 /**
- * Error Types for Data3D Expert Reasoning Engine
+ * Error Types for MotoFlow Expert Reasoning Engine
  *
  * Standardized error codes and structures for consistent error handling
  * across the application. All API errors follow the ApiError interface.

@@ -1,6 +1,6 @@
-# Data3D Type Definitions
+# MotoFlow Type Definitions
 
-This directory contains all TypeScript type definitions for the Data3D Expert Reasoning Engine project.
+This directory contains all TypeScript type definitions for the MotoFlow Expert Reasoning Engine project.
 
 ## Overview
 

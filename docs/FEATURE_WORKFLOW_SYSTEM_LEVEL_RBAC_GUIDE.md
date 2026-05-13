@@ -4,10 +4,11 @@ This document outlines the established pattern for adding new pages, features, a
 
 ## Design System Requirement
 
-**ALL new features MUST use the Stitch Design System:**
-- Primary Accent: Electric Lime (#DFFF00)
+**ALL new features MUST use the MotoFlow Design System:**
+- Primary Accent: Orange (#ff5c00) - NOT lime (#DFFF00)
 - Typography: DM Sans
 - Spacing: 8px rhythm
+- Extend from: StitchSideNav.astro, StitchTopNav.astro
 - Components: Use from `/src/components/ui/`
 - Reference: `/app/components-library` (SuperAdmin only)
 
