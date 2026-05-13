@@ -1,13 +1,11 @@
 ---
 /**
- * Stitch Design System - Top Navigation Bar
+ * Stitch Design System - MotoFlow Top Navigation Bar
  *
- * Dark top navigation bar with:
- * - Logo/Brand area (left)
- * - Navigation links (center)
- * - Search input
- * - Actions (New Project button, notifications, settings)
- * - User profile dropdown
+ * Dark navy top navigation bar with:
+ * - Logo/Brand area (left) - "FLOW OPS" in orange
+ * - Stats metrics (center) - REVENUE, ORDERS, DRIVERS, SLA, AVG
+ * - Actions (right) - "+ NEW ORDER" button, notifications, user profile
  */
 
 interface Props {
@@ -17,72 +15,200 @@ interface Props {
 }
 
 const { userRole, userId, organization } = Astro.props;
-
-const isSuperAdmin = userRole === "SuperAdmin";
 ---
 
-<header class="fixed top-0 left-0 right-0 z-[1000] h-16 bg-[#121212] text-[#f1ffd2] text-sm font-sans">
-  <div class="flex items-center justify-between w-full h-full px-12">
+<header class="top-nav">
+  <div class="top-nav-container">
     <!-- Left: Brand -->
-    <div class="flex items-center">
-      <a href="/app/dashboard" class="flex items-center gap-3 text-decoration-none">
-        <span class="material-symbols-outlined text-2xl text-[#f1ffd2]">auto_awesome</span>
-        <span class="text-lg font-bold tracking-tight text-white">
-          {isSuperAdmin ? "Studio AI" : organization ? organization.name : "Studio"}
-        </span>
+    <div class="brand-section">
+      <a href="/app/dashboard" class="brand-link">
+        <span class="material-symbols-outlined brand-icon">sync</span>
+        <span class="brand-text">MotoFlow</span>
       </a>
     </div>
 
-    <!-- Center: Navigation -->
-    <nav class="hidden md:flex gap-8">
-      <a href="/app/projects" class="text-[#f1ffd2] font-medium py-2 border-b-2 border-[#f1ffd2] opacity-90 hover:text-white hover:opacity-100 transition-all">Projects</a>
-      <a href="/app/characters" class="text-[#f1ffd2] font-medium py-2 border-b-2 border-[#f1ffd2] opacity-90 hover:text-white hover:opacity-100 transition-all">Characters</a>
-      <a href="/app/teams" class="text-[#f1ffd2] font-medium py-2 border-b-2 border-[#f1ffd2] opacity-90 hover:text-white hover:opacity-100 transition-all">Library</a>
-      <a href="#" class="text-[#f1ffd2] font-medium py-2 border-b-2 border-[#f1ffd2] opacity-90 hover:text-white hover:opacity-100 transition-all">Workflows</a>
-      <a href="#" class="text-[#f1ffd2] font-medium py-2 border-b-2 border-[#f1ffd2] opacity-90 hover:text-white hover:opacity-100 transition-all">Assets</a>
-    </nav>
+    <!-- Center: Stats Metrics -->
+    <div class="stats-metrics">
+      <div class="metric active">REVENUE: $12,840</div>
+      <div class="metric">ORDERS: 142</div>
+      <div class="metric">DRIVERS: 28</div>
+      <div class="metric">SLA: 98.2%</div>
+      <div class="metric">AVG: 22M</div>
+    </div>
 
-    <!-- Right: Search, Actions, User -->
-    <div class="flex items-center gap-6">
-      <!-- Search -->
-      <div class="relative hidden lg:block">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af] text-xl">search</span>
-        <input
-          type="text"
-          placeholder="Search projects..."
-          class="bg-[#1a1a1a] border-none rounded-full py-2 px-3 pl-10 text-xs text-[#e5e5e5] w-64 placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#f1ffd2]"
-        />
-      </div>
-
-      <!-- New Project Button -->
-      <a
-        href="/app/projects"
-        class="hidden md:flex items-center gap-2 bg-[#dfff00] text-black border-none rounded-full py-2 px-4 text-sm font-medium hover:brightness-105 transition-filter cursor-pointer text-decoration-none"
-      >
+    <!-- Right: Actions -->
+    <div class="actions-section">
+      <!-- New Order Button -->
+      <button class="btn-new-order">
         <span class="material-symbols-outlined">add</span>
-        <span>New Project</span>
-      </a>
+        <span>GET PARTS NOW</span>
+      </button>
 
       <!-- Icons -->
-      <div class="flex items-center gap-4">
-        <button class="bg-transparent border-none p-0 cursor-pointer flex items-center justify-center text-[#f1ffd2] hover:text-white transition-colors">
+      <div class="icon-actions">
+        <button class="icon-btn">
           <span class="material-symbols-outlined">notifications</span>
         </button>
-        <button class="bg-transparent border-none p-0 cursor-pointer flex items-center justify-center text-[#f1ffd2] hover:text-white transition-colors">
-          <span class="material-symbols-outlined">settings</span>
-        </button>
-
-        <!-- User Avatar -->
-        <div class="flex items-center">
-          <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-[#374151] bg-[#374151]">
-            <img
-              src="https://lh3.googleusercontent.com/a/default-user=l"
-              alt="User"
-              class="w-full h-full object-cover"
-            />
-          </div>
+        <div class="user-avatar">
+          <span>OP</span>
         </div>
       </div>
     </div>
   </div>
 </header>
+
+<style>
+  .top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 64px;
+    background-color: #1A202C;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .top-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 24px;
+    max-width: 100%;
+  }
+
+  /* Brand Section */
+  .brand-section {
+    display: flex;
+    align-items: center;
+  }
+
+  .brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
+  }
+
+  .brand-icon {
+    font-size: 24px;
+    color: #ff5c00;
+  }
+
+  .brand-text {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #ff5c00;
+  }
+
+  /* Stats Metrics */
+  .stats-metrics {
+    display: none;
+    gap: 32px;
+  }
+
+  @media (min-width: 768px) {
+    .stats-metrics {
+      display: flex;
+    }
+  }
+
+  .metric {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .metric:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .metric.active {
+    color: #ff5c00;
+    background-color: rgba(255, 92, 0, 0.1);
+    border-bottom: 2px solid #ff5c00;
+  }
+
+  /* Actions Section */
+  .actions-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .btn-new-order {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ff5c00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 200ms;
+    box-shadow: 0 2px 8px rgba(255, 92, 0, 0.3);
+  }
+
+  .btn-new-order:hover {
+    background-color: #e05000;
+    box-shadow: 0 4px 12px rgba(255, 92, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-new-order:active {
+    transform: translateY(0);
+  }
+
+  .icon-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 200ms;
+  }
+
+  .icon-btn:hover {
+    color: white;
+  }
+
+  .icon-btn .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5c00, #e05000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+</style>

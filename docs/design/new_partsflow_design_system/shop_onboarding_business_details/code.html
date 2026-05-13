@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#a73a00",
+                    "surface-variant": "#fadcd2",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e2e2e2",
+                    "primary-fixed-dim": "#ffb59a",
+                    "on-tertiary-fixed-variant": "#00497f",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#fff1ec",
+                    "on-secondary-container": "#5f6161",
+                    "on-tertiary-container": "#002d51",
+                    "tertiary": "#0061a6",
+                    "secondary-container": "#dcdddd",
+                    "background": "#fff8f6",
+                    "surface": "#fff8f6",
+                    "primary": "#a73a00",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#370e00",
+                    "inverse-on-surface": "#ffede7",
+                    "surface-dim": "#f1d4ca",
+                    "on-secondary-fixed-variant": "#454747",
+                    "secondary": "#5d5f5f",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fff8f6",
+                    "inverse-surface": "#3e2c26",
+                    "on-tertiary-fixed": "#001c37",
+                    "on-surface": "#271812",
+                    "on-primary-fixed-variant": "#802a00",
+                    "surface-container-highest": "#fadcd2",
+                    "primary-fixed": "#ffdbce",
+                    "inverse-primary": "#ffb59a",
+                    "outline-variant": "#e4beb1",
+                    "on-background": "#271812",
+                    "tertiary-fixed-dim": "#a0c9ff",
+                    "tertiary-fixed": "#d2e4ff",
+                    "surface-container": "#ffe9e2",
+                    "on-primary-container": "#521800",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#ffe2d8",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#0096fd",
+                    "primary-container": "#ff5c00",
+                    "on-surface-variant": "#5b4137",
+                    "outline": "#8f7065",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "80px",
+                    "xs": "4px",
+                    "lg": "48px",
+                    "base": "8px",
+                    "md": "24px",
+                    "gutter": "24px",
+                    "container-max": "1440px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "display-xl": ["DM Sans"],
+                    "stat-value": ["DM Sans"],
+                    "body-lg": ["DM Sans"],
+                    "label-sm": ["DM Sans"],
+                    "headline-lg": ["DM Sans"],
+                    "display-lg": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "label-md": ["DM Sans"],
+                    "headline-md": ["DM Sans"]
+            },
+            "fontSize": {
+                    "display-xl": ["80px", {"lineHeight": "0.95", "letterSpacing": "-0.03em", "fontWeight": "900"}],
+                    "stat-value": ["36px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["64px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.06em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased">
+<!-- Top Navigation Bar -->
+<header class="bg-background dark:bg-background flex justify-between items-center w-full px-md h-16 max-w-container-max mx-auto docked full-width top-0">
+<div class="text-headline-md font-headline-md font-black text-primary dark:text-primary-fixed-dim">PartsFlow</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary dark:text-secondary-fixed-dim cursor-pointer hover:bg-surface-variant/20 transition-colors p-2 rounded-full">help_outline</span>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- Side Navigation Bar (Anchored Progress) -->
+<aside class="hidden md:flex flex-col gap-base p-md h-screen w-64 docked left-0 bg-surface-container-low dark:bg-surface-dim shadow-sm">
+<div class="mb-lg">
+<h2 class="text-headline-md font-headline-md text-primary">Setup Guide</h2>
+<p class="text-label-md font-label-md text-on-surface-variant">Complete your profile</p>
+</div>
+<nav class="flex flex-col gap-sm">
+<!-- Role Selection (Completed) -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_pin_circle</span>
+<span class="font-label-md text-label-md">Role Selection</span>
+<span class="material-symbols-outlined text-primary text-sm ml-auto">check_circle</span>
+</div>
+<!-- Business Details (Active) -->
+<div class="flex items-center gap-sm bg-primary-container text-on-primary-container rounded-lg p-sm transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">business</span>
+<span class="font-label-md text-label-md">Business Details</span>
+</div>
+<!-- Verification (Upcoming) -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</div>
+<!-- Completion (Upcoming) -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-md text-label-md">Completion</span>
+</div>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div>
+<p class="text-label-md font-bold text-on-surface">Guest User</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Onboarding Mode</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center pt-xl px-md">
+<div class="w-full max-w-2xl">
+<!-- Step Progress Bar -->
+<div class="mb-lg">
+<div class="flex justify-between items-end mb-sm">
+<span class="text-label-sm font-label-sm text-primary uppercase tracking-widest">Step 2 of 4</span>
+<span class="text-label-sm font-label-sm text-secondary uppercase tracking-widest">Business Details</span>
+</div>
+<div class="h-2 w-full bg-secondary-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[50%] rounded-full"></div>
+</div>
+</div>
+<!-- Form Header -->
+<div class="mb-lg">
+<h1 class="text-display-lg font-display-lg text-on-surface mb-xs">Tell us about your shop.</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">We use this information to calculate delivery times and handle tax-exempt part sourcing for your bays.</p>
+</div>
+<!-- Onboarding Form -->
+<form class="space-y-md">
+<!-- Shop Name -->
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface ml-base" for="shop-name">Shop Name</label>
+<div class="relative group">
+<input class="w-full h-14 bg-surface-container-lowest border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-md text-body-md transition-all" id="shop-name" placeholder="e.g. Precision Auto Works" type="text"/>
+<span class="absolute right-md top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-primary">store</span>
+</div>
+</div>
+<!-- Address -->
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface ml-base" for="address">Business Address</label>
+<div class="relative group">
+<input class="w-full h-14 bg-surface-container-lowest border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-md text-body-md transition-all" id="address" placeholder="Search for your shop address" type="text"/>
+<span class="absolute right-md top-1/2 -translate-y-1/2 material-symbols-outlined text-outline-variant group-focus-within:text-primary">location_on</span>
+</div>
+</div>
+<!-- Tax ID & Phone -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface ml-base" for="tax-id">Sales Tax ID</label>
+<input class="w-full h-14 bg-surface-container-lowest border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-md text-body-md transition-all" id="tax-id" placeholder="XX-XXXXXXX" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface ml-base" for="phone">Shop Phone</label>
+<input class="w-full h-14 bg-surface-container-lowest border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-md text-body-md transition-all" id="phone" placeholder="(555) 000-0000" type="tel"/>
+</div>
+</div>
+<!-- Map Preview / Context Image -->
+<div class="mt-lg relative overflow-hidden rounded-xl h-48 border border-outline-variant">
+<img class="w-full h-full object-cover grayscale opacity-60" data-alt="A clean and modern high-angle digital map visualization of a bustling metropolitan area, featuring a minimal aesthetic with soft gray roads and a single vibrant orange location marker pinpointing a business. The lighting is bright and airy, reflecting a professional and organized light-mode UI design. The composition is sleek and technical, emphasizing reliability and geographical precision for automotive logistics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsMOdd2KWaOdvHqZvcrbLIeoGj_bqJfQkLGBlfqg3gWclFonLrlSXvS80RlgRVZHNmruy9LeYUtDQlFd_L5uSVRIPiFrNalrg-9x4s_gyWiKic1GmdAJg43N8nM6YJ52Cq0kpgf0CK7C0QkHUy-uneqqT35i0aST0YqS0DG1yaqGlrpbkawwP-dXeYP52xwEHsh5ol-kIY6G4_iQdTbJOrafNqf8VAj3gGutOBitj1y5ubZRmxkbBQXYCIUUbU7j7W5KAcAfL17p0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent pointer-events-none"></div>
+<div class="absolute bottom-md left-md flex items-center gap-xs bg-surface-container-highest/90 backdrop-blur-sm px-sm py-xs rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="text-label-sm text-on-surface-variant">Auto-detecting delivery zones...</span>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="pt-lg flex items-center justify-between gap-md">
+<button class="px-lg h-14 rounded-lg bg-secondary-fixed text-on-secondary-fixed font-bold hover:bg-secondary-container transition-colors scale-95 active:scale-90 transition-transform" type="button">
+                            Back
+                        </button>
+<button class="flex-1 h-14 rounded-lg bg-primary-container text-white font-bold flex items-center justify-center gap-base hover:bg-primary transition-colors shadow-lg scale-95 active:scale-90 transition-transform" type="submit">
+                            Next: Connect Suppliers
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Helpful Tip -->
+<div class="mt-xl p-md bg-surface-container-low rounded-xl flex gap-md items-start border border-primary/10">
+<span class="material-symbols-outlined text-primary">info</span>
+<div>
+<p class="text-label-md font-bold text-on-surface">Why do we need this?</p>
+<p class="text-body-md text-on-surface-variant">PartsFlow verifies shop details to ensure your orders qualify for B2B pricing and tax exemptions from our 10,000+ local supplier network.</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

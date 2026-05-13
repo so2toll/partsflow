@@ -98,6 +98,12 @@ export async function getPageData(
     case 'appBilling':
       return getBillingPageData(isSuperAdmin, organizationId, userId);
 
+    case 'appDashboardTest':
+      return getDashboardTestPageData(isSuperAdmin, organizationId, userId);
+    
+      case 'appDashboardTestOld':
+      return getDashboardTestPageData(isSuperAdmin, organizationId, userId);
+
     default:
       console.warn(`[getPageData] Unknown page: ${currentPage}`);
       return data;
@@ -720,6 +726,96 @@ async function getBillingPageData(
   if (organizationId) {
     data.organization = await organizationRepository.findById(organizationId);
   }
+
+  return data;
+}
+
+/**
+ * Dashboard Test page data - MotoFlow Operations Dashboard
+ */
+async function getDashboardTestPageData(
+  isSuperAdmin: boolean,
+  organizationId?: string,
+  userId?: string
+): Promise<PageData> {
+  const data: PageData = {};
+
+  // Get user details
+  if (userId) {
+    const userResults = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})
+      RETURN u
+      `,
+      { userId }
+    );
+
+    if (userResults.length > 0 && userResults[0].u) {
+      const userProps = userResults[0].u.properties;
+      data.user = {
+        id: userProps.id,
+        email: userProps.email,
+        name: userProps.name,
+        role: userProps.role,
+        organizationId: userProps.organizationId,
+      };
+    }
+  }
+
+  // MotoFlow operations dashboard data
+  // This would typically fetch orders, drivers, stats from repositories
+  // For now, we provide mock data that matches the design
+  data.operations = {
+    revenue: 12840,
+    activeOrders: 142,
+    driversOnline: 28,
+    slaStatus: 98.2,
+    urgentShipments: 8,
+    idleUnits: 4,
+    criticalZone: 'F',
+  };
+
+  // Mock live order feed
+  data.liveOrders = [
+    {
+      id: 'order-001',
+      priority: 'P0',
+      priorityLabel: '[P0 EMERGENCY]',
+      eta: 4,
+      title: 'Brake Booster - BPD District 3',
+      driver: { initials: 'SK', name: 'Sarah K.' },
+      status: 'en-route',
+      statusLabel: 'EN ROUTE',
+    },
+    {
+      id: 'order-002',
+      priority: 'P2',
+      priorityLabel: '[P2 STANDARD]',
+      eta: 12,
+      title: 'Oil Filter x10 - Main St Auto',
+      driver: { initials: 'AI', name: 'Auto' },
+      status: 'picked-up',
+      statusLabel: 'PICKED UP',
+    },
+    {
+      id: 'order-003',
+      priority: 'P1',
+      priorityLabel: '[P1 URGENT]',
+      eta: 9,
+      title: 'Fuel Pump - SpeedTech Garage',
+      driver: { initials: 'MD', name: 'Marcus D.' },
+      status: 'dispatched',
+      statusLabel: 'DISPATCHED',
+    },
+  ];
+
+  // Mock unassigned orders queue
+  data.unassignedOrders = [
+    { id: '9401', priority: 'P0', title: 'Radiator Assembly', distance: '0.8 mi', waiting: '2m' },
+    { id: '9405', priority: 'P1', title: 'Spark Plugs (Set of 8)', distance: '2.4 mi', waiting: '5m' },
+    { id: '9408', priority: 'P2', title: 'Synthetic Oil 5W-30', distance: '1.1 mi', waiting: '8m' },
+    { id: '9412', priority: 'P2', title: 'Windshield Wipers', distance: '4.2 mi', waiting: '12m' },
+  ];
 
   return data;
 }

@@ -1,0 +1,781 @@
+---
+/**
+ * MotoFlow Operations Dashboard Content Component
+ *
+ * Displays the MotoFlow operations control room including:
+ * - Live stats (revenue, orders, drivers, SLA)
+ * - Live order feed with priority levels
+ * - Map panel with active orders
+ * - Unassigned orders queue
+ *
+ * @component App/OperationsDashboard
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+
+const operations = data.operations || {
+  revenue: 12840,
+  activeOrders: 142,
+  driversOnline: 28,
+  slaStatus: 98.2,
+  urgentShipments: 8,
+  idleUnits: 4,
+  criticalZone: 'F',
+};
+
+const liveOrders = data.liveOrders || [];
+const unassignedOrders = data.unassignedOrders || [];
+---
+
+<Layout title="Operations Dashboard">
+  <div class="operations-dashboard-content">
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card success">
+      <div class="stat-header">
+        <span class="stat-label">REVENUE</span>
+        <span class="material-symbols-outlined stat-icon success-icon">trending_up</span>
+      </div>
+      <div class="stat-value">${operations.revenue.toLocaleString()}</div>
+      <div class="stat-change positive">+12% VS LAST MONTH</div>
+    </div>
+
+    <div class="stat-card primary">
+      <div class="stat-header">
+        <span class="stat-label">ACTIVE ORDERS</span>
+        <span class="material-symbols-outlined stat-icon primary-icon">package_2</span>
+      </div>
+      <div class="stat-value">{operations.activeOrders}</div>
+      <div class="stat-change primary-change">{operations.urgentShipments} URGENT SHIPMENTS</div>
+    </div>
+
+    <div class="stat-card info">
+      <div class="stat-header">
+        <span class="stat-label">DRIVERS ONLINE</span>
+        <span class="material-symbols-outlined stat-icon info-icon">minor_crash</span>
+      </div>
+      <div class="stat-value">{operations.driversOnline}</div>
+      <div class="stat-change info-change">{operations.idleUnits} IDLE UNITS</div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-header">
+        <span class="stat-label">SLA STATUS</span>
+        <span class="material-symbols-outlined stat-icon warning-icon">timer</span>
+      </div>
+      <div class="stat-value">{operations.slaStatus}%</div>
+      <div class="stat-change warning-change">CRITICAL: ZONE {operations.criticalZone}</div>
+    </div>
+  </div>
+
+  <!-- Dashboard Grid -->
+  <div class="dashboard-grid">
+
+    <!-- Live Order Feed -->
+    <div class="feed-section">
+      <div class="section-header">
+        <h2>LIVE ORDER FEED</h2>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          LIVE
+        </span>
+      </div>
+
+      <div class="order-feed">
+        {liveOrders.map((order: any) => (
+          <div class={`order-card priority-${order.priority.toLowerCase()}`}>
+            <div class="order-header">
+              <span class={`priority-badge ${order.priority.toLowerCase()}`}>
+                ${order.priorityLabel}
+              </span>
+              <span class="eta">{order.eta} MIN ETA</span>
+            </div>
+            <div class="order-title">{order.title}</div>
+            <div class="order-footer">
+              <div class="driver-info">
+                <div class="driver-avatar">{order.driver.initials}</div>
+                <span class="driver-name">{order.driver.name}</span>
+              </div>
+              <div class={`order-status ${order.status.toLowerCase().replace('-', '')}`}>
+                <span class="material-symbols-outlined">
+                  {order.status === 'en-route' ? 'electric_car' :
+                   order.status === 'picked-up' ? 'package' :
+                   'schedule_send'}
+                </span>
+                {order.statusLabel}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <a href="#" class="btn btn-secondary btn-block">View Full History</a>
+    </div>
+
+    <!-- Map & Queue -->
+    <div class="map-queue-section">
+
+      <!-- Map Panel -->
+      <div class="map-panel">
+        <div class="map-placeholder">
+          <div class="map-overlay">
+            <div class="map-legend">
+              <div class="legend-item">
+                <div class="legend-dot p0"></div>
+                <span>Active P0</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot in-transit"></div>
+                <span>In Transit</span>
+              </div>
+            </div>
+          </div>
+          <div class="map-controls">
+            <button class="map-control-btn">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+            <button class="map-control-btn">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <button class="map-control-btn">
+              <span class="material-symbols-outlined">my_location</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unassigned Orders Queue -->
+      <div class="queue-panel">
+        <div class="queue-header">
+          <h3>UNASSIGNED ORDERS</h3>
+        </div>
+        <div class="queue-list">
+          {unassignedOrders.map((order: any) => (
+            <div class="queue-item">
+              <div class="queue-item-header">
+                <span class={`queue-priority ${order.priority.toLowerCase()}`}>
+                  {order.priority}
+                </span>
+                <span class="queue-id">#{order.id}</span>
+              </div>
+              <div class="queue-item-title">{order.title}</div>
+              <div class="queue-item-meta">{order.distance} • {order.waiting} waiting</div>
+            </div>
+          ))}
+        </div>
+        <button class="btn btn-secondary btn-block">Auto-Assign Queue</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</Layout>
+
+<style>
+  .operations-dashboard-content {
+    padding: 24px;
+    background-color: #F8F9FA;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  @media (min-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    background-color: #FFFFFF;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid;
+    transition: transform 200ms;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-card.success {
+    border-left-color: var(--color-success-500);
+  }
+
+  .stat-card.primary {
+    border-left-color: var(--color-primary-400);
+  }
+
+  .stat-card.info {
+    border-left-color: var(--color-info-500);
+  }
+
+  .stat-card.warning {
+    border-left-color: var(--color-warning-500);
+  }
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #556070;
+  }
+
+  .stat-icon {
+    font-size: 20px;
+  }
+
+  .success-icon {
+    color: var(--color-success-500);
+  }
+
+  .primary-icon {
+    color: var(--color-primary-400);
+  }
+
+  .info-icon {
+    color: var(--color-info-500);
+  }
+
+  .warning-icon {
+    color: var(--color-warning-500);
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #0F1923;
+    margin-bottom: 4px;
+  }
+
+  .stat-change {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .positive {
+    color: var(--color-success-500);
+  }
+
+  .primary-change {
+    color: var(--color-primary-400);
+  }
+
+  .info-change {
+    color: var(--color-info-500);
+  }
+
+  .warning-change {
+    color: var(--color-warning-500);
+  }
+
+  /* Dashboard Grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 1280px) {
+    .dashboard-grid {
+      grid-template-columns: repeat(12, 1fr);
+    }
+  }
+
+  /* Feed Section */
+  .feed-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  @media (min-width: 1280px) {
+    .feed-section {
+      grid-column: span 4;
+    }
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .section-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: #0F1923;
+  }
+
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary-400);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-primary-400);
+  }
+
+  /* Order Cards */
+  .order-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .order-card {
+    background-color: #FFFFFF;
+    padding: 24px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid;
+    transition: background-color 200ms;
+  }
+
+  .order-card:hover {
+    background-color: #fafafa;
+  }
+
+  .priority-p0 {
+    border-left-color: var(--color-priority-p0);
+  }
+
+  .priority-p1 {
+    border-left-color: var(--color-priority-p1);
+  }
+
+  .priority-p2 {
+    border-left-color: var(--color-priority-p2);
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+
+  .priority-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #ffffff;
+  }
+
+  .p0 {
+    background-color: var(--color-priority-p0);
+  }
+
+  .p1 {
+    background-color: var(--color-priority-p1);
+  }
+
+  .p2 {
+    background-color: var(--color-priority-p2);
+  }
+
+  .eta {
+    font-size: 11px;
+    font-weight: 700;
+    color: #556070;
+  }
+
+  .order-title {
+    font-weight: 700;
+    color: #0F1923;
+    margin-bottom: 24px;
+  }
+
+  .order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .driver-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .driver-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #F0F1F3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #0F1923;
+  }
+
+  .driver-name {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #556070;
+  }
+
+  .order-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .enroute {
+    background-color: rgba(224, 80, 0, 0.1);
+    color: #e05000;
+    border: 1px solid rgba(224, 80, 0, 0.2);
+    animation: pulse-orange 2s infinite;
+  }
+
+  .pickedup {
+    background-color: #F0F1F3;
+    color: #556070;
+    border: 1px solid #d1d5db;
+  }
+
+  .dispatched {
+    background-color: rgba(59, 130, 246, 0, 0.1);
+    color: var(--color-info-500);
+    border: 1px solid rgba(59, 130, 246, 0, 0.2);
+  }
+
+  @keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(255, 92, 0, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 92, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 92, 0, 0); }
+  }
+
+  /* Map & Queue Section */
+  .map-queue-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  @media (min-width: 1280px) {
+    .map-queue-section {
+      grid-column: span 8;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Map Panel */
+  .map-panel {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    min-height: 500px;
+    border: 1px solid #f1f1f1;
+  }
+
+  @media (min-width: 1280px) {
+    .map-panel {
+      grid-column: span 2;
+    }
+  }
+
+  .map-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .map-overlay {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    backdrop-filter: blur(8px);
+  }
+
+  .map-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.p0 {
+    background-color: var(--color-priority-p0);
+  }
+
+  .legend-dot.in-transit {
+    background-color: var(--color-primary-400);
+  }
+
+  .legend-item span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0F1923;
+  }
+
+  .map-controls {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .map-control-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .map-control-btn:hover {
+    background-color: #f9fafb;
+  }
+
+  .map-control-btn .material-symbols-outlined {
+    color: #0F1923;
+    font-size: 20px;
+  }
+
+  /* Queue Panel */
+  .queue-panel {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    max-height: 600px;
+  }
+
+  .queue-header {
+    padding: 24px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .queue-header h3 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0F1923;
+    margin: 0;
+  }
+
+  .queue-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .queue-item {
+    padding: 8px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .queue-item:hover {
+    background-color: #f9fafb;
+  }
+
+  .queue-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .queue-priority {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .queue-priority.p0 {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-priority-p0);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+  }
+
+  .queue-priority.p1 {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-priority-p1);
+    border: 1px solid rgba(245, 158, 11, 0.1);
+  }
+
+  .queue-priority.p2 {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: var(--color-priority-p2);
+    border: 1px solid rgba(255, 92, 0, 0.1);
+  }
+
+  .queue-id {
+    font-size: 10px;
+    color: #556070;
+  }
+
+  .queue-item-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0F1923;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .queue-item-meta {
+    font-size: 10px;
+    color: #556070;
+    margin-top: 4px;
+  }
+
+  .queue-panel .btn-block {
+    border-radius: 0 0 12px 12px;
+  }
+
+  /* Button Styles */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 200ms;
+    border: none;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background-color: #ff5c00;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 92, 0, 0.3);
+  }
+
+  .btn-primary:hover {
+    background-color: #e05000;
+    box-shadow: 0 4px 12px rgba(255, 92, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background-color: white;
+    color: #0F1923;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-secondary:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-block {
+    display: flex;
+    width: 100%;
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+/**
+ * Stitch Design System - App Sidebar
+ *
+ * White sidebar with:
+ * - Logo/Brand area with Electric Lime accent
+ * - "New Project" button
+ * - Navigation links with icons
+ * - User profile section at bottom
+ */
+
+interface Props {
+  userRole?: string;
+  userId?: string;
+  currentPage?: string;
+}
+
+const { userRole, userId, currentPage } = Astro.props;
+---
+
+<aside class="fixed top-16 left-0 z-[900] w-64 h-[calc(100vh-64px)] bg-white border-r border-[#e5e5e5] flex flex-col p-6 max-lg:-translate-x-full max-lg:transition-transform max-lg:duration-300">
+  <!-- Sidebar Header -->
+  <div class="mb-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 bg-[#dfff00] rounded-lg flex items-center justify-center">
+        <span class="material-symbols-outlined text-2xl text-black font-variation-settings-[&quot;FILL&quot;:_1]">auto_awesome</span>
+      </div>
+      <div class="flex flex-col">
+        <h2 class="text-lg font-bold leading-none text-black">Creative Suite</h2>
+        <p class="text-xs text-[#9ca3af] uppercase tracking-widest font-bold mt-1">Pro Plan</p>
+      </div>
+    </div>
+
+    <!-- New Project Button -->
+    <a
+      href="/app/projects"
+      class="flex items-center justify-center gap-2 bg-[#dfff00] text-black border-none rounded-xl py-3 px-3 w-full text-sm font-medium text-decoration-none transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer mb-6"
+    >
+      <span class="material-symbols-outlined">add</span>
+      <span>New Project</span>
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex flex-col gap-1 flex-1">
+    <a
+      href="/app/dashboard"
+      class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1"
+    >
+      <span class="material-symbols-outlined text-xl">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="/app/videos/new" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">auto_awesome</span>
+      <span>Generator</span>
+    </a>
+
+    <a href="/app/edit" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">edit_note</span>
+      <span>Editor</span>
+    </a>
+
+    <a href="/app/characters" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">person</span>
+      <span>Characters</span>
+    </a>
+
+    <a href="/app/projects" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">history</span>
+      <span>History</span>
+    </a>
+
+    <a href="/app/analytics" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">leaderboard</span>
+      <span>Analytics</span>
+    </a>
+  </nav>
+
+  <!-- Bottom Section -->
+  <div class="border-t border-[#f3f4f6] pt-6 flex flex-col gap-1">
+    <a href="/app/settings" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">data_usage</span>
+      <span>Usage</span>
+    </a>
+    <a href="/app/support" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
+      <span class="material-symbols-outlined text-xl">help_outline</span>
+      <span>Support</span>
+    </a>
+  </div>
+</aside>

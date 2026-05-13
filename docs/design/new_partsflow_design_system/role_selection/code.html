@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-tint": "#a73a00",
+                  "surface-variant": "#fadcd2",
+                  "error": "#ba1a1a",
+                  "secondary-fixed": "#e2e2e2",
+                  "primary-fixed-dim": "#ffb59a",
+                  "on-tertiary-fixed-variant": "#00497f",
+                  "on-secondary": "#ffffff",
+                  "on-primary": "#ffffff",
+                  "surface-container-low": "#fff1ec",
+                  "on-secondary-container": "#5f6161",
+                  "on-tertiary-container": "#002d51",
+                  "tertiary": "#0061a6",
+                  "secondary-container": "#dcdddd",
+                  "background": "#fff8f6",
+                  "surface": "#fff8f6",
+                  "primary": "#a73a00",
+                  "secondary-fixed-dim": "#c6c6c7",
+                  "on-tertiary": "#ffffff",
+                  "on-primary-fixed": "#370e00",
+                  "inverse-on-surface": "#ffede7",
+                  "surface-dim": "#f1d4ca",
+                  "on-secondary-fixed-variant": "#454747",
+                  "secondary": "#5d5f5f",
+                  "on-error": "#ffffff",
+                  "surface-bright": "#fff8f6",
+                  "inverse-surface": "#3e2c26",
+                  "on-tertiary-fixed": "#001c37",
+                  "on-surface": "#271812",
+                  "on-primary-fixed-variant": "#802a00",
+                  "surface-container-highest": "#fadcd2",
+                  "primary-fixed": "#ffdbce",
+                  "inverse-primary": "#ffb59a",
+                  "outline-variant": "#e4beb1",
+                  "on-background": "#271812",
+                  "tertiary-fixed-dim": "#a0c9ff",
+                  "tertiary-fixed": "#d2e4ff",
+                  "surface-container": "#ffe9e2",
+                  "on-primary-container": "#521800",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-container-high": "#ffe2d8",
+                  "on-error-container": "#93000a",
+                  "tertiary-container": "#0096fd",
+                  "primary-container": "#ff5c00",
+                  "on-surface-variant": "#5b4137",
+                  "outline": "#8f7065",
+                  "on-secondary-fixed": "#1a1c1c",
+                  "error-container": "#ffdad6"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "xl": "80px",
+                  "xs": "4px",
+                  "lg": "48px",
+                  "base": "8px",
+                  "md": "24px",
+                  "gutter": "24px",
+                  "container-max": "1440px",
+                  "sm": "12px"
+          },
+          "fontFamily": {
+                  "display-xl": ["DM Sans"],
+                  "stat-value": ["DM Sans"],
+                  "body-lg": ["DM Sans"],
+                  "label-sm": ["DM Sans"],
+                  "headline-lg": ["DM Sans"],
+                  "display-lg": ["DM Sans"],
+                  "body-md": ["DM Sans"],
+                  "label-md": ["DM Sans"],
+                  "headline-md": ["DM Sans"]
+          },
+          "fontSize": {
+                  "display-xl": ["80px", {"lineHeight": "0.95", "letterSpacing": "-0.03em", "fontWeight": "900"}],
+                  "stat-value": ["36px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                  "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "label-sm": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                  "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                  "display-lg": ["64px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                  "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                  "label-md": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.06em", "fontWeight": "700"}],
+                  "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar (Simplified for Onboarding) -->
+<header class="bg-background flex justify-between items-center w-full px-md h-16 max-w-container-max mx-auto top-0 sticky z-50">
+<div class="text-headline-md font-headline-md font-black text-primary">PartsFlow</div>
+<div class="flex items-center gap-sm">
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Back to Home
+      </a>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center px-gutter py-xl">
+<div class="max-w-4xl w-full">
+<!-- Title Section -->
+<div class="text-center mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Welcome to PartsFlow</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Choose your role to get started with the fastest parts sourcing network.</p>
+</div>
+<!-- Role Selection Bento Grid -->
+<div class="grid md:grid-cols-2 gap-md">
+<!-- Shop Owner Card -->
+<button class="group relative flex flex-col text-left bg-surface-container-lowest border-2 border-transparent hover:border-primary-container rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 scale-100 active:scale-95">
+<div class="h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105" data-alt="A clean, high-precision automotive repair bay with organized tools and a modern computer diagnostic station. The lighting is bright and professional, emphasizing a light-mode aesthetic with subtle orange accents on equipment. The mood is efficient, high-tech, and urgent, reflecting a professional shop owner's workspace in a premium automotive environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRIYs0TKv1VELzo9Hlr7Zi-45CRwTdvdDO8G_Gbb3oQRXTnPlmffcrigFpAKmTw7wvN-vQ-mRE26gowQN9QWUp_m-seHa_5MMnpn7S3K1zTgix4TD6MVK946iWNO2P2OWt1GIyEv3DD9bwP_iyubCbLDFZ8whZRT3jVt_grNlRhK4F4BG5oAF14b0skaAdx9Z8uRjsFNocmDCJ9JFMlE2WT7zPfp4E-uCszOcmZseMhXLVaPJT57RhQZNCNlulHfmVMT-WiucssvA"/>
+</div>
+<div class="p-md bg-white">
+<div class="flex items-center justify-between mb-sm">
+<span class="material-symbols-outlined text-primary text-[32px]">storefront</span>
+<span class="bg-primary-container text-on-primary-container font-label-md text-label-md px-sm py-xs rounded-full">Most Popular</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">I am a Shop Owner</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Source OEM and aftermarket parts in real-time. Get them delivered to your bay in minutes, not hours.</p>
+<div class="flex items-center text-primary font-label-md text-label-md uppercase tracking-wider group-hover:translate-x-2 transition-transform">
+              Get Started <span class="material-symbols-outlined ml-xs">arrow_forward</span>
+</div>
+</div>
+</button>
+<!-- Driver Card -->
+<button class="group relative flex flex-col text-left bg-surface-container-lowest border-2 border-transparent hover:border-primary-container rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 scale-100 active:scale-95">
+<div class="h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105" data-alt="A focused perspective from the driver's seat of a modern, clean delivery vehicle moving through a bright city street at golden hour. The interior is well-maintained with a smartphone mounted showing a navigation route. The color palette is warm but grounded with professional grays and sharp orange interface elements. The mood is active, reliable, and swift." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxRBuE1jbuK6ORFHeKnSNqpGG9fS1okX44Epk6x_As2Ii2L2uhUZAAhPhtJEgX1SPQxr-r5XvdwKu_KhwxzfsLnZBkNHD72r9uykQV6slKzv_8BdEcmg6TejNiUR6KCHufihh5Q8LZRbMO87W6o0X9ElTbNAySdPd7kb4janN_9NZdHNptPbmF3TVxZs_sQ1teaISYoEzg0h1NlA0CV0oNyAVsGMkiGeKo6GQTupaE8ql-AYKs1QzJD2FbGvjyrCLSHv60lRs-7Ao"/>
+</div>
+<div class="p-md bg-white">
+<div class="flex items-center justify-between mb-sm">
+<span class="material-symbols-outlined text-primary text-[32px]">local_shipping</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">I am a Driver</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Turn your vehicle into an earning machine. Pick up and deliver automotive parts to local repair shops on your schedule.</p>
+<div class="flex items-center text-primary font-label-md text-label-md uppercase tracking-wider group-hover:translate-x-2 transition-transform">
+              Start Earning <span class="material-symbols-outlined ml-xs">arrow_forward</span>
+</div>
+</div>
+</button>
+</div>
+<!-- Footer/Support -->
+<div class="mt-lg text-center">
+<p class="font-label-md text-label-md text-secondary">
+          Need help deciding? <a class="text-primary hover:underline decoration-2 underline-offset-4" href="#">Talk to an expert</a> or visit our <a class="text-primary hover:underline decoration-2 underline-offset-4" href="#">Help Center</a>.
+        </p>
+</div>
+</div>
+</main>
+<!-- SideNavBar Logic for Progress (Hidden on selection screen as requested, but structure ready) -->
+<aside class="hidden md:flex flex-col gap-base p-md bg-surface-container-low dark:bg-surface-dim h-screen w-64 fixed left-0 top-0 transform -translate-x-full">
+<div class="mb-lg">
+<div class="text-headline-md font-headline-md text-primary mb-xs">Setup Guide</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Complete your profile</div>
+</div>
+<nav class="flex flex-col gap-sm">
+<div class="flex items-center gap-sm bg-primary-container text-on-primary-container rounded-lg p-sm">
+<span class="material-symbols-outlined">person_pin_circle</span>
+<span class="font-label-md text-label-md">Role Selection</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant transition-all duration-200">
+<span class="material-symbols-outlined">business</span>
+<span class="font-label-md text-label-md">Business Details</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant transition-all duration-200">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant p-sm hover:bg-surface-variant transition-all duration-200">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-md text-label-md">Completion</span>
+</div>
+</nav>
+</aside>
+<!-- Background Decoration (Asymmetric) -->
+<div class="fixed top-0 right-0 -z-10 opacity-10 pointer-events-none">
+<svg fill="none" height="600" viewbox="0 0 600 600" width="600" xmlns="http://www.w3.org/2000/svg">
+<path d="M600 0H200L0 600H400L600 0Z" fill="url(#paint0_linear)"></path>
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="paint0_linear" x1="300" x2="300" y1="0" y2="600">
+<stop stop-color="#a73a00"></stop>
+<stop offset="1" stop-color="#ff5c00" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+</body></html>

@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PartsFlow – Unified Parts Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05070F;--s1:#0A0F1A;--s2:#0F1620;--s3:#162030;--border:#1D2D42;--border2:#253550;
+  --accent:#FF6A00;--ah:#FF2500;--aw:#FF9800;--ag:rgba(255,106,0,.22);--a2:#FFD600;
+  --text:#FFF;--t2:#C8D8F0;--muted:#7A90AA;--m2:#253040;
+  --green:#00F07A;--gd:rgba(0,240,122,.13);--red:#FF3A3A;--rd:rgba(255,58,58,.13);
+  --yellow:#FFD600;--yd:rgba(255,214,0,.14);--blue:#1E90FF;--bb:#60B4FF;--bg2:rgba(30,144,255,.2);
+  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'Space Mono',monospace;
+}
+body[data-mode=municipal]{--accent:#1E90FF;--ah:#1260CC;--aw:#60B4FF;--ag:rgba(30,144,255,.22);--a2:#60B4FF}
+body[data-mode=admin]{--accent:#00DDB0;--ah:#009980;--aw:#00F5C2;--ag:rgba(0,221,176,.2);--a2:#FFD600}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 64px);animation:fadeUp .3s ease}
+.screen.active{display:block}
+.panel{display:none}.panel.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(5,7,15,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
+.logo-box{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:900;color:#fff;font-size:15px;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--accent),var(--ah));box-shadow:0 0 14px var(--ag);transition:all .4s}
+.logo-text{font-family:var(--fd);font-weight:900;font-size:22px;letter-spacing:1px;text-transform:uppercase}
+.mode-switcher{display:flex;gap:3px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.mode-btn{padding:6px 14px;border-radius:5px;border:none;cursor:pointer;font-family:var(--fd);font-size:13px;
+  font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:transparent;color:var(--muted);transition:all .25s}
+.mode-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px var(--ag)}
+.nav-right{display:flex;gap:14px;align-items:center}
+.nav-link{background:none;border:none;color:var(--muted);font-family:var(--fd);font-size:13px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:color .2s;padding:0;white-space:nowrap}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--ah));color:#fff;border:none;
+  padding:11px 22px;font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:opacity .2s,transform .1s,box-shadow .2s;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:0 4px 20px var(--ag)}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 6px 28px var(--ag)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border2);padding:11px 22px;
+  font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-ghost:hover{border-color:var(--accent);color:var(--aw);box-shadow:0 0 14px var(--ag)}
+.btn-sm{padding:7px 14px !important;font-size:13px !important}
+.btn-danger{background:var(--rd);color:var(--red);border:1px solid var(--red);padding:7px 14px;
+  font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;border-radius:5px;transition:all .2s}
+.btn-danger:hover{background:var(--red);color:#fff}
+.input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);
+  padding:12px 15px;font-family:var(--fb);font-size:14px;border-radius:6px;outline:none;transition:all .2s}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ag)}
+.input::placeholder{color:var(--muted)}
+.select{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 32px 10px 14px;
+  font-family:var(--fb);font-size:14px;border-radius:6px;outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A90AA' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:20px}
+.card-glow{transition:all .25s;cursor:default}
+.card-glow:hover{border-color:var(--accent);box-shadow:0 0 26px var(--ag);transform:translateY(-1px)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;
+  font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.bg{background:var(--gd);color:var(--green)}
+.bo{background:var(--ag);color:var(--aw)}
+.bb2{background:var(--bg2);color:var(--bb)}
+.br{background:var(--rd);color:var(--red)}
+.by{background:var(--yd);color:var(--yellow)}
+.label{font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:block}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  display:inline-block;animation:livePulse 2s infinite;vertical-align:middle;margin-right:5px}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(0,240,122,.4)}70%{box-shadow:0 0 0 6px rgba(0,240,122,0)}}
+
+/* TICKER */
+.ticker{overflow:hidden;padding:10px 0;white-space:nowrap;
+  background:linear-gradient(90deg,var(--ah),var(--accent),var(--aw),var(--accent),var(--ah))}
+.ticker-inner{display:inline-flex;animation:tick 28s linear infinite}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:#fff;padding:0 26px;border-right:1px solid rgba(255,255,255,.2)}
+
+/* HERO */
+.hero{min-height:calc(100vh - 64px);display:flex;flex-direction:column;justify-content:center;
+  padding:60px 24px 48px;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:62px 62px;opacity:.28;pointer-events:none}
+.hero-glow1{position:absolute;top:8%;right:8%;width:520px;height:520px;
+  background:radial-gradient(circle,rgba(255,106,0,.09),transparent 65%);pointer-events:none}
+.hero-glow2{position:absolute;bottom:8%;left:3%;width:380px;height:380px;
+  background:radial-gradient(circle,rgba(30,144,255,.06),transparent 65%);pointer-events:none}
+.hero-h{font-family:var(--fd);font-size:clamp(68px,13vw,138px);font-weight:900;line-height:.83;letter-spacing:-3px;position:relative}
+.hero-outline{-webkit-text-stroke:2px var(--text);color:transparent}
+.hero-accent{background:linear-gradient(90deg,var(--accent),var(--a2));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:17px;color:var(--muted);max-width:500px;line-height:1.7;margin:22px 0 30px}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:620px;margin-bottom:30px}
+.mode-entry{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;
+  cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.mode-entry.c:hover{border-color:var(--aw);box-shadow:0 12px 40px var(--ag);transform:translateY(-2px)}
+.mode-entry.m:hover{border-color:var(--bb);box-shadow:0 12px 40px var(--bg2);transform:translateY(-2px)}
+.mode-icon{font-size:32px;margin-bottom:10px}
+.mode-title{font-family:var(--fd);font-weight:900;font-size:22px;margin-bottom:6px}
+.mode-desc{font-size:13px;color:var(--muted);line-height:1.55}
+.mode-arrow{position:absolute;bottom:16px;right:16px;font-size:20px;opacity:0;transition:all .3s;transform:translateX(-6px)}
+.mode-entry:hover .mode-arrow{opacity:1;transform:translateX(0)}
+.hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:8px}
+.stat{border-left:2px solid var(--accent);padding-left:14px}
+.stat-n{font-family:var(--fd);font-weight:900;font-size:30px}
+.stat-l{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* SECTIONS */
+.section{padding:72px 24px;max-width:920px;margin:0 auto}
+.sdark{background:var(--s1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:72px 24px}
+.sdi{max-width:920px;margin:0 auto}
+.h2{font-family:var(--fd);font-weight:900;font-size:clamp(30px,5vw,56px);line-height:.93;margin-bottom:14px}
+.h2g{background:linear-gradient(110deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.bmuted{font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:36px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:16px}
+.ficon{width:44px;height:44px;background:var(--ag);border:1px solid rgba(255,106,0,.25);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.ft{font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:6px}
+.fd2{font-size:13px;color:var(--muted);line-height:1.6}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr))}
+.step-col{padding:26px 22px;border-right:1px solid var(--border)}
+.step-col:last-child{border-right:none}
+.step-num{font-family:var(--fm);font-size:9px;color:var(--accent);letter-spacing:3px;margin-bottom:12px}
+.step-icon{font-size:28px;margin-bottom:10px}
+.step-title{font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* PRICING */
+.price-card{border-radius:10px;padding:26px;border:1px solid var(--border);transition:transform .25s;position:relative}
+.price-card:hover{transform:translateY(-2px)}
+.pname{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.pnum{font-family:var(--fd);font-weight:900;font-size:42px;line-height:1}
+.psub{font-family:var(--fm);font-size:11px;color:var(--muted);margin-bottom:22px}
+.pfeat{display:flex;gap:10px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.ptag{position:absolute;top:-13px;left:20px;background:linear-gradient(90deg,var(--accent),var(--ah));color:#fff;
+  font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.quote-text{font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:16px;font-style:italic}
+.quote-name{font-family:var(--fd);font-weight:700;font-size:15px;color:var(--accent)}
+.quote-role{font-family:var(--fm);font-size:10px;color:var(--muted)}
+
+/* CTA */
+.cta-section{background:linear-gradient(135deg,var(--ah),var(--accent),var(--aw));padding:80px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30L30 0L60 30L30 60Z' fill='none' stroke='rgba(255,255,255,.05)' stroke-width='1'/%3E%3C/svg%3E")}
+.cta-h{font-family:var(--fd);font-weight:900;font-size:clamp(36px,7vw,72px);color:#fff;line-height:.88;margin-bottom:18px}
+.cta-sub{font-size:16px;color:rgba(255,255,255,.75);margin-bottom:28px}
+.cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-input{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.3);color:#fff;
+  padding:13px 16px;font-size:15px;border-radius:6px;outline:none;flex:1;min-width:190px;max-width:270px}
+.cta-input::placeholder{color:rgba(255,255,255,.5)}
+footer{background:var(--s1);border-top:1px solid var(--border);padding:34px 24px}
+.fi{max-width:920px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.fcopy{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.flinks{display:flex;gap:18px}
+.flink{font-family:var(--fm);font-size:10px;color:var(--muted);cursor:pointer;transition:color .2s}
+.flink:hover{color:var(--accent)}
+
+/* APP */
+.aw{max-width:720px;margin:0 auto;padding:28px 20px 64px}
+.ph{font-family:var(--fd);font-weight:900;font-size:38px;line-height:1}
+.ps{font-size:14px;color:var(--muted);margin-top:6px}
+.back-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;
+  padding:0;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;transition:color .2s}
+.back-btn:hover{color:var(--text)}
+.tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{flex:1;padding:11px;background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--muted);font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;transition:all .2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* AI SEARCH */
+.ai-bar{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:4px;
+  display:flex;gap:8px;margin-bottom:14px;transition:all .2s}
+.ai-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ag)}
+.ai-inp{flex:1;background:transparent;border:none;color:var(--text);padding:11px 14px;font-size:15px;outline:none;font-family:var(--fb)}
+.ai-inp::placeholder{color:var(--muted)}
+.ai-banner{background:linear-gradient(90deg,rgba(255,106,0,.09),rgba(255,214,0,.05));
+  border:1px solid rgba(255,106,0,.25);border-radius:8px;padding:13px 16px;
+  margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;animation:fadeUp .3s ease}
+.ai-note{font-size:13px;color:var(--t2);line-height:1.5}
+.ai-note strong{color:var(--aw)}
+.aidot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
+.aidot:nth-child(1){animation:aiP .8s 0s infinite}.aidot:nth-child(2){animation:aiP .8s .15s infinite}.aidot:nth-child(3){animation:aiP .8s .3s infinite}
+@keyframes aiP{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.3)}}
+.qtags{display:flex;gap:8px;flex-wrap:wrap}
+.qtag{background:var(--s2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;
+  border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s}
+.qtag:hover{border-color:var(--accent);color:var(--aw);background:var(--ag)}
+
+/* RESULTS */
+.rhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.srow{display:flex;gap:6px}
+.sbtn{padding:5px 11px;border-radius:4px;font-family:var(--fm);font-size:10px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);
+  background:var(--s2);color:var(--muted);transition:all .2s}
+.sbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.part-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px;
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;
+  cursor:pointer;transition:all .2s}
+.part-row:hover{border-color:var(--accent);box-shadow:0 0 18px var(--ag);transform:translateX(2px)}
+.part-row.sel{border-color:var(--accent);background:rgba(255,106,0,.05)}
+.pbrand{font-family:var(--fd);font-weight:700;font-size:17px}
+.psku{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.ploc{font-size:12px;color:var(--muted);margin-top:4px}
+.pprice{font-family:var(--fd);font-weight:900;font-size:26px}
+.peta{font-family:var(--fm);font-size:10px;text-align:right;margin-top:3px}
+.pstock{font-family:var(--fm);font-size:10px;color:var(--muted);text-align:right}
+.order-panel{background:rgba(255,106,0,.07);border:1px solid var(--accent);border-radius:10px;
+  padding:18px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;animation:fadeUp .3s ease;box-shadow:0 0 28px var(--ag)}
+
+/* CHECKOUT */
+.crow{display:flex;justify-content:space-between;padding:8px 0}
+.clabel{font-size:14px;color:var(--muted)}
+.cval{font-family:var(--fm);font-size:14px}
+.ctrow{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:6px}
+.ctlabel{font-family:var(--fd);font-weight:700;font-size:20px}
+.ctval{font-family:var(--fd);font-weight:900;font-size:24px;color:var(--aw)}
+.flabel{font-family:var(--fm);font-size:10px;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.fgroup{margin-bottom:15px}
+.prio-row{display:flex;gap:10px;margin-bottom:16px}
+.prio-btn{flex:1;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--s2);
+  color:var(--muted);font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;text-align:center}
+.prio-btn.p3{border-color:var(--green);background:var(--gd);color:var(--green)}
+.prio-btn.p2{border-color:var(--yellow);background:var(--yd);color:var(--yellow)}
+.prio-btn.p1{border-color:var(--red);background:var(--rd);color:var(--red)}
+
+/* TRACKING */
+.eta-banner{background:linear-gradient(135deg,var(--ah),var(--accent),var(--aw));border-radius:10px;padding:24px;
+  margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 8px 36px var(--ag)}
+.eta-label{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:4px}
+.eta-number{font-family:var(--fd);font-weight:900;font-size:56px;color:#fff;line-height:1}
+.dname{font-family:var(--fd);font-weight:700;font-size:22px;color:#fff}
+.dmeta{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.6)}
+.map-box{width:100%;height:210px;background:var(--s2);border-radius:10px;position:relative;overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:28px 28px}
+.map-glow{position:absolute;inset:0;background:radial-gradient(circle at 58% 65%,rgba(255,106,0,.08),transparent 55%)}
+.mpin{position:absolute;background:var(--s3);border:1px solid var(--border2);border-radius:5px;padding:4px 10px;font-family:var(--fm);font-size:9px;color:var(--muted);white-space:nowrap}
+.mpin.a{background:var(--accent);border-color:var(--accent);color:#fff}
+.tstep{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)}
+.tstep:last-child{border-bottom:none}
+.tcircle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid var(--border);transition:all .3s}
+.tcircle.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 12px var(--ag)}
+.tcircle.curr{border-color:var(--accent);color:var(--accent);background:var(--ag);animation:stepG 1.5s infinite}
+@keyframes stepG{0%,100%{box-shadow:0 0 0 0 var(--ag)}50%{box-shadow:0 0 0 6px var(--ag)}}
+.tlabel{font-family:var(--fd);font-weight:700;font-size:15px;flex:1}
+.ttime{font-family:var(--fm);font-size:10px}
+
+/* DRIVER */
+.earn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.earn-cell{background:var(--s2);padding:18px 12px;text-align:center}
+.earn-num{font-family:var(--fd);font-weight:900;font-size:30px;line-height:1;margin-bottom:4px}
+.earn-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.srow2{display:flex;gap:10px;margin-bottom:20px}
+.sbtn2{flex:1;padding:12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:var(--fd);font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.sbtn2.on{border-color:var(--green);background:var(--gd);color:var(--green);box-shadow:0 0 14px rgba(0,240,122,.15)}
+.job-card{background:rgba(255,106,0,.07);border:2px solid var(--accent);border-radius:10px;padding:20px;margin-bottom:20px;animation:fadeUp .3s ease;box-shadow:0 0 24px var(--ag)}
+.del-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.del-item:last-child{border-bottom:none}
+
+/* MUNICIPAL */
+.munic-nav{display:flex;gap:3px;margin-bottom:24px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:3px;width:fit-content;flex-wrap:wrap}
+.mtab{padding:7px 16px;border-radius:5px;border:none;cursor:pointer;font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:transparent;color:var(--muted);transition:all .2s}
+.mtab.active{background:var(--accent);color:#fff}
+.dept-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.dtag{padding:7px 15px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.dtag.active{border-color:var(--blue);background:var(--bg2);color:var(--bb)}
+.sla-wrap{margin-bottom:10px}
+.sla-hdr{display:flex;justify-content:space-between;margin-bottom:4px}
+.sla-hdr span{font-size:13px;color:var(--t2)}
+.sla-bg{background:var(--s3);border-radius:4px;height:8px;overflow:hidden}
+.sla-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--aw));transition:width .8s ease}
+.porder-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;gap:12px;transition:all .2s}
+.porder-row:hover{border-color:var(--bb)}
+.porder-row.p1{border-left:3px solid var(--red)}
+.porder-row.p2{border-left:3px solid var(--yellow)}
+.porder-row.p3{border-left:3px solid var(--green)}
+.vrow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:12px}
+.vrow:last-child{border-bottom:none}
+.vid{font-family:var(--fm);font-size:12px;font-weight:700}
+.vtype{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ADMIN */
+.admin-layout{display:flex}
+.admin-sb{width:210px;background:var(--s1);border-right:1px solid var(--border);min-height:calc(100vh - 64px);padding:20px 0;flex-shrink:0;position:sticky;top:64px;align-self:flex-start}
+.admin-main{flex:1;padding:26px 22px;min-width:0}
+.anav-section{font-family:var(--fm);font-size:9px;color:var(--m2);letter-spacing:2px;text-transform:uppercase;padding:18px 22px 8px}
+.anav-item{display:flex;align-items:center;gap:12px;padding:11px 22px;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:.5px;border-left:2px solid transparent}
+.anav-item:hover{color:var(--text);background:var(--s2)}
+.anav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(255,106,0,.07)}
+.apg-title{font-family:var(--fd);font-weight:900;font-size:30px;margin-bottom:22px}
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px;margin-bottom:22px}
+.ametric{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+.ametric::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:radial-gradient(circle,var(--ag),transparent 70%)}
+.am-val{font-family:var(--fd);font-weight:900;font-size:32px;line-height:1;margin-bottom:4px}
+.am-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.am-delta{font-family:var(--fm);font-size:10px;margin-top:6px}
+.am-delta.up{color:var(--green)}.am-delta.dn{color:var(--red)}
+.dtable{width:100%;border-collapse:collapse}
+.dtable th{text-align:left;padding:10px 13px;font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--s2);white-space:nowrap}
+.dtable td{padding:12px 13px;border-bottom:1px solid var(--border);font-size:13px;color:var(--t2)}
+.dtable tr:hover td{background:var(--s2)}
+.dtable tr:last-child td{border-bottom:none}
+.rev-bar{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--a2));margin-top:5px}
+.zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.zone-cell{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.zone-cell:hover{border-color:var(--accent)}
+.zone-cell.hot{border-color:var(--accent);background:var(--ag)}
+.zone-name{font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:6px}
+.zone-num{font-family:var(--fd);font-weight:900;font-size:22px}
+.sla-alert{margin-top:16px;padding:14px 16px;background:var(--rd);border:1px solid var(--red);border-radius:8px}
+
+/* REFERRAL */
+.tier-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:22px;transition:all .25s}
+.tier-card:hover{border-color:var(--accent);box-shadow:0 0 24px var(--ag)}
+.tier-card.feat{border-color:var(--accent);background:rgba(255,106,0,.04)}
+.tier-card.munic{border-color:var(--blue);background:rgba(30,144,255,.04)}
+.tier-card.munic:hover{box-shadow:0 0 24px var(--bg2)}
+.tier-icon{font-size:28px;margin-bottom:10px}
+.tier-name{font-family:var(--fd);font-weight:900;font-size:22px;margin-bottom:4px}
+.tier-sub{font-family:var(--fm);font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:14px;text-transform:uppercase}
+.tier-earn{font-family:var(--fd);font-weight:900;font-size:30px;color:var(--aw);line-height:1;margin-bottom:4px}
+.tier-earn.blue{color:var(--bb)}
+.tier-per{font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:14px}
+.tier-feat{display:flex;gap:8px;margin-bottom:8px;font-size:13px;color:var(--muted);align-items:flex-start}
+.tchk{color:var(--accent);font-weight:700;flex-shrink:0}
+.tchk.b{color:var(--bb)}
+.ms-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;gap:12px;transition:border-color .2s}
+.ms-row:hover{border-color:var(--accent)}
+.ms-icon{font-size:22px}.ms-title{font-family:var(--fd);font-weight:700;font-size:16px}
+.ms-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.ms-reward{font-family:var(--fd);font-weight:900;font-size:20px;color:var(--green);text-align:right;white-space:nowrap}
+.ref-dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,106,0,.2)}
+.rdstat-val{font-family:var(--fd);font-weight:900;font-size:24px;margin-bottom:4px}
+.rdstat-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* ACCOUNT */
+.acct-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
+.astat{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.astat-val{font-family:var(--fd);font-weight:900;font-size:26px;margin-bottom:4px}
+.astat-lbl{font-family:var(--fm);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.ord-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.ord-item:last-child{border-bottom:none}
+.ord-part{font-family:var(--fd);font-weight:700;font-size:16px}
+.ord-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.ord-price{font-family:var(--fd);font-weight:900;font-size:18px;text-align:right}
+
+/* SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MOBILE */
+@media(max-width:640px){
+  .admin-layout{flex-direction:column}
+  .admin-sb{width:100%;min-height:auto;position:relative;top:auto;border-right:none;border-bottom:1px solid var(--border);padding:10px 0}
+  .anav-item{padding:9px 16px;font-size:13px}
+  .anav-section{display:none}
+  .mode-cards{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .step-col{border-right:none;border-bottom:1px solid var(--border)}
+  .step-col:last-child{border-bottom:none}
+  .mode-switcher .mode-btn{padding:5px 9px;font-size:11px}
+  .nav-right .nav-link{display:none}
+  .earn-grid{grid-template-columns:repeat(3,1fr)}
+  .hero-h{letter-spacing:-2px}
+}
+</style>
+</head>
+<body data-mode="consumer">
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="show('landing');setMode('consumer')">
+    <div class="logo-box">PF</div>
+    <span class="logo-text">PartsFlow</span>
+  </div>
+  <div class="mode-switcher">
+    <button class="mode-btn active" id="mode-consumer" onclick="setMode('consumer');show('search')">🔧 Local</button>
+    <button class="mode-btn" id="mode-municipal" onclick="setMode('municipal');show('municipal')">🏛 Municipal</button>
+    <button class="mode-btn" id="mode-admin" onclick="setMode('admin');show('admin')">⚙ Admin</button>
+  </div>
+  <div class="nav-right">
+    <button class="nav-link active" id="nav-landing" onclick="show('landing')">Home</button>
+    <button class="nav-link" id="nav-driver" onclick="show('driver')">Drivers</button>
+    <button class="nav-link" id="nav-referral" onclick="show('referral')">Earn</button>
+    <button class="nav-link" id="nav-account" onclick="show('account')">Account</button>
+    <button class="btn-primary btn-sm" onclick="setMode('consumer');show('search')">Get Parts Now</button>
+  </div>
+</nav>
+
+<!-- ===== LANDING ===== -->
+<div class="screen active" id="screen-landing">
+  <div class="hero">
+    <div class="hero-grid"></div><div class="hero-glow1"></div><div class="hero-glow2"></div>
+    <div style="position:relative;max-width:920px;margin:0 auto;width:100%">
+      <span class="label" style="margin-bottom:20px">Baltimore · Washington DC · Now Launching</span>
+      <div class="hero-h">Parts.<br><span class="hero-outline">Delivered.</span><br><span class="hero-accent">Fast.</span></div>
+      <p class="hero-sub">The real-time parts sourcing network for repair shops and city fleets. AI-powered search. 30–60 min SLA. Guaranteed.</p>
+      <div class="mode-cards">
+        <div class="mode-entry c" onclick="setMode('consumer');show('search')">
+          <div class="mode-icon">🔧</div>
+          <div class="mode-title">Local Repair Shop</div>
+          <div class="mode-desc">Search 200+ Baltimore suppliers simultaneously. AI-powered queries. Parts on your lift in 30–60 min.</div>
+          <div class="mode-arrow" style="color:var(--aw)">→</div>
+        </div>
+        <div class="mode-entry m" onclick="setMode('municipal');show('municipal')">
+          <div class="mode-icon">🏛</div>
+          <div class="mode-title">Municipal Fleet</div>
+          <div class="mode-desc">Priority dispatch for city fleets. Department tracking, P1/P2/P3 queues. Sourcewell-ready procurement.</div>
+          <div class="mode-arrow" style="color:var(--bb)">→</div>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-n">30–60</div><div class="stat-l">Min SLA</div></div>
+        <div class="stat"><div class="stat-n">200+</div><div class="stat-l">Suppliers</div></div>
+        <div class="stat"><div class="stat-n">15M+</div><div class="stat-l">Parts in Network</div></div>
+        <div class="stat"><div class="stat-n">$0</div><div class="stat-l">Signup Fee</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ticker"><div class="ticker-inner">
+    <span class="ticker-item">30–60 Min Delivery</span><span class="ticker-item">AI Part Search</span>
+    <span class="ticker-item">200+ Baltimore Suppliers</span><span class="ticker-item">Municipal Fleet Ready</span>
+    <span class="ticker-item">Guaranteed ETA or Refund</span><span class="ticker-item">Sourcewell Cooperative</span>
+    <span class="ticker-item">30–60 Min Delivery</span><span class="ticker-item">AI Part Search</span>
+    <span class="ticker-item">200+ Baltimore Suppliers</span><span class="ticker-item">Municipal Fleet Ready</span>
+    <span class="ticker-item">Guaranteed ETA or Refund</span><span class="ticker-item">Sourcewell Cooperative</span>
+  </div></div>
+
+  <div class="section">
+    <span class="label">The Problem</span>
+    <div class="h2 h2g">Every minute on the lift<br>is money bleeding out.</div>
+    <p class="bmuted">A six-bay shop loses $600–$900/hr idle. A police cruiser that can't patrol is a public safety crisis. Both problems have one fix.</p>
+    <div class="g2">
+      <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">⏱</div><div class="ft">Delivery Delays</div><div class="fd2">9 drivers at one location can't meet peak demand. No routing intelligence, no surge incentives.</div></div>
+      <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">📱</div><div class="ft">Fragmented Lookup</div><div class="fd2">Shops call 4–6 suppliers. Municipal garages call 8–12. No unified real-time availability view.</div></div>
+      <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">💸</div><div class="ft">Driver Economics</div><div class="fd2">$15/hr flat creates high turnover, zero accountability, no peak coverage.</div></div>
+      <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">🏛</div><div class="ft">Municipal Downtime</div><div class="fd2">City fleets avg 7.4 years old — more parts, more often. 73% of repairs are reactive emergencies.</div></div>
+    </div>
+  </div>
+
+  <div class="sdark"><div class="sdi">
+    <span class="label">How It Works</span>
+    <div class="h2" style="margin-bottom:36px">Search. Order. Delivered.</div>
+    <div class="steps-grid">
+      <div class="step-col"><div class="step-num">STEP 01</div><div class="step-icon">🧠</div><div class="step-title">AI-Powered Search</div><div class="step-desc">Type anything — "2019 Civic front brakes" or a part number. AI extracts the right part and finds every local supplier instantly.</div></div>
+      <div class="step-col"><div class="step-num">STEP 02</div><div class="step-icon">⚡</div><div class="step-title">Speed or Price</div><div class="step-desc">Sort by fastest ETA or lowest cost. Set priority level P1–P3. One click to order.</div></div>
+      <div class="step-col"><div class="step-num">STEP 03</div><div class="step-icon">🚗</div><div class="step-title">Driver Dispatched</div><div class="step-desc">Algorithm assigns the nearest driver with surge incentives. Live GPS from pickup to drop-off.</div></div>
+      <div class="step-col"><div class="step-num">STEP 04</div><div class="step-icon">✅</div><div class="step-title">Parts on Your Lift</div><div class="step-desc">30–60 minutes, guaranteed. One-tap reorder for saved vehicles and common repairs.</div></div>
+    </div>
+  </div></div>
+
+  <div class="section">
+    <span class="label">Platform Features</span>
+    <div class="h2" style="margin-bottom:36px">Built for shops.<br>Scaled for cities.</div>
+    <div class="g3">
+      <div class="card card-glow"><div class="ficon">🧠</div><div class="ft">AI Natural Language</div><div class="fd2">Type "2019 Civic needs front brakes" — AI figures out the part, fitment, and best suppliers.</div></div>
+      <div class="card card-glow"><div class="ficon">📡</div><div class="fd2">Live Inventory feed from 200+ suppliers updated every 90 seconds. No phantom stock.</div><div class="ft">Live Inventory Feed</div></div>
+      <div class="card card-glow"><div class="ficon">🗺</div><div class="ft">Zone-Based Dispatch</div><div class="fd2">Driver matched by proximity to supplier. Route optimized. Surge pay during peaks.</div></div>
+      <div class="card card-glow"><div class="ficon">🏛</div><div class="ft">Municipal Command</div><div class="fd2">P1/P2/P3 queues, department-level tracking, SLA reporting, Sourcewell integration.</div></div>
+      <div class="card card-glow"><div class="ficon">📊</div><div class="ft">Analytics</div><div class="fd2">Shop spend, time saved, most-ordered parts. Municipal: fleet downtime, department compliance.</div></div>
+      <div class="card card-glow"><div class="ficon">🔄</div><div class="ft">One-Tap Reorder</div><div class="fd2">Saved vehicles and parts for common repairs. Estimate-to-order in under 20 seconds.</div></div>
+    </div>
+  </div>
+
+  <div class="sdark"><div class="sdi">
+    <span class="label">Pricing</span>
+    <div class="h2" style="margin-bottom:36px">No games. No hidden fees.</div>
+    <div class="g3">
+      <div class="price-card" style="background:var(--s2)"><div class="pname">Pay-As-You-Go</div><div class="pnum">Free</div><div class="psub">+ $15–22 per delivery</div><div style="border-top:1px solid var(--border);padding-top:18px"><div class="pfeat"><span style="color:var(--aw)">→</span>Unlimited searches</div><div class="pfeat"><span style="color:var(--aw)">→</span>Live inventory access</div><div class="pfeat"><span style="color:var(--aw)">→</span>AI part search</div><div class="pfeat"><span style="color:var(--aw)">→</span>SMS alerts</div></div></div>
+      <div class="price-card" style="background:rgba(255,106,0,.05);border-color:var(--accent);position:relative"><div class="ptag">Most Popular</div><div class="pname">Shop Pro</div><div class="pnum">$149</div><div class="psub">per month</div><div style="border-top:1px solid var(--border);padding-top:18px"><div class="pfeat"><span style="color:var(--aw)">→</span>Everything in Free</div><div class="pfeat"><span style="color:var(--aw)">→</span>Priority dispatch queue</div><div class="pfeat"><span style="color:var(--aw)">→</span>Analytics dashboard</div><div class="pfeat"><span style="color:var(--aw)">→</span>API + SMS integration</div><div class="pfeat"><span style="color:var(--aw)">→</span>Account manager</div></div></div>
+      <div class="price-card" style="background:rgba(30,144,255,.05);border-color:var(--blue)"><div class="pname" style="color:var(--bb)">Municipal / Fleet</div><div class="pnum">Custom</div><div class="psub">Sourcewell-eligible</div><div style="border-top:1px solid var(--border);padding-top:18px"><div class="pfeat"><span style="color:var(--bb)">→</span>Dept-level control</div><div class="pfeat"><span style="color:var(--bb)">→</span>P1/P2/P3 priority queue</div><div class="pfeat"><span style="color:var(--bb)">→</span>SLA compliance reporting</div><div class="pfeat"><span style="color:var(--bb)">→</span>Custom contract terms</div></div></div>
+    </div>
+  </div></div>
+
+  <div class="section">
+    <span class="label">Early Feedback</span>
+    <div class="h2" style="margin-bottom:30px">What they're saying.</div>
+    <div class="g3">
+      <div class="card"><div class="quote-text">"I spend 45 minutes a day calling parts stores. If PartsFlow cuts that in half, I'd pay for it twice over."</div><div class="quote-name">Marcus T.</div><div class="quote-role">Owner, Eastside Auto Repair</div></div>
+      <div class="card"><div class="quote-text">"Our garage has 12 bays and 4 city departments. Coordinating parts is a nightmare. This is exactly what we've needed."</div><div class="quote-name">Capt. D. Williams</div><div class="quote-role">Baltimore City Fleet Manager</div></div>
+      <div class="card"><div class="quote-text">"Fastest I got a part was 22 minutes from Parts Authority. I need that to be the standard, not the exception."</div><div class="quote-name">Carlos R.</div><div class="quote-role">Master Tech, Precision Imports</div></div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <span class="label" style="color:rgba(255,255,255,.5)">Baltimore Launch · Early Access</span>
+    <div class="cta-h">First 50 shops<br>get priority access.</div>
+    <p class="cta-sub">Free onboarding. No commitment. Be the fastest shop in your zip code.</p>
+    <div class="cta-row">
+      <input class="cta-input" placeholder="Your email address" type="email"/>
+      <button class="btn-primary" style="background:rgba(0,0,0,.35);box-shadow:none;border:1px solid rgba(255,255,255,.3)" onclick="setMode('consumer');show('search')">Request Early Access</button>
+    </div>
+  </div>
+  <footer><div class="fi">
+    <div class="logo"><div class="logo-box">PF</div><span class="logo-text">PartsFlow</span></div>
+    <div class="fcopy">© 2025 PartsFlow · Baltimore, MD · hello@partsflow.com</div>
+    <div class="flinks"><span class="flink">Terms</span><span class="flink">Privacy</span><span class="flink">Careers</span><span class="flink">Contact</span></div>
+  </div></footer>
+</div>
+
+<!-- ===== LOCAL SEARCH ===== -->
+<div class="screen" id="screen-search">
+  <div class="aw">
+    <span class="label">Local Parts Search</span>
+    <div class="ph" style="margin-bottom:4px">Find Any Part, Instantly</div>
+    <div class="ps" style="margin-bottom:22px">🧠 AI-Powered · 200+ Baltimore-area suppliers</div>
+    <div class="ai-bar">
+      <input class="ai-inp" id="ai-inp" placeholder="Try: '2019 Civic needs front brakes' or 'ACDelco alternator 17D1449'..." onkeydown="if(event.key==='Enter')doAI()"/>
+      <button class="btn-primary btn-sm" onclick="doAI()" id="ai-btn">🧠 AI Search</button>
+    </div>
+    <div id="ai-banner" style="display:none"></div>
+    <div class="qtags" style="margin-bottom:24px">
+      <span style="font-family:var(--fm);font-size:10px;color:var(--muted);align-self:center">Try:</span>
+      <button class="qtag" onclick="qs('Brake Pads')">Brake Pads</button>
+      <button class="qtag" onclick="qs('Alternator')">Alternator</button>
+      <button class="qtag" onclick="qs('Battery')">Battery</button>
+      <button class="qtag" onclick="qs('Starter Motor')">Starter Motor</button>
+      <button class="qtag" onclick="qs('2019 Civic front brakes')">2019 Civic front brakes</button>
+    </div>
+    <div id="results-area" style="display:none;margin-top:4px">
+      <div class="rhdr">
+        <div><span style="font-family:var(--fd);font-weight:700;font-size:19px" id="res-count">4 suppliers found</span><span style="font-size:14px;color:var(--muted)" id="res-q"> for "Brake Pads"</span></div>
+        <div class="srow"><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">Sort:</span><button class="sbtn active" id="seta" onclick="sort('eta')">⚡ Fastest</button><button class="sbtn" id="sprice" onclick="sort('price')">💰 Cheapest</button></div>
+      </div>
+      <div id="parts-list"></div>
+      <div id="order-panel" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MUNICIPAL ===== -->
+<div class="screen" id="screen-municipal">
+  <div class="aw" style="max-width:900px">
+    <span class="label" style="color:var(--blue)">Municipal Command Center</span>
+    <div class="ph" style="color:var(--bb);margin-bottom:4px">Fleet Operations Hub</div>
+    <div class="ps" style="margin-bottom:22px">Baltimore City · <span class="live-dot"></span>Live · Updated 14s ago</div>
+    <div class="munic-nav">
+      <button class="mtab active" onclick="mpanel('dashboard')">Dashboard</button>
+      <button class="mtab" onclick="mpanel('orders')">Place Order</button>
+      <button class="mtab" onclick="mpanel('fleet')">Fleet</button>
+      <button class="mtab" onclick="mpanel('reports')">SLA Reports</button>
+      <button class="mtab" onclick="mpanel('integrations')">Integrations</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="panel active" id="mp-dashboard">
+      <div class="mrow">
+        <div class="ametric" style="--ag:var(--bg2)"><div class="am-val" style="color:var(--green)">12</div><div class="am-lbl">Active Orders</div><div class="am-delta up">↑ 3 from yesterday</div></div>
+        <div class="ametric" style="--ag:var(--bg2)"><div class="am-val">94%</div><div class="am-lbl">SLA Compliance</div><div class="am-delta up">↑ 2.1% this week</div></div>
+        <div class="ametric" style="--ag:var(--bg2)"><div class="am-val" style="color:var(--red)">2</div><div class="am-lbl">P1 Priority Orders</div><div class="am-delta dn">Police Interceptors</div></div>
+        <div class="ametric" style="--ag:var(--bg2)"><div class="am-val">$8,420</div><div class="am-lbl">Spend This Month</div><div class="am-delta up">Under budget $1,200</div></div>
+      </div>
+      <div class="dept-row">
+        <button class="dtag active" onclick="setDept(this)">All Departments</button>
+        <button class="dtag" onclick="setDept(this)">🚔 Police (BPD)</button>
+        <button class="dtag" onclick="setDept(this)">🚒 Fire &amp; EMS</button>
+        <button class="dtag" onclick="setDept(this)">🚛 Public Works</button>
+        <button class="dtag" onclick="setDept(this)">🌳 Parks &amp; Rec</button>
+      </div>
+      <!-- Live map -->
+      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:var(--fd);font-weight:700;font-size:18px">Live Dispatch Map</div>
+          <span class="badge bb2"><span class="live-dot" style="width:6px;height:6px;margin-right:0"></span> 7 drivers active</span>
+        </div>
+        <div class="map-box" style="height:230px;border-radius:0;border:none;margin:0">
+          <div class="map-grid"></div><div class="map-glow" style="background:radial-gradient(circle at 50% 55%,rgba(30,144,255,.07),transparent 55%)"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+            <line x1="20%" y1="25%" x2="48%" y2="55%" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="5,4" opacity=".5"/>
+            <line x1="72%" y1="18%" x2="48%" y2="55%" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="5,4" opacity=".5"/>
+            <line x1="14%" y1="72%" x2="48%" y2="55%" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="5,4" opacity=".5"/>
+            <line x1="80%" y1="62%" x2="48%" y2="55%" stroke="var(--yellow)" stroke-width="1.5" stroke-dasharray="5,4" opacity=".5"/>
+            <circle cx="48%" cy="55%" r="13" fill="rgba(30,144,255,.12)" stroke="var(--blue)" stroke-width="1.5"/>
+            <text x="48%" y="58%" text-anchor="middle" fill="var(--bb)" font-size="11">🏛</text>
+            <circle id="md1" cx="20%" cy="25%" r="7" fill="var(--green)" opacity=".9"/>
+            <circle id="md2" cx="72%" cy="18%" r="7" fill="var(--red)" opacity=".9"/>
+            <circle id="md3" cx="14%" cy="72%" r="7" fill="var(--blue)" opacity=".9"/>
+            <circle id="md4" cx="80%" cy="62%" r="7" fill="var(--yellow)" opacity=".9"/>
+          </svg>
+          <div style="position:absolute;bottom:12px;right:12px;display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">En Route</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--yellow)"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">At Pickup</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div><span style="font-family:var(--fm);font-size:9px;color:var(--muted)">P1 Priority</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Active orders -->
+      <div style="font-family:var(--fd);font-weight:700;font-size:20px;margin-bottom:14px">Active Priority Orders</div>
+      <div class="porder-row p1"><div><span class="badge br">P1 EMERGENCY</span><div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-top:6px">Police Interceptor – Alt Belt</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Unit #PD-2241 · BPD District 3</div></div><div style="text-align:right"><div style="font-family:var(--fd);font-weight:900;font-size:24px;color:var(--red)">8 MIN</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">ETA</div></div></div>
+      <div class="porder-row p2"><div><span class="badge by">P2 URGENT</span><div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-top:6px">Fire Engine Brake Pads – Truck 12</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Unit #FD-0012 · Station 6</div></div><div style="text-align:right"><div style="font-family:var(--fd);font-weight:900;font-size:24px;color:var(--yellow)">22 MIN</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">ETA</div></div></div>
+      <div class="porder-row p3"><div><span class="badge bg">P3 STANDARD</span><div style="font-family:var(--fd);font-weight:700;font-size:16px;margin-top:6px">Oil Filters (x8) – Public Works</div><div style="font-size:12px;color:var(--muted);margin-top:3px">DPW Garage · Rolling maintenance</div></div><div style="text-align:right"><div style="font-family:var(--fd);font-weight:900;font-size:24px">38 MIN</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">ETA</div></div></div>
+      <button class="btn-primary" style="width:100%;margin-top:14px;justify-content:center;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)" onclick="mpanel('orders')">+ Place Emergency Order</button>
+    </div>
+
+    <!-- Place Order -->
+    <div class="panel" id="mp-orders">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div style="font-family:var(--fd);font-weight:700;font-size:22px">Place New Order</div>
+        <div class="prio-row" style="margin:0"><button class="prio-btn p3" id="mp3" onclick="setMP('p3')">P3 Standard</button><button class="prio-btn" id="mp2" onclick="setMP('p2')">P2 Urgent</button><button class="prio-btn" id="mp1" onclick="setMP('p1')">P1 Emergency</button></div>
+      </div>
+      <div class="fgroup"><label class="flabel">Department</label><select class="select" style="width:100%"><option>Baltimore Police Department (BPD)</option><option>Baltimore Fire &amp; EMS</option><option>Department of Public Works</option><option>Parks &amp; Recreation</option></select></div>
+      <div class="fgroup"><label class="flabel">Vehicle / Unit ID</label><input class="input" placeholder="e.g. PD-2241, FD-0012, DPW-0847..."/></div>
+      <div class="fgroup"><label class="flabel">Part Required</label><div class="ai-bar" style="margin:0"><input class="ai-inp" id="munic-inp" placeholder="Describe part or enter part number..."/><button class="btn-primary btn-sm" style="--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Search</button></div></div>
+      <div class="fgroup"><label class="flabel">Justification Notes</label><input class="input" placeholder="Unit out of service, patrol route gap..."/></div>
+      <button class="btn-primary" style="width:100%;justify-content:center;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Dispatch Order →</button>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center;margin-top:10px">P1 orders bypass queue · Guaranteed 20-min response SLA</div>
+    </div>
+
+    <!-- Fleet -->
+    <div class="panel" id="mp-fleet">
+      <div style="font-family:var(--fd);font-weight:700;font-size:22px;margin-bottom:18px">Fleet Vehicle Status</div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">BPD FLEET · 142 VEHICLES</div>
+        <div class="vrow"><div><div class="vid">PD-2241</div><div class="vtype">Ford Police Interceptor · Patrol</div></div><div><span class="badge br">OUT OF SERVICE</span><div style="font-size:11px;color:var(--muted);margin-top:4px">Parts ETA: 8 min</div></div></div>
+        <div class="vrow"><div><div class="vid">PD-1892</div><div class="vtype">Dodge Charger · District 5</div></div><span class="badge by">MAINTENANCE DUE</span></div>
+        <div class="vrow"><div><div class="vid">PD-0554</div><div class="vtype">Ford Explorer · K9 Unit</div></div><span class="badge bg">OPERATIONAL</span></div>
+        <div class="vrow"><div><div class="vid">PD-1123</div><div class="vtype">Chevy Tahoe · Command</div></div><span class="badge bg">OPERATIONAL</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">DPW FLEET · 89 VEHICLES</div>
+        <div class="vrow"><div><div class="vid">DPW-0412</div><div class="vtype">Freightliner Sanitation Truck</div></div><span class="badge by">MAINTENANCE DUE</span></div>
+        <div class="vrow"><div><div class="vid">DPW-0847</div><div class="vtype">Ford F-550 · Road Crew</div></div><span class="badge bg">OPERATIONAL</span></div>
+      </div>
+    </div>
+
+    <!-- SLA Reports -->
+    <div class="panel" id="mp-reports">
+      <div style="font-family:var(--fd);font-weight:700;font-size:22px;margin-bottom:18px">SLA Compliance Reports</div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:18px">THIS MONTH · ALL DEPARTMENTS</div>
+        <div class="sla-wrap"><div class="sla-hdr"><span>Police (BPD)</span><span style="font-family:var(--fm);font-size:12px;color:var(--green)">97%</span></div><div class="sla-bg"><div class="sla-fill" style="width:97%"></div></div></div>
+        <div style="height:10px"></div>
+        <div class="sla-wrap"><div class="sla-hdr"><span>Fire &amp; EMS</span><span style="font-family:var(--fm);font-size:12px;color:var(--green)">94%</span></div><div class="sla-bg"><div class="sla-fill" style="width:94%"></div></div></div>
+        <div style="height:10px"></div>
+        <div class="sla-wrap"><div class="sla-hdr"><span>Public Works</span><span style="font-family:var(--fm);font-size:12px;color:var(--yellow)">88%</span></div><div class="sla-bg"><div class="sla-fill" style="width:88%;background:linear-gradient(90deg,var(--yellow),var(--aw))"></div></div></div>
+        <div style="height:10px"></div>
+        <div class="sla-wrap"><div class="sla-hdr"><span>Parks &amp; Rec</span><span style="font-family:var(--fm);font-size:12px;color:var(--green)">96%</span></div><div class="sla-bg"><div class="sla-fill" style="width:96%"></div></div></div>
+      </div>
+      <div class="mrow">
+        <div class="ametric"><div class="am-val">287</div><div class="am-lbl">Orders This Month</div></div>
+        <div class="ametric"><div class="am-val" style="color:var(--green)">34 min</div><div class="am-lbl">Avg Delivery Time</div></div>
+        <div class="ametric"><div class="am-val" style="color:var(--green)">$0</div><div class="am-lbl">SLA Breach Refunds</div></div>
+      </div>
+      <button class="btn-ghost" style="width:100%;justify-content:center">📊 Export PDF / CSV</button>
+    </div>
+
+    <!-- Integrations -->
+    <div class="panel" id="mp-integrations">
+      <div style="font-family:var(--fd);font-weight:700;font-size:22px;margin-bottom:18px">System Integrations</div>
+      <div class="g2">
+        <div class="card card-glow"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">Sourcewell</div><span class="badge bg">Connected</span></div><div class="fd2" style="margin-bottom:12px">Cooperative purchasing pre-approved for 500+ municipalities.</div><button class="btn-ghost btn-sm" style="width:100%;justify-content:center">Manage Contract</button></div>
+        <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">SAP Procurement</div><span class="badge by">Pending</span></div><div class="fd2" style="margin-bottom:12px">ERP integration for automated PO generation and invoice matching.</div><button class="btn-primary btn-sm" style="width:100%;justify-content:center;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Configure →</button></div>
+        <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">Fleet Complete</div><span class="badge bb2">In Progress</span></div><div class="fd2" style="margin-bottom:12px">Fleet management system sync for parts-to-vehicle history.</div><button class="btn-ghost btn-sm" style="width:100%;justify-content:center">View Docs</button></div>
+        <div class="card card-glow"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div style="font-family:var(--fd);font-weight:700;font-size:18px">PartsTech API</div><span class="badge bg">Connected</span></div><div class="fd2" style="margin-bottom:12px">Live catalog from 200+ suppliers. Real-time pricing and inventory sync.</div><button class="btn-ghost btn-sm" style="width:100%;justify-content:center">API Status</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT ===== -->
+<div class="screen" id="screen-checkout">
+  <div class="aw">
+    <button class="back-btn" onclick="show('search')">← Back to results</button>
+    <span class="label">Order Checkout</span>
+    <div class="ph" style="margin-bottom:22px">Confirm &amp; Dispatch</div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">ORDER SUMMARY</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div style="flex:1"><div id="co-brand" style="font-family:var(--fd);font-weight:700;font-size:20px">Wagner ThermoQuiet</div><div id="co-sku" style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:3px">SKU QC1449</div><div id="co-supplier" style="font-size:13px;color:var(--muted);margin-top:6px">📍 O'Reilly – Catonsville</div><div style="margin-top:10px"><span class="badge bg" id="co-eta">⚡ 19 min ETA</span></div></div>
+        <div style="text-align:right;flex-shrink:0"><div id="co-price" style="font-family:var(--fd);font-weight:900;font-size:30px">$71</div><div style="font-size:12px;color:var(--muted)">part price</div></div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px">
+        <div class="crow"><span class="clabel">Part price</span><span class="cval" id="co-part-price">$71.00</span></div>
+        <div class="crow"><span class="clabel">Delivery fee</span><span class="cval">$18.00</span></div>
+        <div class="crow"><span class="clabel">Service fee</span><span class="cval">$4.00</span></div>
+        <div class="ctrow"><span class="ctlabel">Total</span><span class="ctval" id="co-total">$93</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">DELIVERY PRIORITY</div>
+      <div class="prio-row"><button class="prio-btn p3" id="cop3" onclick="setCP('p3')">P3 Standard</button><button class="prio-btn" id="cop2" onclick="setCP('p2')">P2 Urgent (+$8)</button><button class="prio-btn" id="cop1" onclick="setCP('p1')">P1 Rush (+$18)</button></div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">DELIVERY DETAILS</div>
+      <div class="fgroup"><label class="flabel">Shop / Business Name</label><input class="input" placeholder="e.g. Eastside Auto Repair"/></div>
+      <div class="fgroup"><label class="flabel">Delivery Address</label><input class="input" placeholder="1234 Baltimore Ave, Baltimore MD 21201"/></div>
+      <div class="fgroup"><label class="flabel">Phone (SMS Updates)</label><input class="input" placeholder="(410) 555-0100" type="tel"/></div>
+    </div>
+    <button class="btn-primary" id="pay-btn" onclick="placeOrder()" style="width:100%;margin-top:16px;font-size:18px;padding:16px;letter-spacing:2px;justify-content:center">💳 Pay &amp; Dispatch Driver →</button>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center;margin-top:10px">🔒 Secured by Stripe · Delivery guaranteed or full refund</div>
+  </div>
+</div>
+
+<!-- ===== TRACKING ===== -->
+<div class="screen" id="screen-tracking">
+  <div class="aw">
+    <span class="label">Live Tracking</span>
+    <div class="ph" style="margin-bottom:4px">Driver En Route</div>
+    <p style="font-size:15px;color:var(--muted);margin-bottom:22px">Your <strong id="track-part" style="color:var(--text)">Wagner ThermoQuiet</strong> is on its way</p>
+    <div class="eta-banner">
+      <div><div class="eta-label">ESTIMATED ARRIVAL</div><div class="eta-number" id="eta-disp">19 MIN</div></div>
+      <div style="text-align:right"><div style="font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.6);margin-bottom:4px">Driver</div><div class="dname">Marcus D.</div><div class="dmeta">⭐ 4.9 · 412 deliveries</div></div>
+    </div>
+    <div class="map-box">
+      <div class="map-grid"></div><div class="map-glow"></div>
+      <svg id="track-svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent);stop-opacity:.3"/><stop offset="100%" style="stop-color:var(--accent);stop-opacity:.9"/></linearGradient></defs>
+        <path id="route-path" d="M 28% 26% Q 44% 14% 62% 66%" fill="none" stroke="url(#rg)" stroke-width="2.5" stroke-dasharray="8,5"/>
+        <circle cx="28%" cy="26%" r="5" fill="var(--s2)" stroke="var(--border2)" stroke-width="2"/>
+        <circle cx="62%" cy="66%" r="16" fill="none" stroke="var(--accent)" stroke-width="1" opacity=".3"><animate attributeName="r" values="10;20;10" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0;.4" dur="2s" repeatCount="indefinite"/></circle>
+        <circle cx="62%" cy="66%" r="7" fill="var(--accent)" opacity=".9"/>
+        <circle id="drv-dot" cx="28%" cy="26%" r="8" fill="var(--accent)" style="filter:drop-shadow(0 0 6px var(--accent))"/>
+        <text id="drv-car" x="28%" y="29%" text-anchor="middle" font-size="11">🚗</text>
+      </svg>
+      <div class="mpin" style="left:18%;top:13%">📦 O'Reilly</div>
+      <div class="mpin a" style="left:57%;top:69%">🔧 Your Shop</div>
+    </div>
+    <div class="card" id="track-steps" style="margin-bottom:16px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-ghost" style="flex:1;justify-content:center" onclick="show('search')">New Order</button>
+      <button class="btn-primary" style="flex:2;justify-content:center" id="adv-btn" onclick="advStep()">Advance Status ⟶ (Demo)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DRIVER ===== -->
+<div class="screen" id="screen-driver">
+  <div class="aw">
+    <span class="label">Driver Mode</span>
+    <div class="ph" style="margin-bottom:4px">Driver Dashboard</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:22px">Marcus D. · Baltimore Zone A · <span class="live-dot"></span>Online</p>
+    <div class="earn-grid">
+      <div class="earn-cell"><div class="earn-num" style="color:var(--green)">$142</div><div class="earn-lbl">Today</div></div>
+      <div class="earn-cell"><div class="earn-num">9</div><div class="earn-lbl">Deliveries</div></div>
+      <div class="earn-cell"><div class="earn-num" style="color:var(--yellow)">4.9★</div><div class="earn-lbl">Rating</div></div>
+    </div>
+    <div class="srow2">
+      <button class="sbtn2 on" id="drv-on" onclick="drvStatus('on')">🟢 Available</button>
+      <button class="sbtn2" id="drv-off" onclick="drvStatus('off')">⚫ Offline</button>
+    </div>
+    <div id="job-wrap">
+      <div class="job-card">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--aw);letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;animation:livePulse 1.5s infinite"></span>INCOMING JOB</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div><div style="font-family:var(--fd);font-weight:700;font-size:18px">Brake Pads – Wagner ThermoQuiet</div><div style="font-size:13px;color:var(--muted);margin-top:4px">Pickup: O'Reilly – Catonsville</div><div style="font-size:13px;color:var(--muted)">Drop: Eastside Auto Repair</div></div>
+          <div style="text-align:right"><div style="font-family:var(--fd);font-weight:900;font-size:30px;color:var(--green)">$18</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">~22 min round trip</div></div>
+        </div>
+        <div style="display:flex;gap:10px"><button class="btn-primary" style="flex:2;justify-content:center" onclick="show('tracking')">Accept Job</button><button class="btn-ghost" style="flex:1;justify-content:center" onclick="document.getElementById('job-wrap').style.display='none'">Pass</button></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">RECENT DELIVERIES</div>
+      <div class="del-item"><div><div style="font-size:14px">Alternator – Bosch</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Precision Imports · 10:12 AM</div></div><div style="font-family:var(--fd);font-weight:700;font-size:20px;color:var(--green)">$22</div></div>
+      <div class="del-item"><div><div style="font-size:14px">Battery – Optima Red</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Highlandtown Tire · 9:44 AM</div></div><div style="font-family:var(--fd);font-weight:700;font-size:20px;color:var(--green)">$18</div></div>
+      <div class="del-item"><div><div style="font-size:14px">Oil Filter (x6)</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">Fleet Plus · 8:55 AM</div></div><div style="font-family:var(--fd);font-weight:700;font-size:20px;color:var(--green)">$26</div></div>
+    </div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--muted);text-align:center">PartsFlow drivers avg <strong style="color:var(--yellow)">$24–31/hr</strong> vs $15/hr industry standard</div>
+  </div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div class="screen" id="screen-admin">
+  <div class="admin-layout">
+    <div class="admin-sb">
+      <div class="anav-section">Operations</div>
+      <div class="anav-item active" onclick="apanel('overview')"><span>📊</span>Overview</div>
+      <div class="anav-item" onclick="apanel('orders')"><span>📦</span>Orders</div>
+      <div class="anav-item" onclick="apanel('drivers')"><span>🚗</span>Drivers</div>
+      <div class="anav-item" onclick="apanel('zones')"><span>🗺</span>Zones</div>
+      <div class="anav-section">Business</div>
+      <div class="anav-item" onclick="apanel('suppliers')"><span>🏪</span>Suppliers</div>
+      <div class="anav-item" onclick="apanel('customers')"><span>🔧</span>Customers</div>
+      <div class="anav-item" onclick="apanel('finance')"><span>💰</span>Finance</div>
+      <div class="anav-item" onclick="apanel('referrals')"><span>🤝</span>Referrals</div>
+      <div class="anav-section">System</div>
+      <div class="anav-item" onclick="apanel('sla')"><span>📋</span>SLA Monitor</div>
+      <div class="anav-item" onclick="apanel('settings')"><span>⚙</span>Settings</div>
+    </div>
+    <div class="admin-main">
+
+      <!-- Overview -->
+      <div class="panel active" id="ap-overview">
+        <div class="apg-title">Operations Overview <span class="live-dot"></span></div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val" style="color:var(--green)">$4,820</div><div class="am-lbl">Revenue Today</div><div class="am-delta up">↑ 12% vs yesterday</div></div>
+          <div class="ametric"><div class="am-val">47</div><div class="am-lbl">Orders Today</div><div class="am-delta up">↑ 8 from avg</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--green)">31 min</div><div class="am-lbl">Avg Delivery</div><div class="am-delta up">↓ 4 min vs last wk</div></div>
+          <div class="ametric"><div class="am-val">94%</div><div class="am-lbl">SLA Compliance</div><div class="am-delta up">↑ 1.2% this week</div></div>
+        </div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val">23</div><div class="am-lbl">Active Drivers</div><div class="am-delta" style="color:var(--yellow)">3 in surge zone</div></div>
+          <div class="ametric"><div class="am-val">12</div><div class="am-lbl">Orders In Flight</div><div class="am-delta" style="color:var(--blue)">2 municipal P1</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--yellow)">3</div><div class="am-lbl">SLA Alerts</div><div class="am-delta dn">Needs attention</div></div>
+          <div class="ametric"><div class="am-val">$142K</div><div class="am-lbl">Monthly Run Rate</div><div class="am-delta up">↑ 28% MoM</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:var(--fd);font-weight:700;font-size:20px">Live Order Feed</div><span class="badge bg"><span class="live-dot" style="width:6px;height:6px;margin-right:0"></span>Real-time</span></div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Order ID</th><th>Part</th><th>Customer</th><th>Driver</th><th>ETA</th><th>Status</th><th>Revenue</th></tr></thead>
+          <tbody>
+            <tr><td><span style="font-family:var(--fm)">#PF-4821</span></td><td>Wagner Brake Pads</td><td>Eastside Auto</td><td>Marcus D.</td><td><span style="color:var(--green)">8 min</span></td><td><span class="badge bo">En Route</span></td><td style="font-family:var(--fd);font-weight:700">$89</td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4820</span></td><td>Bosch Alternator</td><td>Precision Imports</td><td>Keisha M.</td><td><span style="color:var(--green)">14 min</span></td><td><span class="badge bo">En Route</span></td><td style="font-family:var(--fd);font-weight:700">$156</td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4819</span></td><td>Police Interceptor Belt</td><td>BPD Fleet</td><td>David W.</td><td><span style="color:var(--red)">P1 Rush</span></td><td><span class="badge br">Priority</span></td><td style="font-family:var(--fd);font-weight:700">$94</td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4818</span></td><td>ACDelco Battery</td><td>Fleet Plus</td><td>Rosa L.</td><td style="color:var(--muted)">Delivered</td><td><span class="badge bg">Complete</span></td><td style="font-family:var(--fd);font-weight:700">$112</td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4817</span></td><td>Starter Motor</td><td>Highlandtown Tire</td><td>—</td><td style="color:var(--muted)">Assigning</td><td><span class="badge by">Dispatching</span></td><td style="font-family:var(--fd);font-weight:700">$178</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- Orders -->
+      <div class="panel" id="ap-orders">
+        <div class="apg-title">Order Management</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <select class="select"><option>All Statuses</option><option>In Flight</option><option>Priority</option><option>Delivered</option><option>Issues</option></select>
+          <select class="select"><option>All Customers</option><option>Shops</option><option>Municipal</option></select>
+          <select class="select"><option>Today</option><option>This Week</option><option>This Month</option></select>
+          <input class="input" placeholder="Search order ID..." style="flex:1;min-width:140px"/>
+        </div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Order ID</th><th>Part</th><th>Customer</th><th>Supplier</th><th>Driver</th><th>ETA</th><th>Priority</th><th>Revenue</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span style="font-family:var(--fm)">#PF-4821</span></td><td>Wagner Brake Pads</td><td>Eastside Auto</td><td>O'Reilly–Catonsville</td><td>Marcus D.</td><td>8 min</td><td><span class="badge bg">P3</span></td><td>$89</td><td><span class="badge bo">En Route</span></td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4819</span></td><td>Police Int. Belt</td><td>BPD Fleet</td><td>Advance–Towson</td><td>David W.</td><td>P1 Rush</td><td><span class="badge br">P1</span></td><td>$94</td><td><span class="badge br">Priority</span></td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4818</span></td><td>ACDelco Battery</td><td>Fleet Plus</td><td>NAPA–Essex</td><td>Rosa L.</td><td>10:44 AM</td><td><span class="badge bg">P3</span></td><td>$112</td><td><span class="badge bg">Delivered</span></td></tr>
+            <tr><td><span style="font-family:var(--fm)">#PF-4815</span></td><td>Fire Engine Pads</td><td>BFEMS Fleet</td><td>Parts Authority</td><td>James K.</td><td>22 min</td><td><span class="badge by">P2</span></td><td>$148</td><td><span class="badge bo">En Route</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- Drivers -->
+      <div class="panel" id="ap-drivers">
+        <div class="apg-title">Driver Management</div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val" style="color:var(--green)">23</div><div class="am-lbl">Online Now</div></div>
+          <div class="ametric"><div class="am-val">7</div><div class="am-lbl">Offline</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--yellow)">4.82</div><div class="am-lbl">Avg Rating</div></div>
+          <div class="ametric"><div class="am-val">$142</div><div class="am-lbl">Avg Day Earnings</div></div>
+        </div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Driver</th><th>Zone</th><th>Status</th><th>Deliveries</th><th>Earnings</th><th>Rating</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Marcus D.</td><td>Zone A</td><td><span class="badge bg">Active</span></td><td>9</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$142</td><td>⭐ 4.9</td><td><button class="btn-ghost btn-sm">View</button></td></tr>
+            <tr><td>Keisha M.</td><td>Zone B</td><td><span class="badge bg">Active</span></td><td>7</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$118</td><td>⭐ 4.8</td><td><button class="btn-ghost btn-sm">View</button></td></tr>
+            <tr><td>David W.</td><td>Zone A</td><td><span class="badge bo">En Route</span></td><td>11</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$198</td><td>⭐ 4.95</td><td><button class="btn-ghost btn-sm">View</button></td></tr>
+            <tr><td>Rosa L.</td><td>Zone C</td><td><span class="badge bg">Active</span></td><td>5</td><td style="color:var(--green);font-family:var(--fd);font-weight:700">$84</td><td>⭐ 4.7</td><td><button class="btn-ghost btn-sm">View</button></td></tr>
+          </tbody>
+        </table></div>
+        <button class="btn-primary" style="margin-top:14px">+ Onboard New Driver</button>
+      </div>
+
+      <!-- Zones -->
+      <div class="panel" id="ap-zones">
+        <div class="apg-title">Zone Management</div>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:16px">Click a zone to adjust drivers, surge multipliers, and supplier assignments.</p>
+        <div class="zone-grid">
+          <div class="zone-cell hot"><div class="zone-name">ZONE A · Downtown</div><div class="zone-num" style="color:var(--aw)">9 drivers</div><div style="font-family:var(--fm);font-size:9px;color:var(--aw);margin-top:4px">🔥 Surge 1.4x</div></div>
+          <div class="zone-cell"><div class="zone-name">ZONE B · East Side</div><div class="zone-num">6 drivers</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:4px">Normal</div></div>
+          <div class="zone-cell"><div class="zone-name">ZONE C · Catonsville</div><div class="zone-num">4 drivers</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:4px">Normal</div></div>
+          <div class="zone-cell"><div class="zone-name">ZONE D · Towson</div><div class="zone-num">3 drivers</div><div style="font-family:var(--fm);font-size:9px;color:var(--muted);margin-top:4px">Normal</div></div>
+          <div class="zone-cell"><div class="zone-name">ZONE E · Essex</div><div class="zone-num">2 drivers</div><div style="font-family:var(--fm);font-size:9px;color:var(--yellow);margin-top:4px">⚠ Under-served</div></div>
+          <div class="zone-cell"><div class="zone-name">ZONE F · Dundalk</div><div class="zone-num" style="color:var(--red)">1 driver</div><div style="font-family:var(--fm);font-size:9px;color:var(--red);margin-top:4px">⛔ Critical</div></div>
+        </div>
+        <button class="btn-primary">+ Add Zone</button>
+      </div>
+
+      <!-- Suppliers -->
+      <div class="panel" id="ap-suppliers">
+        <div class="apg-title">Supplier Management</div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Supplier</th><th>Zone</th><th>Parts</th><th>Orders/Mo</th><th>Avg Pickup</th><th>Reliability</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>O'Reilly – Catonsville</td><td>C</td><td style="font-family:var(--fm)">42,800</td><td>312</td><td style="color:var(--green)">4.2 min</td><td><div class="rev-bar" style="width:94%"></div><span style="font-family:var(--fm);font-size:10px">94%</span></td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Advance Auto – Towson</td><td>D</td><td style="font-family:var(--fm)">38,200</td><td>241</td><td>6.8 min</td><td><div class="rev-bar" style="width:88%"></div><span style="font-family:var(--fm);font-size:10px">88%</span></td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>NAPA – Essex</td><td>E</td><td style="font-family:var(--fm)">29,500</td><td>178</td><td>8.1 min</td><td><div class="rev-bar" style="width:91%"></div><span style="font-family:var(--fm);font-size:10px">91%</span></td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Parts Authority – Dundalk</td><td>F</td><td style="font-family:var(--fm)">51,000</td><td>389</td><td style="color:var(--green)">3.9 min</td><td><div class="rev-bar" style="width:96%"></div><span style="font-family:var(--fm);font-size:10px">96%</span></td><td><span class="badge bg">Active</span></td></tr>
+          </tbody>
+        </table></div>
+        <button class="btn-primary" style="margin-top:14px">+ Add Supplier</button>
+      </div>
+
+      <!-- Customers -->
+      <div class="panel" id="ap-customers">
+        <div class="apg-title">Customer Accounts</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap"><select class="select"><option>All Accounts</option><option>Shop Pro</option><option>Pay-As-You-Go</option><option>Municipal</option></select><input class="input" placeholder="Search shop name..." style="flex:1"/></div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Shop</th><th>Plan</th><th>Orders/Mo</th><th>MRR</th><th>Last Order</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Eastside Auto Repair</td><td><span class="badge bo">Shop Pro</span></td><td>176</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$5,600</td><td>2 min ago</td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Precision Imports</td><td><span class="badge bo">Shop Pro</span></td><td>94</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$3,200</td><td>1 hr ago</td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Baltimore City (BPD)</td><td><span class="badge bb2">Municipal</span></td><td>287</td><td style="font-family:var(--fd);font-weight:700;color:var(--blue)">$8,420</td><td>8 min ago</td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Fleet Plus</td><td><span class="badge bo">Shop Pro</span></td><td>142</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$4,800</td><td>3 hr ago</td><td><span class="badge bg">Active</span></td></tr>
+            <tr><td>Highlandtown Tire</td><td><span class="badge by">Pay-As-You-Go</span></td><td>34</td><td style="font-family:var(--fd);font-weight:700;color:var(--yellow)">$680</td><td>Yesterday</td><td><span class="badge bg">Active</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- Finance -->
+      <div class="panel" id="ap-finance">
+        <div class="apg-title">Financial Overview</div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val" style="color:var(--green)">$142K</div><div class="am-lbl">Monthly Run Rate</div><div class="am-delta up">↑ 28% MoM</div></div>
+          <div class="ametric"><div class="am-val">$1.7M</div><div class="am-lbl">ARR Projected</div><div class="am-delta up">↑ 22% vs plan</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--yellow)">$18,200</div><div class="am-lbl">Referral Payouts</div><div class="am-delta up">↑ 34% — healthy</div></div>
+          <div class="ametric"><div class="am-val">68%</div><div class="am-lbl">Gross Margin</div><div class="am-delta up">↑ 3pts this month</div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">REVENUE BREAKDOWN</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px">Local Shops (delivery fees)</span><span style="font-family:var(--fd);font-weight:700">$84,200 · 59%</span></div><div style="height:8px;background:var(--s3);border-radius:4px"><div style="height:100%;width:59%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--a2))"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px">Municipal Contracts</span><span style="font-family:var(--fd);font-weight:700">$42,800 · 30%</span></div><div style="height:8px;background:var(--s3);border-radius:4px"><div style="height:100%;width:30%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--bb))"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px">Shop Pro Subscriptions</span><span style="font-family:var(--fd);font-weight:700">$15,600 · 11%</span></div><div style="height:8px;background:var(--s3);border-radius:4px"><div style="height:100%;width:11%;border-radius:4px;background:var(--green)"></div></div></div>
+          </div>
+        </div>
+        <button class="btn-ghost" style="width:100%;justify-content:center">📊 Export Financial Report</button>
+      </div>
+
+      <!-- Referrals admin -->
+      <div class="panel" id="ap-referrals">
+        <div class="apg-title">Referral Program Management</div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val" style="color:var(--green)">142</div><div class="am-lbl">Active Referrers</div></div>
+          <div class="ametric"><div class="am-val">38</div><div class="am-lbl">Shops Referred</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--yellow)">$18,200</div><div class="am-lbl">Payouts / Month</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--blue)">3</div><div class="am-lbl">Municipal Referrals</div></div>
+        </div>
+        <div style="overflow-x:auto"><table class="dtable">
+          <thead><tr><th>Referrer</th><th>Tier</th><th>Active Accounts</th><th>Deliveries/Mo</th><th>Monthly Payout</th><th>YTD Earned</th></tr></thead>
+          <tbody>
+            <tr><td>James O. (Fleet Mgr)</td><td><span class="badge bb2">Municipal Connector</span></td><td>1 city dept</td><td>287</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$1,435</td><td style="font-family:var(--fd);font-weight:700">$8,610</td></tr>
+            <tr><td>Tanya R.</td><td><span class="badge bo">Accelerator</span></td><td>14</td><td>1,840</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$9,200</td><td style="font-family:var(--fd);font-weight:700">$52,400</td></tr>
+            <tr><td>Marcus T.</td><td><span class="badge by">Ignition</span></td><td>6</td><td>420</td><td style="font-family:var(--fd);font-weight:700;color:var(--green)">$1,470</td><td style="font-family:var(--fd);font-weight:700">$6,820</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- SLA -->
+      <div class="panel" id="ap-sla">
+        <div class="apg-title">SLA Compliance Monitor</div>
+        <div class="mrow">
+          <div class="ametric"><div class="am-val" style="color:var(--green)">94%</div><div class="am-lbl">Overall Compliance</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--yellow)">3</div><div class="am-lbl">Breaches Today</div></div>
+          <div class="ametric"><div class="am-val" style="color:var(--green)">$0</div><div class="am-lbl">Refunds Issued</div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">SLA BY SEGMENT</div>
+          <div class="sla-wrap"><div class="sla-hdr"><span style="font-size:13px;color:var(--t2)">Local Shops – Standard</span><span style="font-family:var(--fm);font-size:12px;color:var(--green)">96%</span></div><div class="sla-bg"><div class="sla-fill" style="width:96%"></div></div></div>
+          <div style="height:10px"></div>
+          <div class="sla-wrap"><div class="sla-hdr"><span style="font-size:13px;color:var(--t2)">Municipal P1 Emergency</span><span style="font-family:var(--fm);font-size:12px;color:var(--green)">98%</span></div><div class="sla-bg"><div class="sla-fill" style="width:98%;background:linear-gradient(90deg,var(--blue),var(--bb))"></div></div></div>
+          <div style="height:10px"></div>
+          <div class="sla-wrap"><div class="sla-hdr"><span style="font-size:13px;color:var(--t2)">Zone F (Dundalk) – All</span><span style="font-family:var(--fm);font-size:12px;color:var(--red)">71%</span></div><div class="sla-bg"><div class="sla-fill" style="width:71%;background:linear-gradient(90deg,var(--red),var(--aw))"></div></div></div>
+        </div>
+        <div class="sla-alert"><div style="font-family:var(--fd);font-weight:700;font-size:16px;color:var(--red);margin-bottom:6px">⚠ Alert: Zone F Under-Coverage</div><div style="font-size:13px;color:var(--t2)">Zone F (Dundalk) is at 71% SLA. Only 1 active driver. Recommend: deploy 2 additional drivers at 1.6x surge.</div><button class="btn-primary" style="margin-top:12px;--accent:var(--red);--ah:#cc0000;--ag:var(--rd)">Deploy Surge Drivers →</button></div>
+      </div>
+
+      <!-- Settings -->
+      <div class="panel" id="ap-settings">
+        <div class="apg-title">Platform Settings</div>
+        <div class="g2">
+          <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:14px">SLA Thresholds</div><div class="fgroup"><label class="flabel">Standard SLA (min)</label><input class="input" value="60"/></div><div class="fgroup"><label class="flabel">P2 Urgent (min)</label><input class="input" value="40"/></div><div class="fgroup"><label class="flabel">P1 Emergency (min)</label><input class="input" value="20"/></div><button class="btn-primary btn-sm">Save</button></div>
+          <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:14px">Pricing Config</div><div class="fgroup"><label class="flabel">Base Delivery Fee ($)</label><input class="input" value="18"/></div><div class="fgroup"><label class="flabel">Service Fee ($)</label><input class="input" value="4"/></div><div class="fgroup"><label class="flabel">Surge Multiplier (max)</label><input class="input" value="2.0"/></div><button class="btn-primary btn-sm">Save</button></div>
+          <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:14px">Referral Rates</div><div class="fgroup"><label class="flabel">Tier 1 Activation ($)</label><input class="input" value="50"/></div><div class="fgroup"><label class="flabel">Tier 2 Per-Delivery ($)</label><input class="input" value="3.50"/></div><div class="fgroup"><label class="flabel">Municipal Pilot Bonus ($)</label><input class="input" value="500"/></div><button class="btn-primary btn-sm">Update</button></div>
+          <div class="card"><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:14px">API Keys</div><div class="fgroup"><label class="flabel">PartsTech API</label><input class="input" value="••••••••••••••••" type="password"/></div><div class="fgroup"><label class="flabel">Stripe Secret</label><input class="input" value="••••••••••••••••" type="password"/></div><div class="fgroup"><label class="flabel">Twilio SMS SID</label><input class="input" value="••••••••••••••••" type="password"/></div><button class="btn-primary btn-sm">Save Keys</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REFERRAL HUB ===== -->
+<div class="screen" id="screen-referral">
+  <div class="aw" style="max-width:860px">
+    <span class="label">Referral Program</span>
+    <div class="ph" style="margin-bottom:4px">Earn With PartsFlow</div>
+    <p style="font-size:15px;color:var(--muted);margin-bottom:28px">Refer shops, fleets, and city contracts. Earn residuals for life — no cap, no expiration.</p>
+    <!-- Ref link box -->
+    <div class="card" style="margin-bottom:28px;background:linear-gradient(135deg,rgba(255,106,0,.08),rgba(255,214,0,.04));border-color:var(--accent)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div><div style="font-family:var(--fd);font-weight:700;font-size:20px;margin-bottom:6px">Your Referral Link</div><div style="font-family:var(--fm);font-size:14px;color:var(--aw)">partsflow.com/ref/yourname</div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-ghost btn-sm" onclick="alert('Link copied!')">📋 Copy Link</button><button class="btn-primary btn-sm">📊 Dashboard</button></div>
+      </div>
+      <div class="ref-dash">
+        <div style="text-align:center"><div class="rdstat-val" style="color:var(--green)">$0</div><div class="rdstat-lbl">YTD Earned</div></div>
+        <div style="text-align:center"><div class="rdstat-val">0</div><div class="rdstat-lbl">Active Referrals</div></div>
+        <div style="text-align:center"><div class="rdstat-val">0</div><div class="rdstat-lbl">Deliveries / Mo</div></div>
+        <div style="text-align:center"><div class="rdstat-val" style="color:var(--aw)">Spark</div><div class="rdstat-lbl">Current Tier</div></div>
+      </div>
+    </div>
+
+    <span class="label" style="margin-bottom:18px">Consumer Referral Tiers</span>
+    <div class="g2" style="margin-bottom:28px">
+      <div class="tier-card"><div class="tier-icon">🔥</div><div class="tier-name">Spark</div><div class="tier-sub">1–3 Active Referrals</div><div class="tier-earn">$50</div><div class="tier-per">per activation + $2/delivery (90 days)</div><div class="tier-feat"><span class="tchk">→</span>$50 cash per shop activated</div><div class="tier-feat"><span class="tchk">→</span>$2/delivery, first 90 days</div><div class="tier-feat"><span class="tchk">→</span>Personal referral dashboard</div></div>
+      <div class="tier-card feat"><div class="tier-icon">⚡</div><div class="tier-name">Ignition</div><div class="tier-sub">4–10 Active Referrals</div><div class="tier-earn">$75</div><div class="tier-per">per activation + $3.50/delivery (permanent)</div><div class="tier-feat"><span class="tchk">→</span>$75 cash per activation</div><div class="tier-feat"><span class="tchk">→</span>$3.50/delivery — no expiration</div><div class="tier-feat"><span class="tchk">→</span>Priority support line</div></div>
+      <div class="tier-card"><div class="tier-icon">🏆</div><div class="tier-name">Accelerator</div><div class="tier-sub">11–25 Active Referrals</div><div class="tier-earn">$100</div><div class="tier-per">per activation + $5/delivery (lifetime)</div><div class="tier-feat"><span class="tchk">→</span>$100 cash per activation</div><div class="tier-feat"><span class="tchk">→</span>$5/delivery for life of account</div><div class="tier-feat"><span class="tchk">→</span>Co-branded marketing materials</div></div>
+      <div class="tier-card" style="border-color:var(--yellow)"><div class="tier-icon">🏅</div><div class="tier-name">Fleet Partner</div><div class="tier-sub">26+ Referrals or One Municipal</div><div class="tier-earn" style="color:var(--yellow)">$150</div><div class="tier-per">per activation + 3% gross revenue (all accounts)</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>$150 per shop activation</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>3% gross — quarterly check</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>Named in PartsFlow literature</div></div>
+    </div>
+
+    <span class="label" style="color:var(--blue);margin-bottom:8px">Municipal &amp; Government Referral Tiers</span>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px">For fleet managers, procurement officers, city employees, consultants, and anyone with influence in city/state auto parts contracts.</p>
+    <div class="g2" style="margin-bottom:28px">
+      <div class="tier-card munic"><div class="tier-icon">🏛</div><div class="tier-name">Municipal Connector</div><div class="tier-sub">1 Department Pilot Signed</div><div class="tier-earn blue">$500</div><div class="tier-per">per dept pilot + 2% of year-1 contract (quarterly)</div><div class="tier-feat"><span class="tchk b">→</span>$500 bonus per department pilot</div><div class="tier-feat"><span class="tchk b">→</span>2% of year-1 contract value</div><div class="tier-feat"><span class="tchk b">→</span>For: fleet managers, procurement officers, city aides</div><button class="btn-primary btn-sm" style="margin-top:14px;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Apply →</button></div>
+      <div class="tier-card munic"><div class="tier-icon">🌐</div><div class="tier-name">Sourcewell Ambassador</div><div class="tier-sub">Multi-City / Cooperative Contracts</div><div class="tier-earn blue">$2,000</div><div class="tier-per">flat fee + 1% of all Sourcewell revenue (24 months)</div><div class="tier-feat"><span class="tchk b">→</span>$2K flat fee on contract execution</div><div class="tier-feat"><span class="tchk b">→</span>1% Sourcewell revenue for 24 months</div><div class="tier-feat"><span class="tchk b">→</span>For: state procurement officials, coop purchasing officers</div><button class="btn-primary btn-sm" style="margin-top:14px;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Apply →</button></div>
+      <div class="tier-card munic"><div class="tier-icon">🔑</div><div class="tier-name">City Contract Closer</div><div class="tier-sub">Full City/County Contract Closed</div><div class="tier-earn blue">5%</div><div class="tier-per">of total contract value year 1 + 2% ongoing</div><div class="tier-feat"><span class="tchk b">→</span>5% of contract value paid at signing</div><div class="tier-feat"><span class="tchk b">→</span>2% ongoing for contract duration</div><div class="tier-feat"><span class="tchk b">→</span>For: lobbyists, consultants, former procurement directors</div><button class="btn-primary btn-sm" style="margin-top:14px;--accent:var(--blue);--ah:#1260CC;--ag:var(--bg2)">Discuss →</button></div>
+      <div class="tier-card munic" style="border-color:var(--yellow)"><div class="tier-icon">⭐</div><div class="tier-name">State Influencer</div><div class="tier-sub">State-Level / MDOT / MGA Programs</div><div class="tier-earn" style="color:var(--yellow)">Custom</div><div class="tier-per">negotiate directly — equity stake available for transformative deals</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>Equity or revenue share — negotiated</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>For: state legislators, MDOT/MDE officials, MGA contacts</div><div class="tier-feat"><span class="tchk" style="color:var(--yellow)">→</span>Statewide fleet contracts worth $2M+</div><button class="btn-ghost btn-sm" style="margin-top:14px;border-color:var(--yellow);color:var(--yellow)">Contact Founders →</button></div>
+    </div>
+
+    <span class="label" style="margin-bottom:18px">Milestone Rewards</span>
+    <div style="margin-bottom:28px">
+      <div class="ms-row"><div class="ms-icon">🔥</div><div><div class="ms-title">First Burn</div><div class="ms-desc">First referral activated</div></div><div class="ms-reward">+$25</div></div>
+      <div class="ms-row"><div class="ms-icon">⚡</div><div><div class="ms-title">Five Alive</div><div class="ms-desc">5 shops referred</div></div><div class="ms-reward">Gear Pack</div></div>
+      <div class="ms-row"><div class="ms-icon">💰</div><div><div class="ms-title">Stack Club</div><div class="ms-desc">$500 earned in residuals</div></div><div class="ms-reward">Newsletter Feature</div></div>
+      <div class="ms-row" style="border-color:var(--blue)"><div class="ms-icon">🏛</div><div><div class="ms-title">City Maker</div><div class="ms-desc">First municipal referral closes</div></div><div class="ms-reward" style="color:var(--bb)">+$500</div></div>
+      <div class="ms-row"><div class="ms-icon">🚀</div><div><div class="ms-title">Top Producer</div><div class="ms-desc">$2,000+/month in residuals</div></div><div class="ms-reward">Custom Deal</div></div>
+    </div>
+
+    <div class="cta-section" style="border-radius:12px;position:relative">
+      <div class="cta-h" style="font-size:clamp(28px,5vw,52px)">Ready to earn?</div>
+      <p class="cta-sub" style="font-size:15px">Share your link. Get paid every month. No cap, no expiration.</p>
+      <div class="cta-row">
+        <input class="cta-input" placeholder="Your name" style="max-width:170px;min-width:130px"/>
+        <input class="cta-input" placeholder="Email address" style="min-width:190px"/>
+        <button class="btn-primary" style="background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);box-shadow:none">Get My Link →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ACCOUNT ===== -->
+<div class="screen" id="screen-account">
+  <div class="aw">
+    <span class="label">Shop Account</span>
+    <div class="ph" style="margin-bottom:4px">Eastside Auto Repair</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:22px">Shop Pro · Baltimore, MD · Member since Jan 2025</p>
+    <div class="acct-stats">
+      <div class="astat"><div class="astat-val">176</div><div class="astat-lbl">Orders / Month</div></div>
+      <div class="astat"><div class="astat-val" style="color:var(--green)">34 min</div><div class="astat-lbl">Avg Delivery</div></div>
+      <div class="astat"><div class="astat-val" style="color:var(--aw)">$5,600</div><div class="astat-lbl">Spend / Month</div></div>
+      <div class="astat"><div class="astat-val" style="color:var(--yellow)">62 hrs</div><div class="astat-lbl">Time Saved</div></div>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="acctTab('history')">Order History</button>
+      <button class="tab" onclick="acctTab('vehicles')">Saved Vehicles</button>
+      <button class="tab" onclick="acctTab('billing')">Billing</button>
+    </div>
+    <div class="panel active" id="acct-history">
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">ORDER HISTORY · THIS MONTH</div>
+        <div class="ord-item"><div style="flex:1"><div class="ord-part">Wagner ThermoQuiet Brake Pads</div><div class="ord-meta">O'Reilly – Catonsville · Today 10:42 AM · 19 min delivery</div></div><div><div class="ord-price">$89</div><button class="btn-ghost btn-sm" style="margin-top:6px" onclick="qs('Brake Pads')">Reorder</button></div></div>
+        <div class="ord-item"><div style="flex:1"><div class="ord-part">Bosch Alternator</div><div class="ord-meta">Advance Auto – Towson · Yesterday 2:15 PM · 28 min delivery</div></div><div><div class="ord-price">$156</div><button class="btn-ghost btn-sm" style="margin-top:6px" onclick="qs('Alternator')">Reorder</button></div></div>
+        <div class="ord-item"><div style="flex:1"><div class="ord-part">Optima RedTop Battery</div><div class="ord-meta">NAPA – Essex · Apr 22 · 44 min delivery</div></div><div><div class="ord-price">$178</div><button class="btn-ghost btn-sm" style="margin-top:6px" onclick="qs('Battery')">Reorder</button></div></div>
+        <div class="ord-item"><div style="flex:1"><div class="ord-part">ACDelco Oil Filters (x6)</div><div class="ord-meta">Parts Authority – Dundalk · Apr 21 · 35 min delivery</div></div><div><div class="ord-price">$94</div><button class="btn-ghost btn-sm" style="margin-top:6px">Reorder</button></div></div>
+      </div>
+    </div>
+    <div class="panel" id="acct-vehicles">
+      <div class="g2">
+        <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">🚗</div><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:4px">2019 Honda Civic</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:12px">VIN: 2HGFC2F54KH123456</div><button class="btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="qs('2019 Honda Civic brake pads')">Find Parts</button></div>
+        <div class="card card-glow"><div style="font-size:28px;margin-bottom:10px">🚙</div><div style="font-family:var(--fd);font-weight:700;font-size:18px;margin-bottom:4px">2017 Ford F-150</div><div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:12px">VIN: 1FTFW1ET5HFB12345</div><button class="btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="qs('2017 Ford F-150 alternator')">Find Parts</button></div>
+        <div class="card" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:120px;gap:8px" onclick="setMode('consumer');show('search')"><div style="font-size:28px">＋</div><div style="font-size:14px;color:var(--muted)">Add Vehicle</div></div>
+      </div>
+    </div>
+    <div class="panel" id="acct-billing">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div><div style="font-family:var(--fd);font-weight:700;font-size:18px">Shop Pro Plan</div><div style="font-size:13px;color:var(--muted);margin-top:4px">$149/month · Renews May 25, 2025</div></div>
+          <span class="badge bg">Active</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-ghost btn-sm">Change Plan</button><button class="btn-danger">Cancel Subscription</button>
+        </div>
+      </div>
+      <div class="card"><div style="font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px">PAYMENT METHOD</div><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:14px">Visa •••• 4242</div><button class="btn-ghost btn-sm">Update Card</button></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+const S = {
+  mode:'consumer', sort:'eta', part:null, trackStep:3,
+};
+const PARTS = [
+  {id:1,brand:"Bosch QuietCast",sku:"BC1449",price:64,eta:28,dist:"2.1 mi",supplier:"Advance Auto – Towson",stock:8},
+  {id:2,brand:"Wagner ThermoQuiet",sku:"QC1449",price:71,eta:19,dist:"0.8 mi",supplier:"O'Reilly – Catonsville",stock:4},
+  {id:3,brand:"ACDelco Professional",sku:"17D1449MH",price:58,eta:44,dist:"4.3 mi",supplier:"NAPA – Essex",stock:12},
+  {id:4,brand:"PowerStop Z23",sku:"Z23-1449",price:89,eta:35,dist:"3.2 mi",supplier:"Parts Authority – Dundalk",stock:3},
+];
+const STEPS = [
+  {l:"Order Confirmed",    t:"10:42 AM",  i:"🛒"},
+  {l:"Supplier Located",   t:"10:43 AM",  i:"📍"},
+  {l:"Driver Assigned",    t:"10:44 AM",  i:"👤"},
+  {l:"Picked Up at Store", t:"10:51 AM",  i:"📦"},
+  {l:"En Route to Shop",   t:"Est 11:09", i:"🚗"},
+  {l:"Delivered",          t:"Est 11:14", i:"✅"},
+];
+
+// ── NAVIGATION ──
+function show(n) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  const nb = document.getElementById('nav-'+n);
+  if(nb) nb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n==='tracking'){renderSteps();animDriver();}
+  if(n==='checkout') fillCheckout();
+}
+function setMode(m) {
+  S.mode=m;
+  document.body.dataset.mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  const mb=document.getElementById('mode-'+m);
+  if(mb) mb.classList.add('active');
+}
+
+// ── ADMIN PANELS ──
+function apanel(p) {
+  document.querySelectorAll('#screen-admin .panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('ap-'+p)?.classList.add('active');
+  document.querySelectorAll('.anav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.anav-item').forEach(el=>{if(el.getAttribute('onclick')?.includes("'"+p+"'"))el.classList.add('active');});
+}
+
+// ── MUNICIPAL PANELS ──
+function mpanel(p) {
+  document.querySelectorAll('#screen-municipal .panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('mp-'+p)?.classList.add('active');
+  document.querySelectorAll('.mtab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(el=>{if(el.getAttribute('onclick')?.includes("'"+p+"'"))el.classList.add('active');});
+}
+function setDept(el) {
+  document.querySelectorAll('.dtag').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setMP(p) {
+  ['p1','p2','p3'].forEach(k=>{const b=document.getElementById('m'+k);if(b)b.className='prio-btn'+(k===p?' '+k:'');});
+}
+
+// ── ACCOUNT TABS ──
+function acctTab(t) {
+  document.querySelectorAll('#screen-account .panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('acct-'+t)?.classList.add('active');
+  document.querySelectorAll('#screen-account .tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('#screen-account .tab').forEach(el=>{if(el.getAttribute('onclick')?.includes("'"+t+"'"))el.classList.add('active');});
+}
+
+// ── AI SEARCH ──
+async function doAI() {
+  const inp=document.getElementById('ai-inp');
+  const q=(inp.value||'').trim();
+  if(!q) return;
+  const btn=document.getElementById('ai-btn');
+  btn.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true;
+  const banner=document.getElementById('ai-banner');
+  banner.style.display='block';
+  banner.innerHTML='<div class="ai-banner"><div style="font-size:22px">🧠</div><div class="ai-note"><div style="display:flex;gap:4px;align-items:center"><span class="aidot"></span><span class="aidot"></span><span class="aidot"></span></div><div style="margin-top:6px;color:var(--muted);font-size:12px">Analyzing with AI...</div></div></div>';
+  try {
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:500,
+        messages:[{role:"user",content:`You are PartsFlow AI for Baltimore shops. Parse this query and return ONLY valid JSON, no markdown:\nQuery: "${q}"\n{"partType":"string","vehicle":{"year":null,"make":null,"model":null},"aiNote":"1-2 helpful sentences","recommendedBrands":["brand1","brand2"]}`}]
+      })
+    });
+    const data=await res.json();
+    let parsed=null;
+    try{parsed=JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());}catch(e){}
+    if(parsed){
+      const veh=parsed.vehicle&&(parsed.vehicle.year||parsed.vehicle.make)?`${parsed.vehicle.year||''} ${parsed.vehicle.make||''} ${parsed.vehicle.model||''}`.trim():null;
+      banner.innerHTML=`<div class="ai-banner"><div style="font-size:22px">🧠</div><div class="ai-note"><strong>AI Detected:</strong> ${parsed.partType||q}${veh?` for <strong>${veh}</strong>`:''}<br><span style="color:var(--muted)">${parsed.aiNote||''}</span>${parsed.recommendedBrands?.length?`<br><span style="color:var(--muted)">Top brands: ${parsed.recommendedBrands.join(', ')}</span>`:''}</div></div>`;
+      document.getElementById('results-area').style.display='block';
+      document.getElementById('res-q').textContent=` for "${parsed.partType||q}"`;
+      renderParts();
+    } else { fallback(q); }
+  } catch(e){ fallback(q); }
+  btn.innerHTML='🧠 AI Search';
+  btn.disabled=false;
+}
+function fallback(q) {
+  const b=document.getElementById('ai-banner');
+  b.innerHTML=`<div class="ai-banner"><div style="font-size:22px">🔍</div><div class="ai-note">Showing results for: <strong>${q}</strong></div></div>`;
+  document.getElementById('results-area').style.display='block';
+  document.getElementById('res-q').textContent=` for "${q}"`;
+  renderParts();
+}
+function qs(q) {
+  setMode('consumer');
+  document.getElementById('ai-inp').value=q;
+  show('search');
+  setTimeout(doAI,120);
+}
+
+// ── SORT / RENDER ──
+function sort(by) {
+  S.sort=by;
+  document.getElementById('seta').classList.toggle('active',by==='eta');
+  document.getElementById('sprice').classList.toggle('active',by==='price');
+  renderParts();
+}
+function renderParts() {
+  const sorted=[...PARTS].sort((a,b)=>S.sort==='eta'?a.eta-b.eta:a.price-b.price);
+  document.getElementById('res-count').textContent=sorted.length+' suppliers found';
+  document.getElementById('parts-list').innerHTML=sorted.map((p,i)=>`
+    <div class="part-row${S.part?.id===p.id?' sel':''}" onclick="selPart(${p.id})">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
+          ${i===0?`<span class="badge ${S.sort==='eta'?'bg':'bo'}">${S.sort==='eta'?'⚡ Fastest':'💰 Best Price'}</span>`:''}
+          <span class="pbrand">${p.brand}</span>
+        </div>
+        <div class="psku">SKU ${p.sku}</div>
+        <div class="ploc">📍 ${p.supplier} · ${p.dist}</div>
+      </div>
+      <div style="flex-shrink:0;text-align:right">
+        <div class="pprice">$${p.price}</div>
+        <div class="peta" style="color:${p.eta<30?'var(--green)':'var(--muted)'}">${p.eta} min ETA</div>
+        <div class="pstock">${p.stock} in stock</div>
+      </div>
+    </div>`).join('');
+  renderPanel();
+}
+function selPart(id) {S.part=PARTS.find(p=>p.id===id);renderParts();}
+function renderPanel() {
+  const el=document.getElementById('order-panel');
+  if(!S.part){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=`<div class="order-panel"><div><div style="font-family:var(--fd);font-weight:700;font-size:17px">${S.part.brand}</div><div style="font-size:13px;color:var(--muted);margin-top:4px">$${S.part.price} + $18 delivery = <strong style="color:var(--text)">$${S.part.price+18}</strong></div><div style="font-family:var(--fm);font-size:11px;color:var(--green);margin-top:4px">Estimated: ${S.part.eta} minutes</div></div><button class="btn-primary" onclick="show('checkout')">Order Now →</button></div>`;
+}
+
+// ── CHECKOUT ──
+function fillCheckout() {
+  const p=S.part||PARTS[1];
+  document.getElementById('co-brand').textContent=p.brand;
+  document.getElementById('co-sku').textContent='SKU '+p.sku;
+  document.getElementById('co-supplier').textContent='📍 '+p.supplier;
+  document.getElementById('co-eta').textContent='⚡ '+p.eta+' min ETA';
+  document.getElementById('co-price').textContent='$'+p.price;
+  document.getElementById('co-part-price').textContent='$'+p.price+'.00';
+  document.getElementById('co-total').textContent='$'+(p.price+22);
+  const tp=document.getElementById('track-part');
+  if(tp) tp.textContent=p.brand;
+  const ed=document.getElementById('eta-disp');
+  if(ed) ed.textContent=p.eta+' MIN';
+}
+function setCP(p) {
+  ['p1','p2','p3'].forEach(k=>{const b=document.getElementById('co'+k);if(b)b.className='prio-btn'+(k===p?' '+p:'');});
+}
+function placeOrder() {
+  const btn=document.getElementById('pay-btn');
+  btn.innerHTML='<span class="spinner"></span> Dispatching Driver...';
+  btn.disabled=true;
+  setTimeout(()=>{
+    S.trackStep=3;show('tracking');
+    btn.innerHTML='💳 Pay &amp; Dispatch Driver →';btn.disabled=false;
+  },1800);
+}
+
+// ── TRACKING ──
+function renderSteps() {
+  const c=document.getElementById('track-steps');
+  if(!c) return;
+  c.innerHTML=STEPS.map((s,i)=>{
+    const done=i<S.trackStep,curr=i===S.trackStep;
+    return `<div class="tstep"><div class="tcircle ${done?'done':curr?'curr':''}">${done?'✓':s.i}</div><div class="tlabel" style="color:${done||curr?'var(--text)':'var(--muted)'}">${s.l}</div><div class="ttime" style="color:${done?'var(--green)':curr?'var(--aw)':'var(--muted)'}">${s.t}</div></div>`;
+  }).join('');
+  const btn=document.getElementById('adv-btn');
+  if(!btn) return;
+  if(S.trackStep>=STEPS.length-1){btn.textContent='✅ Delivered! Order Again';btn.onclick=()=>show('search');btn.style.background='var(--green)';}
+  else{btn.textContent='Advance Status ⟶ (Demo)';btn.onclick=advStep;btn.style.background='';}
+}
+function advStep() {
+  if(S.trackStep<STEPS.length-1){
+    S.trackStep++;
+    const p=S.part||PARTS[1];
+    const eta=Math.max(0,p.eta-S.trackStep*6);
+    const ed=document.getElementById('eta-disp');
+    if(ed) ed.textContent=eta>0?eta+' MIN':'NOW';
+    animDriverTo(S.trackStep/(STEPS.length-1));
+    renderSteps();
+  }
+}
+
+// ── MAP ANIMATION ──
+let drvProg=0.3,drvFrame=null;
+function animDriver(){drvProg=0.3;moveDriver(drvProg);}
+function animDriverTo(target){
+  const end=Math.min(target*0.92,0.95),start=drvProg;let t=0;
+  function step(){t+=0.025;if(t>1)t=1;drvProg=start+(end-start)*t;moveDriver(drvProg);if(t<1)drvFrame=requestAnimationFrame(step);}
+  if(drvFrame) cancelAnimationFrame(drvFrame);requestAnimationFrame(step);
+}
+function moveDriver(prog) {
+  const t=prog;
+  const x=(1-t)*(1-t)*28+2*(1-t)*t*44+t*t*62;
+  const y=(1-t)*(1-t)*26+2*(1-t)*t*14+t*t*66;
+  const dot=document.getElementById('drv-dot');
+  const car=document.getElementById('drv-car');
+  if(dot){dot.setAttribute('cx',x+'%');dot.setAttribute('cy',y+'%');}
+  if(car){car.setAttribute('x',x+'%');car.setAttribute('y',(y+3)+'%');}
+}
+
+// ── MUNICIPAL MAP ANIMATION ──
+let mframe=0;
+function animMunic(){
+  setInterval(()=>{
+    mframe++;
+    const dots=[{id:'md1',bx:20,by:25},{id:'md2',bx:72,by:18},{id:'md3',bx:14,by:72},{id:'md4',bx:80,by:62}];
+    dots.forEach(({id,bx,by})=>{
+      const el=document.getElementById(id);if(!el) return;
+      el.setAttribute('cx',(bx+Math.sin(mframe*.04+bx)*.25*bx/10)+'%');
+      el.setAttribute('cy',(by+Math.cos(mframe*.04+by)*.25*by/10)+'%');
+    });
+  },150);
+}
+
+// ── DRIVER ──
+function drvStatus(s){
+  document.getElementById('drv-on').classList.toggle('on',s==='on');
+  document.getElementById('drv-off').classList.toggle('on',s==='off');
+  document.getElementById('job-wrap').style.display=s==='on'?'block':'none';
+}
+
+// ── INIT ──
+S.part=PARTS[1];
+renderParts();
+animMunic();
+</script>
+</body>
+</html>

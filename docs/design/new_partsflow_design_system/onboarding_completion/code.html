@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PartsFlow | Final Onboarding Step</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#a73a00",
+                    "surface-variant": "#fadcd2",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e2e2e2",
+                    "primary-fixed-dim": "#ffb59a",
+                    "on-tertiary-fixed-variant": "#00497f",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#fff1ec",
+                    "on-secondary-container": "#5f6161",
+                    "on-tertiary-container": "#002d51",
+                    "tertiary": "#0061a6",
+                    "secondary-container": "#dcdddd",
+                    "background": "#fff8f6",
+                    "surface": "#fff8f6",
+                    "primary": "#a73a00",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#370e00",
+                    "inverse-on-surface": "#ffede7",
+                    "surface-dim": "#f1d4ca",
+                    "on-secondary-fixed-variant": "#454747",
+                    "secondary": "#5d5f5f",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fff8f6",
+                    "inverse-surface": "#3e2c26",
+                    "on-tertiary-fixed": "#001c37",
+                    "on-surface": "#271812",
+                    "on-primary-fixed-variant": "#802a00",
+                    "surface-container-highest": "#fadcd2",
+                    "primary-fixed": "#ffdbce",
+                    "inverse-primary": "#ffb59a",
+                    "outline-variant": "#e4beb1",
+                    "on-background": "#271812",
+                    "tertiary-fixed-dim": "#a0c9ff",
+                    "tertiary-fixed": "#d2e4ff",
+                    "surface-container": "#ffe9e2",
+                    "on-primary-container": "#521800",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#ffe2d8",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#0096fd",
+                    "primary-container": "#ff5c00",
+                    "on-surface-variant": "#5b4137",
+                    "outline": "#8f7065",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "80px",
+                    "xs": "4px",
+                    "lg": "48px",
+                    "base": "8px",
+                    "md": "24px",
+                    "gutter": "24px",
+                    "container-max": "1440px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "display-xl": ["DM Sans"],
+                    "stat-value": ["DM Sans"],
+                    "body-lg": ["DM Sans"],
+                    "label-sm": ["DM Sans"],
+                    "headline-lg": ["DM Sans"],
+                    "display-lg": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "label-md": ["DM Sans"],
+                    "headline-md": ["DM Sans"]
+            },
+            "fontSize": {
+                    "display-xl": ["80px", {"lineHeight": "0.95", "letterSpacing": "-0.03em", "fontWeight": "900"}],
+                    "stat-value": ["36px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["64px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.06em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-md h-16 max-w-container-max mx-auto">
+<div class="text-headline-md font-headline-md font-black text-primary dark:text-primary-fixed-dim">
+                PartsFlow
+            </div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant/20 transition-colors p-2 rounded-full" data-icon="help_outline">help_outline</button>
+</div>
+</nav>
+</header>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- SideNavBar (Progress Tracking) -->
+<aside class="hidden md:flex flex-col gap-base p-md bg-surface-container-low dark:bg-surface-dim shadow-sm h-full w-64">
+<div class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary">Setup Guide</h2>
+<p class="font-label-md text-label-md text-secondary">Complete your profile</p>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Nav Item: Role Selection -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm transition-all duration-200 ease-in-out hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="person_pin_circle">person_pin_circle</span>
+<span class="font-label-md text-label-md">Role Selection</span>
+</div>
+<!-- Nav Item: Business Details -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm transition-all duration-200 ease-in-out hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+<span class="font-label-md text-label-md">Business Details</span>
+</div>
+<!-- Nav Item: Verification -->
+<div class="flex items-center gap-sm text-on-surface-variant p-sm transition-all duration-200 ease-in-out hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</div>
+<!-- Nav Item: Completion (Active) -->
+<div class="flex items-center gap-sm bg-primary-container text-on-primary-container rounded-lg p-sm transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Completion</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-md py-lg md:px-xl lg:py-xl">
+<div class="max-w-4xl mx-auto">
+<!-- Success Hero Section -->
+<div class="flex flex-col items-center text-center mb-xl">
+<div class="w-24 h-24 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-md shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[48px]" data-icon="celebration" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-xs">Almost There!</h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-xl">
+                        Your application for PartsFlow is currently under review by our operations team. We ensure every shop and driver meets our quality standards.
+                    </p>
+</div>
+<!-- Bento Grid Layout for Status Details -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md items-stretch">
+<!-- Left Column: Verification Status (The "Sunken" look from style guidance) -->
+<div class="md:col-span-7 bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-sm flex flex-col gap-md">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface">Verification Checklist</h3>
+<span class="px-sm py-1 bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm rounded-full uppercase tracking-widest">In Progress</span>
+</div>
+<div class="space-y-md">
+<!-- Background Check Item -->
+<div class="flex items-center gap-md p-sm bg-secondary-fixed/30 rounded-lg">
+<div class="w-10 h-10 flex items-center justify-center bg-tertiary-container text-on-tertiary-container rounded-full shrink-0">
+<span class="material-symbols-outlined" data-icon="search_check" style="font-variation-settings: 'FILL' 1;">search_check</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Background Check Initiated</p>
+<p class="font-body-md text-label-sm text-secondary">Estimated completion: 24-48 hours</p>
+</div>
+<span class="material-symbols-outlined text-secondary" data-icon="pending">pending</span>
+</div>
+<!-- Supplier Sync (Shop Specific) -->
+<div class="flex items-center gap-md p-sm bg-secondary-fixed/30 rounded-lg">
+<div class="w-10 h-10 flex items-center justify-center bg-green-100 text-green-800 rounded-full shrink-0">
+<span class="material-symbols-outlined" data-icon="hub" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Suppliers Connected</p>
+<p class="font-body-md text-label-sm text-secondary">4 local distributors synced successfully</p>
+</div>
+<span class="material-symbols-outlined text-green-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Security Auth -->
+<div class="flex items-center gap-md p-sm bg-secondary-fixed/30 rounded-lg">
+<div class="w-10 h-10 flex items-center justify-center bg-green-100 text-green-800 rounded-full shrink-0">
+<span class="material-symbols-outlined" data-icon="shield_person" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Account Secured</p>
+<p class="font-body-md text-label-sm text-secondary">2FA and multi-factor authentication active</p>
+</div>
+<span class="material-symbols-outlined text-green-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Visual/Status Card -->
+<div class="md:col-span-5 flex flex-col gap-md">
+<!-- Est. Launch Stat Card -->
+<div class="bg-white p-md rounded-xl border-l-4 border-primary shadow-sm">
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-xs">Estimated Launch</p>
+<h4 class="font-stat-value text-stat-value text-on-surface">Tuesday</h4>
+<p class="font-body-md text-label-sm text-secondary mt-xs">Pending final document approval</p>
+</div>
+<!-- Image Placeholder with prompt -->
+<div class="flex-1 relative rounded-xl overflow-hidden group">
+<img alt="Automotive Shop" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="A clean, high-end automotive repair shop with polished concrete floors and bright white overhead lighting. The scene is quiet and professional, with a single high-performance car visible on a lift in the background. The color palette is modern and minimalist with subtle hints of blaze orange tools, maintaining a crisp light-mode aesthetic that communicates order and technological precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEalunTPSByVjMlbGgUz7FsKoOn074c3ZIidAFGJRyrfau3_WUy4f-CGLFB22YWQaBh0sM2gGYSvfax9FWW3HVIlDCZbxDhbFV8j21S_oM2a3WYMyP5DrWCvdUFrYHqujkjBYJMneFvVPzAsfZTNq7WcCYtZEW-rPdSVqBnq-WYiuA9JOq2M3PeM_4zGu2mz-29cnJPfc5u_15-CFICYd6w-UjWoAIYzK6bBC3_JXN_dtSNpWYYxY_rDnzdA50QCDBc06ht5skQrI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-md">
+<p class="text-white font-label-md text-label-md italic">"Getting you back in the bay, faster."</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="mt-xl flex flex-col md:flex-row items-center justify-between gap-md p-md bg-surface-container-high rounded-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant">We'll notify you via email as soon as your account is live.</p>
+</div>
+<button class="px-lg py-md bg-secondary text-white font-bold rounded-lg opacity-50 cursor-not-allowed flex items-center gap-sm transition-transform active:scale-95" disabled="">
+<span>Go to Dashboard</span>
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

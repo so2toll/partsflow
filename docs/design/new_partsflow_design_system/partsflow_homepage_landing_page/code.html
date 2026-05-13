@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PartsFlow | Urgent Professional Parts Delivery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#0096fd",
+                        "primary-container": "#ff5c00",
+                        "on-surface": "#271812",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#454747",
+                        "outline": "#8f7065",
+                        "inverse-surface": "#3e2c26",
+                        "secondary-container": "#dcdddd",
+                        "on-surface-variant": "#5b4137",
+                        "surface-tint": "#a73a00",
+                        "inverse-on-surface": "#ffede7",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#ffe2d8",
+                        "on-primary-fixed-variant": "#802a00",
+                        "on-primary-fixed": "#370e00",
+                        "surface-container": "#ffe9e2",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "surface-container-low": "#fff1ec",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fff8f6",
+                        "outline-variant": "#e4beb1",
+                        "surface-bright": "#fff8f6",
+                        "primary-fixed": "#ffdbce",
+                        "on-primary-container": "#521800",
+                        "surface-variant": "#fadcd2",
+                        "on-background": "#271812",
+                        "background": "#fff8f6",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#e2e2e2",
+                        "tertiary": "#0061a6",
+                        "on-tertiary-fixed-variant": "#00497f",
+                        "tertiary-fixed-dim": "#a0c9ff",
+                        "surface-container-highest": "#fadcd2",
+                        "primary-fixed-dim": "#ffb59a",
+                        "on-tertiary-container": "#002d51",
+                        "primary": "#a73a00",
+                        "on-tertiary-fixed": "#001c37",
+                        "inverse-primary": "#ffb59a",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#d2e4ff",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#5f6161",
+                        "surface-dim": "#f1d4ca",
+                        "secondary": "#5d5f5f",
+                        "surface-900": "#05070F",
+                        "surface-800": "#0A0F1A"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "base": "8px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "xs": "4px",
+                        "lg": "48px",
+                        "xl": "80px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["DM Sans"],
+                        "headline-lg": ["DM Sans"],
+                        "label-md": ["DM Sans"],
+                        "stat-value": ["DM Sans"],
+                        "label-sm": ["DM Sans"],
+                        "body-lg": ["DM Sans"],
+                        "display-xl": ["DM Sans"],
+                        "display-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.06em", "fontWeight": "700"}],
+                        "stat-value": ["36px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-sm": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-xl": ["80px", {"lineHeight": "0.95", "letterSpacing": "-0.03em", "fontWeight": "900"}],
+                        "display-lg": ["64px", {"lineHeight": "1.0", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glow-orange { box-shadow: 0 0 20px rgba(255, 92, 0, 0.3); }
+        .ticker-wrap { overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-white">
+<!-- TopNavBar (Shared Component Identity) -->
+<header class="flex justify-between items-center h-16 w-full px-md z-50 bg-surface-900 border-b border-outline-variant fixed top-0 shadow-md">
+<div class="flex items-center gap-md">
+<span class="font-display-lg text-headline-md font-black text-primary-400 tracking-tighter">AUTOFLOW OPS</span>
+<nav class="hidden md:flex gap-md">
+<a class="text-primary-400 font-bold border-b-2 border-primary-400 pb-1 font-label-sm text-label-sm uppercase tracking-wider" href="#">Revenue: $12.4k</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 font-label-sm text-label-sm uppercase tracking-wider" href="#">Orders: 142</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 font-label-sm text-label-sm uppercase tracking-wider" href="#">Drivers: 28</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 font-label-sm text-label-sm uppercase tracking-wider" href="#">SLA: 98.2%</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 font-label-sm text-label-sm uppercase tracking-wider" href="#">Avg: 22m</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm">
+<button class="bg-primary-container text-white px-md py-xs rounded-lg font-label-md text-label-md uppercase tracking-widest font-bold hover:scale-95 transition-transform duration-100">+ NEW ORDER</button>
+<span class="material-symbols-outlined text-primary-400 cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-primary-400 cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<main class="pt-16">
+<!-- Section 1: Hero Section (Dark) -->
+<section class="relative bg-surface-900 text-white min-h-[921px] flex flex-col justify-center items-center px-md overflow-hidden">
+<div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at 20% 30%, #ff5c00 0%, transparent 40%);"></div>
+<div class="max-w-container-max w-full text-center z-10">
+<span class="font-label-md text-label-md uppercase tracking-[0.3em] text-primary-container mb-md block">BALTIMORE • WASHINGTON DC • ACTIVE</span>
+<h1 class="font-display-xl text-display-xl mb-md leading-none">
+                    Parts. <br class="md:hidden"/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-primary-container">Delivered.</span> <br class="md:hidden"/>
+                    Fast.
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-lg">
+                    The real-time parts sourcing network for repair shops and city fleets. 30–60 min SLA. Guaranteed.
+                </p>
+<div class="flex flex-col sm:flex-row gap-md justify-center items-center">
+<button class="bg-primary-container text-white px-xl py-md rounded-lg font-headline-md text-headline-md glow-orange hover:scale-105 transition-transform">
+                        Get Parts Now
+                    </button>
+<button class="border border-outline text-white px-xl py-md rounded-lg font-headline-md text-headline-md hover:bg-white/10 transition-colors">
+                        View Network
+                    </button>
+</div>
+</div>
+<div class="mt-xl grid grid-cols-2 md:grid-cols-4 gap-xl max-w-4xl w-full text-center">
+<div>
+<div class="font-stat-value text-stat-value text-primary-container">30-60</div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Min SLA</div>
+</div>
+<div>
+<div class="font-stat-value text-stat-value text-primary-container">200+</div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Suppliers</div>
+</div>
+<div>
+<div class="font-stat-value text-stat-value text-primary-container">15M+</div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Live Parts</div>
+</div>
+<div>
+<div class="font-stat-value text-stat-value text-primary-container">$0</div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Signup Fee</div>
+</div>
+</div>
+</section>
+<!-- Section 2: KPI Ticker -->
+<div class="ticker-wrap bg-primary-container py-xs border-y border-white/10">
+<div class="ticker-move">
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">200+ Baltimore Suppliers</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">32 Min Avg Delivery</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">98.2% SLA Compliance</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">Sourcewell Certified</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">Real-Time Dispatch</span>
+<!-- Duplicate for seamless loop -->
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">200+ Baltimore Suppliers</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">32 Min Avg Delivery</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">98.2% SLA Compliance</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">Sourcewell Certified</span>
+<span class="font-label-md text-label-md text-white uppercase tracking-widest mx-xl">Real-Time Dispatch</span>
+</div>
+</div>
+<!-- Section 3: Problem/Solution Section -->
+<section class="py-xl bg-background px-md">
+<div class="max-w-container-max mx-auto">
+<div class="mb-lg max-w-3xl">
+<span class="font-label-md text-label-md uppercase tracking-widest text-primary-container mb-xs block">THE COST OF WAITING</span>
+<h2 class="font-headline-lg text-display-lg leading-tight text-on-surface">Every minute on the lift is money bleeding out.</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Left: Problem -->
+<div class="bg-surface-container-low p-lg rounded-xl border border-outline-variant">
+<span class="material-symbols-outlined text-error mb-md text-4xl" data-icon="timer_off">timer_off</span>
+<h3 class="font-headline-md text-headline-md mb-sm">Fragmented Sourcing</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Calling 4-6 suppliers for every ticket wastes 45+ minutes of bay time. Inconsistent ETAs and "no-stock" surprises kill your daily throughput.</p>
+<div class="mt-md border-t border-outline-variant pt-md">
+<span class="font-label-md text-label-md text-error uppercase">IDLE BAY LOSS: $150/HR</span>
+</div>
+</div>
+<!-- Right: Solution -->
+<div class="bg-surface-container-highest p-lg rounded-xl border-2 border-primary-container">
+<span class="material-symbols-outlined text-primary mb-md text-4xl" data-icon="bolt">bolt</span>
+<h3 class="font-headline-md text-headline-md mb-sm">The PartsFlow Advantage</h3>
+<p class="font-body-md text-body-md text-on-surface">Our AI scans 200+ local inventories in 15 seconds. Unified dispatch brings parts directly to your shop while your tech stays on the job.</p>
+<div class="mt-md border-t border-outline-variant pt-md">
+<span class="font-label-md text-label-md text-primary uppercase">TIME SAVED: 62 HRS/MO</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: How It Works (4 Steps) -->
+<section class="py-xl bg-surface-800 text-white px-md">
+<div class="max-w-container-max mx-auto">
+<div class="text-center mb-xl">
+<h2 class="font-display-lg text-headline-lg uppercase tracking-tighter">Unified Workflow</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+<div class="relative p-md border-l border-outline-variant bg-white/5">
+<div class="font-display-lg text-primary opacity-50 mb-sm">01</div>
+<h4 class="font-headline-md text-headline-md mb-xs">AI-Powered Search</h4>
+<p class="font-body-md text-on-surface-variant">Type "2019 Civic front brakes" — our AI identifies fitment and checks real-time stock across the city.</p>
+</div>
+<div class="relative p-md border-l border-outline-variant bg-white/5">
+<div class="font-display-lg text-primary opacity-50 mb-sm">02</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Speed or Price</h4>
+<p class="font-body-md text-on-surface-variant">Choose your trade-off. Filter by the absolute fastest arrival or the lowest cost within our network.</p>
+</div>
+<div class="relative p-md border-l border-outline-variant bg-white/5">
+<div class="font-display-lg text-primary opacity-50 mb-sm">03</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Driver Dispatch</h4>
+<p class="font-body-md text-on-surface-variant">Algorithm-matched drivers are dispatched instantly. Watch your parts move on a live GPS map.</p>
+</div>
+<div class="relative p-md border-l border-outline-variant bg-white/5">
+<div class="font-display-lg text-primary opacity-50 mb-sm">04</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Parts on Lift</h4>
+<p class="font-body-md text-on-surface-variant">30-60 minutes later, the job continues. One-tap reordering for your frequent shop needs.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Dual-Mode Feature Section -->
+<section class="grid grid-cols-1 md:grid-cols-2">
+<!-- Light Mode: Local Shop -->
+<div class="bg-surface-bright p-xl flex flex-col justify-center border-r border-outline-variant">
+<div class="max-w-lg ml-auto px-md">
+<span class="font-label-sm text-label-sm bg-primary-container text-white px-sm py-xs rounded mb-md inline-block uppercase tracking-widest">LOCAL REPAIR SHOP</span>
+<h3 class="font-display-lg text-headline-lg text-on-surface mb-md">Maximize Bay Velocity</h3>
+<p class="font-body-lg text-on-surface-variant mb-lg">For independent shops that can't afford a full-time driver. Access professional tools to source, order, and track parts in under 20 seconds.</p>
+<div class="relative rounded-xl overflow-hidden shadow-xl border border-outline-variant">
+<img class="w-full aspect-video object-cover" data-alt="A clean, modern automotive repair shop interior with organized tools and a digital tablet showing a parts sourcing interface. The lighting is bright and professional, highlighting the high-tech atmosphere. Mechanics are working efficiently in the background, creating a sense of professional urgency and operational precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_2FloTHkEbIf99RwAoyMaBV8Ccv7YoSUt17f3BSUkKuOypPQohdT3zbnJI-3V7upMbFNZfFuFkzcDzcIC7cv8b54ozUYYoXKFJTtK6LX1VMLMP6RWY-peYVCAbkyf29AtBmusLVYCtf9cL7NSUBEwOE34u3aEjPKDcvLystEpw3mp9IcXmHcH_6lWhhkR1DSptOqJdEPVoU_dnDB-fWieLwfSwO6gu050u6oyG3M3L-Z2UCdKmZ4RS1mbidqmNqZx2Iw6rZJRjcQ"/>
+</div>
+</div>
+</div>
+<!-- Dark Mode: Command Center -->
+<div class="bg-surface-900 p-xl flex flex-col justify-center text-white">
+<div class="max-w-lg mr-auto px-md">
+<span class="font-label-sm text-label-sm bg-tertiary text-white px-sm py-xs rounded mb-md inline-block uppercase tracking-widest">MUNICIPAL FLEET</span>
+<h3 class="font-display-lg text-headline-lg mb-md">Operational Governance</h3>
+<p class="font-body-lg text-on-surface-variant mb-lg">Unified command for city fleets. Track P1 emergency response orders, department-level budgets, and SLA compliance across your entire jurisdiction.</p>
+<div class="relative rounded-xl overflow-hidden shadow-xl border border-white/10">
+<img class="w-full aspect-video object-cover" data-alt="A high-tech control room environment with large digital displays showing real-time fleet tracking maps and analytics dashboards. The room is dimly lit with deep blue and orange glowing interface elements, creating a sophisticated command center aesthetic. The mood is focused and technologically advanced, emphasizing large-scale logistics management." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwFwX7U3gPKE4vo276yN6NqVGddac24bwmlvk5jGt546aEhoyaEAtI2BsTSXLnsbVLut7ypa_JxrtzHTvVlaXg5WRQ3uozr_BCTWRvR6MIUU5IMhcXhXdJkcJyn7DxdydKZ-bNDaYwrCRhHWij-xwmThhsCE78pO9EzdKSsaFZmuwaESgBGoyOBtRaeLhzzzQ8Zu6Fk1iCphYbI-3hTKHftHEPzsd79uFvAmAh0c_Rk1yrx_2PVwfdzTA-6KpptLcqoiDP2nTQi0c"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 6: Pricing Tiers -->
+<section class="py-xl bg-background px-md">
+<div class="max-w-container-max mx-auto text-center mb-xl">
+<span class="font-label-md text-label-md uppercase tracking-widest text-primary-container block mb-xs">TRANSPARENT PRICING</span>
+<h2 class="font-headline-lg text-display-lg text-on-surface">Built for shops. Scaled for cities.</h2>
+</div>
+<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Free -->
+<div class="bg-surface-container-low p-lg rounded-xl flex flex-col">
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-md">PAY-AS-YOU-GO</div>
+<div class="font-stat-value text-display-lg text-on-surface mb-xs">$0<span class="text-headline-md font-body-md">/mo</span></div>
+<p class="font-body-md text-on-surface-variant mb-lg">Plus $18-22 delivery fee</p>
+<ul class="space-y-sm mb-xl text-left">
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span> Unlimited AI Search</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span> Live GPS Tracking</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span> SMS Notifications</li>
+</ul>
+<button class="mt-auto border border-outline text-on-surface py-md rounded-lg font-headline-md">Get Started</button>
+</div>
+<!-- Shop Pro -->
+<div class="bg-surface-container-lowest p-lg rounded-xl flex flex-col border-2 border-primary-container relative">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary-container text-white px-md py-1 rounded-full font-label-sm text-label-sm uppercase tracking-widest">MOST POPULAR</div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-primary-container mb-md">SHOP PRO</div>
+<div class="font-stat-value text-display-lg text-on-surface mb-xs">$149<span class="text-headline-md font-body-md">/mo</span></div>
+<p class="font-body-md text-on-surface-variant mb-lg">Fixed overhead for elite shops</p>
+<ul class="space-y-sm mb-xl text-left">
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle" data-weight="fill">check_circle</span> Priority Dispatch Queue</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle" data-weight="fill">check_circle</span> Detailed Spend Analytics</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle" data-weight="fill">check_circle</span> Dedicated Account Manager</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary" data-icon="check_circle" data-weight="fill">check_circle</span> API Integration Ready</li>
+</ul>
+<button class="mt-auto bg-primary-container text-white py-md rounded-lg font-headline-md glow-orange">Select Pro</button>
+</div>
+<!-- Municipal -->
+<div class="bg-surface-800 text-white p-lg rounded-xl flex flex-col">
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-tertiary-container mb-md">GOVERNMENT</div>
+<div class="font-stat-value text-display-lg mb-xs">Custom</div>
+<p class="font-body-md text-on-surface-variant mb-lg">Sourcewell-eligible pricing</p>
+<ul class="space-y-sm mb-xl text-left">
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-tertiary-container" data-icon="check_circle">check_circle</span> P1 Emergency Queue</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-tertiary-container" data-icon="check_circle">check_circle</span> Dept-Level Governance</li>
+<li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-tertiary-container" data-icon="check_circle">check_circle</span> SLA Breach Protection</li>
+</ul>
+<button class="mt-auto border border-outline text-white py-md rounded-lg font-headline-md hover:bg-white/5">Contact Sales</button>
+</div>
+</div>
+</section>
+<!-- Section 7: Social Proof -->
+<section class="py-xl bg-surface-container px-md">
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-3 gap-md">
+<div class="bg-white p-lg rounded-xl shadow-sm border border-outline-variant">
+<p class="font-body-lg text-body-lg text-on-surface mb-lg italic">"I spend 45 minutes a day calling parts stores. If PartsFlow cuts that in half, I'd pay for it twice over."</p>
+<div class="flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center font-bold text-primary">MT</div>
+<div>
+<div class="font-headline-md text-body-md font-bold">Marcus T.</div>
+<div class="font-label-sm text-label-sm uppercase text-on-surface-variant">Owner, Eastside Auto</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-lg rounded-xl shadow-sm border border-outline-variant">
+<p class="font-body-lg text-body-lg text-on-surface mb-lg italic">"Our garage has 12 bays and 4 city departments. Coordinating parts is a nightmare. This is exactly what we've needed."</p>
+<div class="flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-tertiary/20 flex items-center justify-center font-bold text-tertiary">DW</div>
+<div>
+<div class="font-headline-md text-body-md font-bold">Capt. D. Williams</div>
+<div class="font-label-sm text-label-sm uppercase text-on-surface-variant">Baltimore City Fleet Manager</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-lg rounded-xl shadow-sm border border-outline-variant">
+<p class="font-body-lg text-body-lg text-on-surface mb-lg italic">"Fastest I got a part was 22 minutes. I need that to be the standard, not the exception. PartsFlow makes it happen."</p>
+<div class="flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center font-bold text-primary">CR</div>
+<div>
+<div class="font-headline-md text-body-md font-bold">Carlos R.</div>
+<div class="font-label-sm text-label-sm uppercase text-on-surface-variant">Master Tech, Precision Imports</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 8: Final CTA -->
+<section class="py-xl bg-surface-900 text-white px-md relative overflow-hidden">
+<div class="absolute inset-0 opacity-10" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKjXn0On-80v_rYGmGueW9Ng4F-54SqAEynidP6tYhN-6x0uY76llOiqNeEMgns3K2vRdKN91O0QGPAMgZBAEyjbkFYMr7ODTqjDzWQ_pVi5SPGV8uDXM4HFCYjA85eT4nd-cHYCFY_hHjRug2RfMPP8Bnc77NZcOOAWe2dHiQYyFItLamt8T5YxwRyclgluQhbitEdTPyVZ2iX92w01y7n0-oiQqr9GgdIJZFdyzoM4rhNRuYAbW9jFGDh5hOhFYO3PzkpOkGXwg');"></div>
+<div class="max-w-3xl mx-auto text-center z-10 relative">
+<h2 class="font-display-lg text-display-lg mb-md">Ready to slash your bay downtime?</h2>
+<p class="font-body-lg text-on-surface-variant mb-xl">Join the fastest parts network in the Mid-Atlantic. No long-term contracts, just results.</p>
+<form class="flex flex-col sm:flex-row gap-sm items-center">
+<input class="w-full bg-white/10 border border-outline-variant rounded-lg px-md py-md text-white font-body-md focus:border-primary-container outline-none" placeholder="shop.owner@example.com" type="email"/>
+<button class="w-full sm:w-auto bg-primary-container text-white px-xl py-md rounded-lg font-headline-md whitespace-nowrap glow-orange hover:scale-105 transition-transform">
+                        Request Access
+                    </button>
+</form>
+<p class="mt-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">BALTIMORE LAUNCH • EARLY ACCESS SLOTS: 14 REMAINING</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-900 text-white py-xl px-md border-t border-white/10">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-xl">
+<div class="col-span-1 md:col-span-2">
+<span class="font-display-lg text-headline-lg font-black text-primary-400 tracking-tighter block mb-md">PARTSFLOW</span>
+<p class="font-body-md text-on-surface-variant max-w-sm mb-lg">Unified parts sourcing and delivery for automotive professionals. We bridge the gap between suppliers and technicians with algorithmic precision.</p>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-primary-400" data-icon="public">public</span>
+<span class="material-symbols-outlined text-primary-400" data-icon="verified">verified</span>
+<span class="material-symbols-outlined text-primary-400" data-icon="shield">shield</span>
+</div>
+</div>
+<div>
+<h5 class="font-label-md text-label-md uppercase tracking-widest text-primary mb-md">NETWORK</h5>
+<ul class="space-y-sm text-on-surface-variant font-body-md">
+<li><a class="hover:text-primary transition-colors" href="#">Supplier Directory</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Driver Program</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">API Documentation</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">SLA Transparency</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md text-label-md uppercase tracking-widest text-primary mb-md">SUPPORT</h5>
+<ul class="space-y-sm text-on-surface-variant font-body-md">
+<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contact Ops</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-xl pt-lg border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">© 2025 PARTSFLOW OPS. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-md font-label-sm text-label-sm text-on-surface-variant uppercase">
+<span>STATION 04-B</span>
+<span>SYSTEM STATUS: OPTIMAL</span>
+</div>
+</div>
+</footer>
+</body></html>

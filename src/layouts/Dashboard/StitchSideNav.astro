@@ -1,12 +1,12 @@
 ---
 /**
- * Stitch Design System - App Sidebar
+ * Stitch Design System - MotoFlow Operations Sidebar
  *
- * White sidebar with:
- * - Logo/Brand area with Electric Lime accent
- * - "New Project" button
- * - Navigation links with icons
- * - User profile section at bottom
+ * Dark navy sidebar with:
+ * - User profile section at top
+ * - Navigation items with icons
+ * - Active state with orange border
+ * - System status indicator at bottom
  */
 
 interface Props {
@@ -16,76 +16,188 @@ interface Props {
 }
 
 const { userRole, userId, currentPage } = Astro.props;
+
+const navItems = [
+  { id: 'map', label: 'MAP', icon: 'map' },
+  { id: 'feed', label: 'FEED', icon: 'format_list_bulleted' },
+  { id: 'dispatch', label: 'DISPATCH', icon: 'local_shipping' },
+  { id: 'revenue', label: 'REVENUE', icon: 'payments' },
+  { id: 'fleet', label: 'FLEET', icon: 'directions_car' },
+  { id: 'settings', label: 'SETTINGS', icon: 'settings' },
+];
 ---
 
-<aside class="fixed top-16 left-0 z-[900] w-64 h-[calc(100vh-64px)] bg-white border-r border-[#e5e5e5] flex flex-col p-6 max-lg:-translate-x-full max-lg:transition-transform max-lg:duration-300">
-  <!-- Sidebar Header -->
-  <div class="mb-6">
-    <div class="flex items-center gap-3 mb-6">
-      <div class="w-10 h-10 bg-[#dfff00] rounded-lg flex items-center justify-center">
-        <span class="material-symbols-outlined text-2xl text-black font-variation-settings-[&quot;FILL&quot;:_1]">auto_awesome</span>
-      </div>
-      <div class="flex flex-col">
-        <h2 class="text-lg font-bold leading-none text-black">Creative Suite</h2>
-        <p class="text-xs text-[#9ca3af] uppercase tracking-widest font-bold mt-1">Pro Plan</p>
-      </div>
+<aside class="sidebar">
+  <!-- User Profile Section -->
+  <div class="user-profile">
+    <div class="user-avatar">
+      <span>OP</span>
     </div>
-
-    <!-- New Project Button -->
-    <a
-      href="/app/projects"
-      class="flex items-center justify-center gap-2 bg-[#dfff00] text-black border-none rounded-xl py-3 px-3 w-full text-sm font-medium text-decoration-none transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer mb-6"
-    >
-      <span class="material-symbols-outlined">add</span>
-      <span>New Project</span>
-    </a>
+    <div class="user-info">
+      <div class="user-name">OPS CONTROL</div>
+      <div class="user-station">STATION 04-B</div>
+    </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="flex flex-col gap-1 flex-1">
-    <a
-      href="/app/dashboard"
-      class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1"
-    >
-      <span class="material-symbols-outlined text-xl">dashboard</span>
-      <span>Dashboard</span>
-    </a>
-
-    <a href="/app/videos/new" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">auto_awesome</span>
-      <span>Generator</span>
-    </a>
-
-    <a href="/app/edit" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">edit_note</span>
-      <span>Editor</span>
-    </a>
-
-    <a href="/app/characters" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">person</span>
-      <span>Characters</span>
-    </a>
-
-    <a href="/app/projects" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">history</span>
-      <span>History</span>
-    </a>
-
-    <a href="/app/analytics" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">leaderboard</span>
-      <span>Analytics</span>
-    </a>
+  <!-- Navigation Items -->
+  <nav class="nav-section">
+    {navItems.map((item) => (
+      <a
+        href={`/app/${item.id}`}
+        class={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+      >
+        <span class="material-symbols-outlined nav-icon">{item.icon}</span>
+        <span class="nav-label">{item.label}</span>
+      </a>
+    ))}
   </nav>
 
-  <!-- Bottom Section -->
-  <div class="border-t border-[#f3f4f6] pt-6 flex flex-col gap-1">
-    <a href="/app/settings" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">data_usage</span>
-      <span>Usage</span>
-    </a>
-    <a href="/app/support" class="flex items-center gap-3 py-3 px-3 rounded-lg text-decoration-none text-[#6b7280] text-sm font-medium transition-all hover:bg-[#f9fafb] hover:text-black hover:translate-x-1">
-      <span class="material-symbols-outlined text-xl">help_outline</span>
-      <span>Support</span>
-    </a>
+  <!-- System Status -->
+  <div class="system-status">
+    <div class="status-dot"></div>
+    <span class="status-text">OPTIMAL</span>
   </div>
 </aside>
+
+<style>
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    z-index: 900;
+    width: 240px;
+    height: calc(100vh - 64px);
+    background-color: #1A202C;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  }
+
+  @media (max-width: 1024px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 300ms;
+    }
+  }
+
+  /* User Profile */
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 32px;
+  }
+
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5c00, #e05000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.02em;
+  }
+
+  .user-station {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  /* Navigation */
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 200ms;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .nav-item.active {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
+    border-left-color: #ff5c00;
+  }
+
+  .nav-icon {
+    font-size: 20px;
+  }
+
+  .nav-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  /* System Status */
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+  }
+
+  .status-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+</style>

@@ -23,6 +23,8 @@ import AppProjectDetail from '../../content-container/App/ProjectDetail.astro';
 import AppProfile from '../../content-container/App/Profile.astro';
 import AppProfile2 from '../../content-container/App/Profile2.astro';
 import AppProfile4 from '../../content-container/App/Profile4.astro';
+import AppOperationsDashboard from '../../content-container/App/OperationsDashboard.astro';
+import AppOperationsDashboardOld from '../../content-container/App/OperationsDashboard_old.astro';
 
 // Blank Content
 import Blank from '../../content-container/Blank/Content.astro';
@@ -36,6 +38,8 @@ import AppTopNav from '../../layouts/Dashboard/AppTopNav.astro';
 // Stitch Design System Navigation
 import StitchTopNav from '../../layouts/Dashboard/StitchTopNav.astro';
 import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
+import StitchTopNavOld from '../../layouts/Dashboard/StitchTopNavOld.astro';
+import StitchSideNavOld from '../../layouts/Dashboard/StitchSideNav_Old.astro';
 
 // Content for Video AI Pages
 import NewVideoProject from '../../content-container/App/NewVideoProject.astro';
@@ -227,6 +231,14 @@ export const RBAC_CONFIG = {
         footer: Blank,
         title: "Billing & Subscription",
         description: "Manage your subscription plan and billing - SuperAdmin View",
+      },
+      appDashboardTest: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: AppOperationsDashboard,
+        footer: Blank,
+        title: "Operations Dashboard",
+        description: "MotoFlow Operations Control Room - Test Page",
       },
     },
 
@@ -494,6 +506,22 @@ export const RBAC_CONFIG = {
         title: "Billing & Subscription",
         description: "Manage your subscription plan and billing",
       },
+      appDashboardTest: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: AppOperationsDashboard,
+        footer: Blank,
+        title: "Operations Dashboard",
+        description: "MotoFlow Operations Control Room - Test Page",
+      },
+        appDashboardTestOld: {
+        topNav: StitchTopNavOld,
+        sideNav: StitchSideNavOld,
+        content: AppOperationsDashboardOld,
+        footer: Blank,
+        title: "Operations Dashboard",
+        description: "MotoFlow Operations Control Room - Test Page",
+      },
     },
 
     StudioViewer: {
@@ -609,6 +637,22 @@ export const RBAC_CONFIG = {
         footer: Blank,
         title: "Billing & Subscription",
         description: "View your subscription plan and billing",
+      },
+      appDashboardTest: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: AppOperationsDashboard,
+        footer: Blank,
+        title: "Operations Dashboard",
+        description: "MotoFlow Operations Control Room - Test Page",
+      },
+      appDashboardTestOld: {
+        topNav: StitchTopNavOld,
+        sideNav: StitchSideNavOld,
+        content: AppOperationsDashboardOld,
+        footer: Blank,
+        title: "Operations Dashboard",
+        description: "MotoFlow Operations Control Room - Test Page",
       },
     },
 

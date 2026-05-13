@@ -1,0 +1,1254 @@
+---
+/**
+ * Landing Page - PartsFlow Video AI Content Studio
+ *
+ * A modern, conversion-focused landing page following the Stitch Design System.
+ * Features hero section with CTA, features grid, demo video section, pricing preview,
+ * testimonials, and footer.
+ *
+ * Design System: Electric Lime (#DFFF00) accent, DM Sans font, 8px spacing rhythm
+ */
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="PartsFlow - AI-Powered Video Content Studio">
+  <div class="landing-page">
+
+    <!-- Navigation -->
+    <nav class="nav-container">
+      <div class="nav-content">
+        <div class="logo">
+          <span class="logo-text">PartsFlow</span>
+          <span class="logo-accent">.</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#demo" class="nav-link">Demo</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
+          <a href="#testimonials" class="nav-link">Testimonials</a>
+        </div>
+        <div class="nav-actions">
+          <a href="/auth/signin" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="/auth/signup" class="btn btn-primary btn-sm">Get Started Free</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge badge-primary">New</span>
+            <span class="badge-text">AI Video Generation 2.0</span>
+          </div>
+          <h1 class="hero-title">
+            Create Stunning Videos with <span class="text-primary">AI Magic</span>
+          </h1>
+          <p class="hero-description">
+            Transform your ideas into professional videos in minutes. No editing skills required.
+            Powered by cutting-edge AI that understands your vision.
+          </p>
+          <div class="hero-cta">
+            <a href="/auth/signup" class="btn btn-primary btn-lg">
+              Start Creating Free
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </a>
+            <a href="#demo" class="btn btn-secondary btn-lg">
+              <span class="material-symbols-outlined">play_circle</span>
+              Watch Demo
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="stat-value">10K+</div>
+              <div class="stat-label">Creators</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">1M+</div>
+              <div class="stat-label">Videos Created</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">4.9★</div>
+              <div class="stat-label">Rating</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card card">
+            <div class="hero-card-header">
+              <div class="card-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <span class="card-title">AI Video Studio</span>
+            </div>
+            <div class="hero-card-body">
+              <div class="video-preview">
+                <div class="preview-placeholder">
+                  <span class="material-symbols-outlined preview-icon">smart_display</span>
+                  <span class="preview-text">AI-generated video preview</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+      <div class="features-container">
+        <div class="section-header">
+          <span class="badge badge-primary">Features</span>
+          <h2 class="section-title">Everything you need to create amazing videos</h2>
+          <p class="section-description">
+            Powerful AI tools designed for creators, marketers, and businesses
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">auto_awesome</span>
+            </div>
+            <h3 class="feature-title">AI-Powered Generation</h3>
+            <p class="feature-description">
+              Generate professional videos from text prompts. Our AI understands context, style, and tone.
+            </p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">style</span>
+            </div>
+            <h3 class="feature-title">Customizable Templates</h3>
+            <p class="feature-description">
+              Choose from hundreds of professionally designed templates or create your own unique style.
+            </p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">groups</span>
+            </div>
+            <h3 class="feature-title">Team Collaboration</h3>
+            <p class="feature-description">
+              Work together seamlessly with your team. Share projects, leave feedback, and iterate in real-time.
+            </p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">speed</span>
+            </div>
+            <h3 class="feature-title">Lightning Fast</h3>
+            <p class="feature-description">
+              Get results in seconds, not hours. Our optimized infrastructure delivers speed without quality loss.
+            </p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">high_quality</span>
+            </div>
+            <h3 class="feature-title">4K Quality Export</h3>
+            <p class="feature-description">
+              Export your videos in stunning 4K resolution. Perfect for professional presentations and social media.
+            </p>
+          </div>
+          <div class="feature-card card">
+            <div class="feature-icon">
+              <span class="material-symbols-outlined">shield</span>
+            </div>
+            <h3 class="feature-title">Enterprise Security</h3>
+            <p class="feature-description">
+              Your data is protected with enterprise-grade encryption. SOC 2 Type II certified infrastructure.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo Video Section -->
+    <section id="demo" class="demo">
+      <div class="demo-container">
+        <div class="section-header">
+          <span class="badge badge-primary">See it in action</span>
+          <h2 class="section-title">Create your first video in under 2 minutes</h2>
+          <p class="section-description">
+            Watch how easy it is to transform your ideas into professional videos
+          </p>
+        </div>
+        <div class="demo-video-wrapper">
+          <div class="demo-video card">
+            <div class="video-thumbnail">
+              <button class="play-button">
+                <span class="material-symbols-outlined">play_arrow</span>
+              </button>
+              <div class="video-overlay"></div>
+            </div>
+            <div class="video-info">
+              <h3 class="video-title">Quick Start Guide</h3>
+              <p class="video-description">Learn the basics and create your first AI-generated video</p>
+              <div class="video-meta">
+                <span class="meta-item">
+                  <span class="material-symbols-outlined">schedule</span>
+                  2:45
+                </span>
+                <span class="meta-item">
+                  <span class="material-symbols-outlined">visibility</span>
+                  15.2K views
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+      <div class="pricing-container">
+        <div class="section-header">
+          <span class="badge badge-primary">Pricing</span>
+          <h2 class="section-title">Simple, transparent pricing</h2>
+          <p class="section-description">
+            Start free, scale as you grow. No hidden fees.
+          </p>
+        </div>
+        <div class="pricing-grid">
+          <!-- Free Tier -->
+          <div class="pricing-card card">
+            <div class="pricing-header">
+              <h3 class="pricing-title">Free</h3>
+              <div class="pricing-price">
+                <span class="price-amount">$0</span>
+                <span class="price-period">/month</span>
+              </div>
+              <p class="pricing-description">Perfect for trying out</p>
+            </div>
+            <ul class="pricing-features">
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                5 videos per month
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                720p export quality
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Basic templates
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Community support
+              </li>
+            </ul>
+            <a href="/auth/signup" class="btn btn-secondary btn-lg btn-block">Get Started</a>
+          </div>
+
+          <!-- Pro Tier -->
+          <div class="pricing-card card pricing-popular">
+            <div class="popular-badge">
+              <span class="badge badge-primary">Most Popular</span>
+            </div>
+            <div class="pricing-header">
+              <h3 class="pricing-title">Pro</h3>
+              <div class="pricing-price">
+                <span class="price-amount">$29</span>
+                <span class="price-period">/month</span>
+              </div>
+              <p class="pricing-description">For serious creators</p>
+            </div>
+            <ul class="pricing-features">
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                50 videos per month
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                4K export quality
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                All templates + custom
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Priority support
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Brand kit
+              </li>
+            </ul>
+            <a href="/auth/signup" class="btn btn-primary btn-lg btn-block">Start Pro Trial</a>
+          </div>
+
+          <!-- Enterprise Tier -->
+          <div class="pricing-card card">
+            <div class="pricing-header">
+              <h3 class="pricing-title">Enterprise</h3>
+              <div class="pricing-price">
+                <span class="price-amount">Custom</span>
+              </div>
+              <p class="pricing-description">For large teams</p>
+            </div>
+            <ul class="pricing-features">
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Unlimited videos
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                4K + custom formats
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                White-label option
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Dedicated support
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                Custom integrations
+              </li>
+              <li class="feature-item">
+                <span class="material-symbols-outlined feature-check">check</span>
+                SLA guarantee
+              </li>
+            </ul>
+            <a href="/contact" class="btn btn-secondary btn-lg btn-block">Contact Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+      <div class="testimonials-container">
+        <div class="section-header">
+          <span class="badge badge-primary">Testimonials</span>
+          <h2 class="section-title">Loved by creators worldwide</h2>
+          <p class="section-description">
+            See what our community is saying about PartsFlow
+          </p>
+        </div>
+        <div class="testimonials-grid">
+          <div class="testimonial-card card">
+            <div class="testimonial-rating">
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+            </div>
+            <p class="testimonial-text">
+              "PartsFlow has completely transformed our video production workflow. What used to take days now takes minutes. The AI is incredibly intuitive."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <span class="avatar-initials">SK</span>
+              </div>
+              <div class="author-info">
+                <div class="author-name">Sarah Kim</div>
+                <div class="author-title">Marketing Director, TechStart</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card card">
+            <div class="testimonial-rating">
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+            </div>
+            <p class="testimonial-text">
+              "The quality of the AI-generated videos is outstanding. We've increased our social media engagement by 300% since we started using PartsFlow."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <span class="avatar-initials">MJ</span>
+              </div>
+              <div class="author-info">
+                <div class="author-name">Marcus Johnson</div>
+                <div class="author-title">Content Creator, 500K followers</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card card">
+            <div class="testimonial-rating">
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+              <span class="material-symbols-outlined star">star</span>
+            </div>
+            <p class="testimonial-text">
+              "As a small business owner, I don't have the budget for a video production team. PartsFlow gives me professional results at a fraction of the cost."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <span class="avatar-initials">EC</span>
+              </div>
+              <div class="author-info">
+                <div class="author-name">Emily Chen</div>
+                <div class="author-title">Founder, GreenLife Co.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <div class="cta-container card">
+        <h2 class="cta-title">Ready to create amazing videos?</h2>
+        <p class="cta-description">
+          Join thousands of creators who are already using PartsFlow to bring their ideas to life
+        </p>
+        <div class="cta-actions">
+          <a href="/auth/signup" class="btn btn-primary btn-lg">
+            Start Creating Free
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+          <a href="/demo" class="btn btn-secondary btn-lg">
+            Schedule a Demo
+          </a>
+        </div>
+        <p class="cta-terms">No credit card required · Free forever plan available</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <div class="logo">
+              <span class="logo-text">PartsFlow</span>
+              <span class="logo-accent">.</span>
+            </div>
+            <p class="footer-tagline">AI-powered video creation for everyone</p>
+            <div class="footer-social">
+              <a href="#" class="social-link" aria-label="Twitter">
+                <span class="material-symbols-outlined">share</span>
+              </a>
+              <a href="#" class="social-link" aria-label="LinkedIn">
+                <span class="material-symbols-outlined">work</span>
+              </a>
+              <a href="#" class="social-link" aria-label="YouTube">
+                <span class="material-symbols-outlined">smart_display</span>
+              </a>
+            </div>
+          </div>
+          <div class="footer-sections">
+            <div class="footer-section">
+              <h4 class="footer-section-title">Product</h4>
+              <ul class="footer-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="/templates">Templates</a></li>
+                <li><a href="/api">API</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4 class="footer-section-title">Resources</h4>
+              <ul class="footer-links">
+                <li><a href="/docs">Documentation</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/community">Community</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4 class="footer-section-title">Company</h4>
+              <ul class="footer-links">
+                <li><a href="/about">About</a></li>
+                <li><a href="/careers">Careers</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/press">Press</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4 class="footer-section-title">Legal</h4>
+              <ul class="footer-links">
+                <li><a href="/privacy">Privacy</a></li>
+                <li><a href="/terms">Terms</a></li>
+                <li><a href="/security">Security</a></li>
+                <li><a href="/cookies">Cookies</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p class="footer-copyright">&copy; 2025 PartsFlow. All rights reserved.</p>
+          <p class="footer-location">Made with AI-powered creativity</p>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</Layout>
+
+<style>
+  /* Landing Page Styles - Stitch Design System */
+
+<style>
+  /* Landing Page Styles - Stitch Design System */
+
+  .landing-page {
+    min-height: 100vh;
+    background-color: var(--color-surface-100);
+  }
+
+  /* ===== Navigation ===== */
+  .nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-content {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.125rem;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .logo-accent {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-300);
+    line-height: 1;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 200ms;
+  }
+
+  .nav-link:hover {
+    color: #ffffff;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* ===== Hero Section ===== */
+  .hero {
+    padding-top: 6rem;
+    padding-bottom: 5rem;
+    background: linear-gradient(180deg, #121212 0%, var(--color-surface-100) 100%);
+  }
+
+  .hero-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background-color: rgba(223, 255, 0, 0.1);
+    border-radius: 9999px;
+    align-self: flex-start;
+  }
+
+  .badge-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary-300);
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .text-primary {
+    color: var(--color-primary-300);
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    padding-top: 1rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Hero Visual */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-card {
+    width: 100%;
+    max-width: 500px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  .hero-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-dots {
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  .card-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .hero-card-body {
+    padding: 1.5rem;
+  }
+
+  .video-preview {
+    aspect-ratio: 16 / 9;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .preview-icon {
+    font-size: 4rem;
+  }
+
+  .preview-text {
+    font-size: 0.875rem;
+  }
+
+  /* ===== Section Styles ===== */
+  .features, .demo, .pricing, .testimonials, .cta {
+    padding: 5rem 0;
+  }
+
+  .features-container, .demo-container, .pricing-container, .testimonials-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--color-neutral-600);
+  }
+
+  .section-description {
+    font-size: 1.125rem;
+    color: var(--color-neutral-400);
+  }
+
+  /* ===== Features Grid ===== */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .feature-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .feature-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary-900);
+  }
+
+  .feature-icon .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-neutral-600);
+  }
+
+  .feature-description {
+    color: var(--color-neutral-400);
+    line-height: 1.6;
+  }
+
+  /* ===== Demo Section ===== */
+  .demo-video-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .demo-video {
+    overflow: hidden;
+  }
+
+  .video-thumbnail {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, var(--color-primary-200) 0%, var(--color-primary-100) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .play-button {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: var(--color-primary-300);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 200ms, box-shadow 200ms;
+    z-index: 1;
+  }
+
+  .play-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(223, 255, 0, 0.4);
+  }
+
+  .play-button .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: var(--color-neutral-900);
+  }
+
+  .video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+  }
+
+  .video-info {
+    padding: 1.5rem;
+  }
+
+  .video-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-neutral-600);
+    margin-bottom: 0.5rem;
+  }
+
+  .video-description {
+    color: var(--color-neutral-400);
+    margin-bottom: 1rem;
+  }
+
+  .video-meta {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-neutral-400);
+  }
+
+  .meta-item .material-symbols-outlined {
+    font-size: 1rem;
+  }
+
+  /* ===== Pricing Section ===== */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .pricing-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .pricing-popular {
+    border: 2px solid var(--color-primary-300);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .pricing-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .pricing-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-neutral-600);
+  }
+
+  .pricing-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .price-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-neutral-600);
+  }
+
+  .price-period {
+    font-size: 1rem;
+    color: var(--color-neutral-400);
+  }
+
+  .pricing-description {
+    color: var(--color-neutral-400);
+  }
+
+  .pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-neutral-400);
+  }
+
+  .feature-check {
+    color: var(--color-primary-600);
+    font-size: 1.25rem;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  /* ===== Testimonials Section ===== */
+  .testimonials {
+    background-color: var(--color-surface-200);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .testimonial-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .testimonial-rating {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .star {
+    color: var(--color-warning-500);
+    font-size: 1.25rem;
+  }
+
+  .testimonial-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-neutral-500);
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .author-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary-300) 0%, var(--color-primary-500) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-neutral-900);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .author-name {
+    font-weight: 600;
+    color: var(--color-neutral-600);
+  }
+
+  .author-title {
+    font-size: 0.875rem;
+    color: var(--color-neutral-400);
+  }
+
+  /* ===== CTA Section ===== */
+  .cta {
+    padding: 6rem 0;
+  }
+
+  .cta-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 3rem;
+    text-align: center;
+    background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #ffffff;
+    margin-bottom: 1rem;
+  }
+
+  .cta-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-terms {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    background-color: #121212;
+    padding: 4rem 0 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr;
+    gap: 4rem;
+    margin-bottom: 3rem;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-tagline {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .social-link {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    transition: background-color 200ms;
+  }
+
+  .social-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .footer-sections {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 200ms;
+  }
+
+  .footer-links a:hover {
+    color: var(--color-primary-300);
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-copyright, .footer-location {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ===== Responsive Design ===== */
+  @media (max-width: 1024px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-content {
+      align-items: center;
+    }
+
+    .hero-cta {
+      justify-content: center;
+    }
+
+    .hero-stats {
+      justify-content: center;
+    }
+
+    .features-grid,
+    .pricing-grid,
+    .testimonials-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-content {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-sections {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav-content {
+      flex-wrap: wrap;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .features-grid,
+    .pricing-grid,
+    .testimonials-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-sections {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+  }
+</style>
