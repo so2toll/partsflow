@@ -12,7 +12,6 @@
 import { organizationRepository } from "../db/repositories/OrganizationRepository";
 import { projectRepository } from "../db/repositories/ProjectRepository";
 import { teamRepository } from "../db/repositories/TeamRepository";
-import { characterRepository } from "../db/repositories/CharacterRepository";
 import { userSubscriptionRepository } from "../db/repositories/UserSubscriptionRepository";
 import { graph } from "../db/graph";
 
@@ -77,26 +76,6 @@ export async function getPageData(
 
     case 'appProfile4':
       return getProfile4PageData(isSuperAdmin, organizationId, userId);
-
-    case 'appCharacters':
-      return getCharactersPageData(isSuperAdmin, organizationId, userId);
-
-    case 'appVideoEdit':
-      return getVideoEditPageData(isSuperAdmin, organizationId, userId);
-
-    case 'appVideoProgress':
-      // For video progress, the page handles its own data fetching with projectId from params
-      // This returns minimal data for consistency
-      return data;
-
-    case 'appNewVideo':
-      return getNewVideoPageData(isSuperAdmin, organizationId, userId);
-
-    case 'appUpload':
-      return getUploadPageData(isSuperAdmin, organizationId, userId);
-
-    case 'appBilling':
-      return getBillingPageData(isSuperAdmin, organizationId, userId);
 
     case 'appDashboardTest':
       return getDashboardTestPageData(isSuperAdmin, organizationId, userId);
@@ -403,149 +382,6 @@ async function getProfile4PageData(
 }
 
 /**
- * Characters page data - Character Library
- */
-async function getCharactersPageData(
-  isSuperAdmin: boolean,
-  organizationId?: string,
-  userId?: string
-): Promise<PageData> {
-  const data: PageData = {};
-
-  // Get current user info
-  if (userId) {
-    const userResults = await graph.query<any>(
-      `
-      MATCH (u:User {id: $userId})
-      RETURN u
-      `,
-      { userId }
-    );
-
-    if (userResults.length > 0 && userResults[0].u) {
-      const userProps = userResults[0].u.properties;
-      data.user = {
-        id: userProps.id,
-        email: userProps.email,
-        name: userProps.name,
-        role: userProps.role,
-        organizationId: userProps.organizationId,
-      };
-    }
-  }
-
-  if (isSuperAdmin) {
-    // SuperAdmin sees all characters across all organizations
-    // Get all organizations first
-    const orgsResult = await organizationRepository.list({ limit: 50 });
-    data.organizations = orgsResult.organizations;
-
-    // Aggregate characters from all organizations
-    const allCharacters: any[] = [];
-    for (const org of orgsResult.organizations) {
-      const charactersResult = await characterRepository.findByOrgId(org.id);
-      allCharacters.push(...charactersResult.characters);
-    }
-    data.characters = allCharacters;
-
-  } else if (organizationId) {
-    // Regular users see their organization's characters
-    const charactersResult = await characterRepository.findByOrgId(organizationId);
-    data.characters = charactersResult.characters;
-
-    // Get organization for context
-    data.organization = await organizationRepository.findById(organizationId);
-  }
-
-  return data;
-}
-
-/**
- * Video Edit page data - Phase 4 Demo
- */
-async function getVideoEditPageData(
-  isSuperAdmin: boolean,
-  organizationId?: string,
-  userId?: string
-): Promise<PageData> {
-  const data: PageData = {};
-
-  // For demo purposes, we'll return minimal data
-  // The actual demo functionality is client-side with mock data
-  data.isDemo = true;
-  data.demoMode = 'edit';
-  data.userId = userId;
-  data.userRole = isSuperAdmin ? 'SuperAdmin' : 'User';
-
-  // Skip database queries for the demo to avoid potential issues
-  // The component has built-in mock data
-
-  return data;
-}
-
-/**
- * New Video Project page data
- */
-async function getNewVideoPageData(
-  isSuperAdmin: boolean,
-  organizationId?: string,
-  userId?: string
-): Promise<PageData> {
-  const data: PageData = {};
-
-  // Get user subscription data
-  if (userId) {
-    data.subscription = await userSubscriptionRepository.getSubscription(userId);
-  }
-
-  // Get characters for the character selector
-  if (isSuperAdmin) {
-    // SuperAdmin can see all characters
-    const orgsResult = await organizationRepository.list({ limit: 50 });
-    const allCharacters: any[] = [];
-    for (const org of orgsResult.organizations) {
-      const charactersResult = await characterRepository.findByOrgId(org.id);
-      allCharacters.push(...charactersResult.characters);
-    }
-    data.characters = allCharacters;
-    data.organizations = orgsResult.organizations;
-
-  } else if (organizationId) {
-    // Regular users see their organization's characters
-    const charactersResult = await characterRepository.findByOrgId(organizationId);
-    data.characters = charactersResult.characters;
-    data.organization = await organizationRepository.findById(organizationId);
-  } else {
-    // No organization - return empty characters
-    data.characters = [];
-  }
-
-  // Get user details
-  if (userId) {
-    const userResults = await graph.query<any>(
-      `
-      MATCH (u:User {id: $userId})
-      RETURN u
-      `,
-      { userId }
-    );
-
-    if (userResults.length > 0 && userResults[0].u) {
-      const userProps = userResults[0].u.properties;
-      data.user = {
-        id: userProps.id,
-        email: userProps.email,
-        name: userProps.name,
-        role: userProps.role,
-        organizationId: userProps.organizationId,
-      };
-    }
-  }
-
-  return data;
-}
-
-/**
  * Project detail page data
  * Called separately with projectId
  */
@@ -589,145 +425,6 @@ export async function getProjectDetailPageData(
     organization: org,
     owner
   };
-}
-
-/**
- * Video progress page data
- * Called separately with projectId from route params
- */
-export async function getVideoProgressPageData(
-  projectId: string,
-  userId: string
-): Promise<PageData | null> {
-  const project = await projectRepository.findById(projectId);
-
-  if (!project) {
-    return null;
-  }
-
-  // Calculate progress percentage
-  let progress = 0;
-  const videoStatus = (project as any).videoStatus;
-  const totalScenes = (project as any).totalScenes || 1;
-  const completedScenes = (project as any).completedScenes || 0;
-
-  if (videoStatus === 'completed') {
-    progress = 100;
-  } else if (videoStatus === 'generating' || videoStatus === 'rendering') {
-    progress = Math.round((completedScenes / totalScenes) * 80) + 10;
-  } else if (videoStatus === 'scripted') {
-    progress = 10;
-  }
-
-  // Get job status (mock for now)
-  const jobStatus = {
-    state: videoStatus || 'draft',
-    progress: progress,
-  };
-
-  // Check if user can edit (is owner or SuperAdmin)
-  const canEdit = (project as any).createdBy === userId;
-
-  return {
-    project,
-    jobStatus,
-    progress,
-    canEdit,
-  };
-}
-
-/**
- * Upload page data - Video AI Edit Mode Upload
- */
-async function getUploadPageData(
-  isSuperAdmin: boolean,
-  organizationId?: string,
-  userId?: string
-): Promise<PageData> {
-  const data: PageData = {};
-
-  // Get user details
-  if (userId) {
-    const userResults = await graph.query<any>(
-      `
-      MATCH (u:User {id: $userId})
-      RETURN u
-      `,
-      { userId }
-    );
-
-    if (userResults.length > 0 && userResults[0].u) {
-      const userProps = userResults[0].u.properties;
-      data.user = {
-        id: userProps.id,
-        email: userProps.email,
-        name: userProps.name,
-        role: userProps.role,
-        organizationId: userProps.organizationId,
-      };
-    }
-  }
-
-  // Get organization for context
-  if (organizationId) {
-    data.organization = await organizationRepository.findById(organizationId);
-  }
-
-  // Get user subscription for upload limits
-  if (userId) {
-    data.subscription = await userSubscriptionRepository.getSubscription(userId);
-  }
-
-  return data;
-}
-
-/**
- * Billing page data - Subscription Management
- */
-async function getBillingPageData(
-  isSuperAdmin: boolean,
-  organizationId?: string,
-  userId?: string
-): Promise<PageData> {
-  const data: PageData = {};
-
-  // Get user subscription data
-  if (userId) {
-    data.subscription = await userSubscriptionRepository.getSubscription(userId);
-  }
-
-  // Get payment history (stub for now - will be populated from Stripe)
-  // In production, this would fetch from Stripe API or cache
-  data.paymentHistory = [];
-
-  // Get user details
-  if (userId) {
-    const userResults = await graph.query<any>(
-      `
-      MATCH (u:User {id: $userId})
-      RETURN u
-      `,
-      { userId }
-    );
-
-    if (userResults.length > 0 && userResults[0].u) {
-      const userProps = userResults[0].u.properties;
-      data.user = {
-        id: userProps.id,
-        email: userProps.email,
-        name: userProps.name,
-        role: userProps.role,
-        organizationId: userProps.organizationId,
-      };
-    }
-  }
-
-  // Get organization for context
-  if (organizationId) {
-    data.organization = await organizationRepository.findById(organizationId);
-  }
-
-  return data;
 }
 
 /**
@@ -825,43 +522,18 @@ async function getDashboardTestPageData(
 // ============================================================================
 
 async function getSystemStats() {
-  const [userResults, videoResults, highlightResults] = await Promise.all([
+  const [userResults] = await Promise.all([
     graph.query<any>("MATCH (u:User) RETURN count(u) as count"),
-    graph.query<any>(
-      "MATCH (p:Project)-[:HAS_VIDEO]->(v:Video) RETURN count(v) as count"
-    ),
-    graph.query<any>(
-      "MATCH (v:Video)-[:HAS_HIGHLIGHT]->(h:Highlight) RETURN count(h) as count"
-    ),
   ]);
 
   return {
     userCount: userResults[0]?.count || 0,
-    videoCount: videoResults[0]?.count || 0,
-    highlightCount: highlightResults[0]?.count || 0,
   };
 }
 
-async function getOrgStats(organizationId: string) {
-  const [videoResults, highlightResults] = await Promise.all([
-    graph.query<any>(
-      `
-      MATCH (org:Organization {id: $orgId})-[:HAS_PROJECT]->(p:Project)-[:HAS_VIDEO]->(v:Video)
-      RETURN count(v) as count
-      `,
-      { orgId: organizationId }
-    ),
-    graph.query<any>(
-      `
-      MATCH (org:Organization {id: $orgId})-[:HAS_PROJECT]->(p:Project)-[:HAS_VIDEO]->(v:Video)-[:HAS_HIGHLIGHT]->(h:Highlight)
-      RETURN count(h) as count
-      `,
-      { orgId: organizationId }
-    ),
-  ]);
-
+async function getOrgStats(_organizationId: string) {
   return {
-    videoCount: videoResults[0]?.count || 0,
-    highlightCount: highlightResults[0]?.count || 0,
+    videoCount: 0,
+    highlightCount: 0,
   };
 }
