@@ -1,0 +1,28 @@
+---
+/**
+ * Driver Dashboard Content Component
+ *
+ * Driver-specific dashboard with current delivery, available orders queue, and stats.
+ *
+ * @component content-container/Driver/DriverDashboard
+ * @version 0.1.0
+ */
+
+import DriverDashboardComponent from '../../components/driver/DriverDashboardComponent.tsx';
+import type { DriverDashboardPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: DriverDashboardPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<DriverDashboardComponent
+  client:load
+  driver={data.driver}
+  currentDelivery={data.currentDelivery}
+  availableOrders={data.availableOrders || []}
+  stats={data.stats}
+  userId={data.userId}
+/>

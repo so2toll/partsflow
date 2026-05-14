@@ -26,6 +26,17 @@ import AppProfile4 from '../../content-container/App/Profile4.astro';
 import AppOperationsDashboard from '../../content-container/App/OperationsDashboard.astro';
 import AppOperationsDashboardOld from '../../content-container/App/OperationsDashboard_old.astro';
 
+// Content for Shop Pages (MotoFlow)
+import PartsSearch from '../../content-container/Shop/PartsSearch.astro';
+import OrdersList from '../../content-container/Shop/OrdersList.astro';
+import OrderDetail from '../../content-container/Shop/OrderDetail.astro';
+
+// Content for Driver Pages (MotoFlow)
+import DriverDashboard from '../../content-container/Driver/DriverDashboard.astro';
+
+// Content for Admin Pages (MotoFlow)
+import DispatchManagement from '../../content-container/Admin/DispatchManagement.astro';
+
 // Blank Content
 import Blank from '../../content-container/Blank/Content.astro';
 
@@ -197,6 +208,15 @@ export const RBAC_CONFIG = {
         footer: Blank,
         title: "Invite Management",
         description: "Generate and manage invite links for Shop Owners and Drivers",
+      },
+      // MotoFlow Dispatch Management (SuperAdmin only)
+      adminDispatch: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: DispatchManagement,
+        footer: Blank,
+        title: "Dispatch Management",
+        description: "Assign orders to drivers and monitor fleet",
       },
     },
 
@@ -384,6 +404,31 @@ export const RBAC_CONFIG = {
         title: "Operations Dashboard",
         description: "MotoFlow Operations Control Room - Test Page",
       },
+      // MotoFlow Shop Pages
+      partsSearch: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: PartsSearch,
+        footer: Blank,
+        title: "Parts Search",
+        description: "Search for parts and place orders for delivery",
+      },
+      ordersList: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: OrdersList,
+        footer: Blank,
+        title: "Orders",
+        description: "Manage your parts delivery orders",
+      },
+      orderDetail: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: OrderDetail,
+        footer: Blank,
+        title: "Order Details",
+        description: "View order details and track delivery",
+      },
     },
 
     StudioViewer: {
@@ -484,7 +529,7 @@ export const RBAC_CONFIG = {
       driverDashboard: {
         topNav: StitchTopNav,
         sideNav: DriverSideNav,
-        content: Blank, // Will be replaced with DriverDashboard component
+        content: DriverDashboard,
         footer: Blank,
         title: "Driver Dashboard",
         description: "View and manage your deliveries",

@@ -1,0 +1,79 @@
+---
+/**
+ * Order Detail Page - MotoFlow
+ *
+ * Standard page template with dynamic route parameter:
+ * 1. Get session
+ * 2. Set currentPage
+ * 3. Extract orderId from params
+ * 4. Fetch data via unified getPageData()
+ * 5. Validate role access
+ * 6. Render RBACComponent
+ */
+
+import { getSession } from "../../../../lib/auth/session-adapter";
+import { getLoginUrl } from "../../../../lib/auth/feature-flag";
+import { RBAC_CONFIG } from "../../../../lib/configs/rbacConfig.js";
+import RBACComponent from "../../../../components/RBAC/RBACComponent.astro";
+import { getPageData } from "../../../../lib/data/appPageData";
+
+// ========================================================================
+// PAGE CONFIGURATION - Only this changes per page!
+// ========================================================================
+const currentPage = 'orderDetail';
+
+// Get order ID from dynamic route parameter
+const { id } = Astro.params;
+
+// ========================================================================
+// STANDARD PAGE LOGIC - Copy-paste for all app pages
+// ========================================================================
+
+// Get session
+const session = await getSession(Astro.request, Astro.cookies);
+
+if (!session) {
+  return Astro.redirect(getLoginUrl());
+}
+
+// Get user info from session
+const user = session.user;
+const userId = user?.global_id || user?.id;
+const userRole = user?.role;
+const organizationId = user?.organizationId;
+
+// ========================================================================
+// DATA FETCHING - Uses unified getPageData() function
+// ========================================================================
+
+const data = await getPageData(currentPage, userId, userRole, organizationId, { orderId: id });
+
+// ========================================================================
+// ROLE VALIDATION
+// ========================================================================
+
+if (!userRole) {
+  console.log('No role found for user:', userId);
+  return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+  console.log('Invalid role:', userRole, 'for user:', userId);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+  console.log('Role', userRole, 'does not have access to page:', currentPage);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+// ========================================================================
+// RENDER RBAC COMPONENT
+// ========================================================================
+---
+<RBACComponent
+  userRole={userRole}
+  userId={userId}
+  data={data}
+  currentPage={currentPage}
+/>

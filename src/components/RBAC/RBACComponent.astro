@@ -4,8 +4,7 @@ import { RBAC_CONFIG } from '../../lib/configs/rbacConfig.js';
 let {userRole, userId, data, currentPage} = Astro.props;
 
 // Initialize component variables
-let ContentComponent, FooterComponent, title, description;
-let useStitchDesign = false;
+let TopNavComponent, SideNavComponent, ContentComponent, FooterComponent, title, description;
 
 // Safety check - this should never happen if validation is done in parent pages
 // but adding as an extra safety net
@@ -16,23 +15,20 @@ try {
         return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
     }
 
+    TopNavComponent = RBAC_CONFIG[userRole][currentPage].topNav;
+    SideNavComponent = RBAC_CONFIG[userRole][currentPage].sideNav;
     ContentComponent = RBAC_CONFIG[userRole][currentPage].content;
     FooterComponent = RBAC_CONFIG[userRole][currentPage].footer;
     title = RBAC_CONFIG[userRole][currentPage].title;
     description = RBAC_CONFIG[userRole][currentPage].description;
-
-    // Check if this page uses Stitch design system
-    const config = RBAC_CONFIG[userRole][currentPage];
-    useStitchDesign = config.topNav.name === 'StitchTopNav';
 } catch (error) {
     console.error('RBAC Component Configuration Error:', error);
     return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
 }
 
-// Import navigation components based on configuration
-import StitchTopNav from '../../layouts/Dashboard/StitchTopNav.astro';
-import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
-
+// Check if using Stitch navigation (for margin calculations)
+const useStitchNav = TopNavComponent.name === 'StitchTopNav' || SideNavComponent.name === 'StitchSideNav';
+const hasSideNav = SideNavComponent.name !== 'Blank';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -44,28 +40,39 @@ import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
   <link rel="icon" href="/images/data3DLogoBlack.svg">
   <meta name="keywords" content="dashboard, projects, teams, analytics">
   <meta name="theme-color" content="#121212">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
+  <style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
 </head>
 
 <body>
-  {useStitchDesign ? (
+  {useStitchNav ? (
     <>
-      {/* Fixed Top Navigation Bar */}
-      <StitchTopNav
-        userRole={userRole}
-        userId={userId}
-        title={title}
-        organization={data?.organization}
-      />
+      {/* Fixed Top Navigation Bar - render from rbacConfig */}
+      {TopNavComponent.name !== 'Blank' && (
+        <TopNavComponent
+          userRole={userRole}
+          userId={userId}
+          title={title}
+          organization={data?.organization}
+        />
+      )}
 
-      {/* Fixed Sidebar */}
-      <StitchSideNav
-        userRole={userRole}
-        userId={userId}
-        currentPage={currentPage}
-      />
+      {/* Fixed Sidebar - render from rbacConfig */}
+      {SideNavComponent.name !== 'Blank' && (
+        <SideNavComponent
+          userRole={userRole}
+          userId={userId}
+          currentPage={currentPage}
+        />
+      )}
 
       {/* Main Content Area - with margins for fixed nav */}
-      <div class="mt-16 ml-64 min-h-[calc(100vh-64px)] bg-[#f9f9f9] transition-all duration-300 max-lg:ml-0">
+      <div class={hasSideNav ? "mt-16 ml-64 min-h-[calc(100vh-64px)] bg-[#f9f9f9] transition-all duration-300 max-lg:ml-0" : "min-h-screen"}>
         <ContentComponent data={data} userRole={userRole} userId={userId} />
         <FooterComponent />
       </div>
@@ -94,7 +101,7 @@ import StitchSideNav from '../../layouts/Dashboard/StitchSideNav.astro';
   // Sidebar toggle for mobile
   (function() {
     let sidebarOpen = false;
-    const sidebar = document.querySelector('.stitch-sidebar');
+    const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.stitch-main-content');
 
     if (window.innerWidth <= 1024) {

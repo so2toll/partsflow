@@ -33,3 +33,13 @@ export type { PaymentEvent, CreatePaymentEventData } from "./PaymentRepository";
 
 export { inviteRepository, InviteRepository } from "./InviteRepository";
 export type { Invite, InviteType, InviteStatus, CreateInviteData, ListInvitesOptions } from "./InviteRepository";
+
+// MotoFlow operations repositories
+export { driverRepository, DriverRepository } from "./DriverRepository";
+export type { Driver, DriverStatus, CreateDriverData, UpdateDriverLocationData, ListDriversOptions } from "./DriverRepository";
+
+export { orderRepository, OrderRepository } from "./OrderRepository";
+export type { Order, OrderPriority, OrderStatus, CreateOrderData, ListOrdersOptions } from "./OrderRepository";
+
+export { supplierRepository, SupplierRepository } from "./SupplierRepository";
+export type { Supplier } from "./SupplierRepository";

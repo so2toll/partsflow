@@ -1,20 +1,55 @@
 ---
 /**
- * Stitch Design System - MotoFlow Top Navigation Bar
+ * MotoFlow Top Navigation Bar - Role-Based
  *
- * Dark navy top navigation bar with:
- * - Logo/Brand area (left) - "FLOW OPS" in orange
- * - Stats metrics (center) - REVENUE, ORDERS, DRIVERS, SLA, AVG
- * - Actions (right) - "+ NEW ORDER" button, notifications, user profile
+ * Shows different actions based on user role.
+ *
+ * Shop Roles: "Search Parts" button
+ * Driver: Status indicator
+ * SuperAdmin: "Dispatch" button
  */
 
 interface Props {
   userRole?: string;
   userId?: string;
+  currentPage?: string;
   organization?: any;
 }
 
-const { userRole, userId, organization } = Astro.props;
+const { userRole, userId, currentPage, organization } = Astro.props;
+
+// Navigation items (same as StitchSideNav)
+const navItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
+  { id: 'teams', label: 'Teams', icon: 'groups', href: '/app/teams' },
+  { id: 'projects', label: 'Projects', icon: 'folder', href: '/app/projects' },
+  { id: 'partsSearch', label: 'Parts Search', icon: 'search', href: '/app/parts/search' },
+  { id: 'ordersList', label: 'Orders', icon: 'list', href: '/app/orders' },
+];
+
+// Role-based CTA button
+const getCtaButton = (role: string | undefined) => {
+  if (role === 'Driver') {
+    return null; // Drivers don't need a CTA button in top nav
+  }
+
+  if (role === 'SuperAdmin') {
+    return {
+      label: 'Dispatch',
+      href: '/app/admin/dispatch',
+      icon: 'local_shipping',
+    };
+  }
+
+  // Shop roles
+  return {
+    label: 'Search Parts',
+    href: '/app/parts/search',
+    icon: 'search',
+  };
+};
+
+const ctaButton = getCtaButton(userRole);
 ---
 
 <header class="top-nav">
@@ -26,28 +61,135 @@ const { userRole, userId, organization } = Astro.props;
         <span class="brand-text">MotoFlow</span>
       </a>
     </div>
+    <span class="divider"></span>
 
-  
+    <!-- Center: Quick Stats (for visual interest) -->
+    <div class="stats-section">
+      <div class="stat-item">
+        <span class="stat-label">Active Orders</span>
+        <span class="stat-value">--</span>
+      </div>
+      {userRole === 'SuperAdmin' && (
+        <>
+          <div class="stat-item">
+            <span class="stat-label">Available Drivers</span>
+            <span class="stat-value">--</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">SLA Status</span>
+            <span class="stat-value stat-success">GOOD</span>
+          </div>
+        </>
+      )}
+    </div>
+
+    <!-- Spacer to push actions to the right -->
+    <div class="spacer"></div>
+
     <!-- Right: Actions -->
     <div class="actions-section">
-      <!-- New Order Button -->
-      <button class="btn-new-order">
-        <span class="material-symbols-outlined">add</span>
-        <span>NEW PROJECT</span>
-      </button>
+      {ctaButton && (
+        <a href={ctaButton.href} class="btn-cta">
+          <span class="material-symbols-outlined">{ctaButton.icon}</span>
+          <span>{ctaButton.label}</span>
+        </a>
+      )}
 
-      <!-- Icons -->
-      <div class="icon-actions">
-        <button class="icon-btn">
+      <!-- Desktop Icons -->
+      <div class="icon-actions desktop-only">
+        <button class="icon-btn" title="Notifications">
           <span class="material-symbols-outlined">notifications</span>
         </button>
-        <div class="user-avatar">
-          <span>OP</span>
+        <div class="user-avatar" title={userRole || 'User'}>
+          <span>{userRole?.slice(0, 2).toUpperCase() || 'US'}</span>
         </div>
       </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-button"
+        class="mobile-menu-btn mobile-only"
+        type="button"
+        aria-label="Toggle menu"
+      >
+        <span class="material-symbols-outlined menu-icon">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu" class="mobile-menu">
+    <nav class="mobile-nav">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class={`mobile-nav-item ${currentPage === item.id ? 'active' : ''}`}
+        >
+          <span class="material-symbols-outlined mobile-nav-icon">{item.icon}</span>
+          <span class="mobile-nav-label">{item.label}</span>
+        </a>
+      ))}
+    </nav>
+
+    <div class="mobile-menu-footer">
+      <button id="mobile-logout-button" class="mobile-logout-btn" type="button">
+        <span class="material-symbols-outlined">logout</span>
+        <span>Logout</span>
+      </button>
     </div>
   </div>
 </header>
+
+<script>
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileLogoutBtn = document.getElementById('mobile-logout-button');
+  let isMenuOpen = false;
+
+  mobileMenuBtn?.addEventListener('click', () => {
+    isMenuOpen = !isMenuOpen;
+    if (mobileMenu) {
+      mobileMenu.classList.toggle('open', isMenuOpen);
+    }
+    const icon = mobileMenuBtn?.querySelector('.menu-icon');
+    if (icon) {
+      icon.textContent = isMenuOpen ? 'close' : 'menu';
+    }
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (isMenuOpen && mobileMenu && !mobileMenu.contains(e.target as Node) && !mobileMenuBtn?.contains(e.target as Node)) {
+      isMenuOpen = false;
+      mobileMenu.classList.remove('open');
+      const icon = mobileMenuBtn?.querySelector('.menu-icon');
+      if (icon) {
+        icon.textContent = 'menu';
+      }
+    }
+  });
+
+  // Mobile logout
+  mobileLogoutBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const button = e.target as HTMLButtonElement;
+    button.disabled = true;
+    button.textContent = 'Logging out...';
+
+    try {
+      const { logout } = await import('../../lib/auth/auth-client');
+      await logout();
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('[MobileMenu] Logout error:', error);
+      window.location.href = '/auth/login';
+    }
+  });
+</script>
 
 <style>
   .top-nav {
@@ -64,7 +206,6 @@ const { userRole, userId, organization } = Astro.props;
   .top-nav-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 100%;
     padding: 0 24px;
     max-width: 100%;
@@ -74,14 +215,14 @@ const { userRole, userId, organization } = Astro.props;
   .brand-section {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 
   .brand-link {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     text-decoration: none;
-    color: white;
   }
 
   .brand-icon {
@@ -90,44 +231,53 @@ const { userRole, userId, organization } = Astro.props;
   }
 
   .brand-text {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    color: #ff5c00;
-  }
-
-  /* Stats Metrics */
-  .stats-metrics {
-    display: none;
-    gap: 32px;
-  }
-
-  @media (min-width: 768px) {
-    .stats-metrics {
-      display: flex;
-    }
-  }
-
-  .metric {
-    font-size: 11px;
+    font-size: 20px;
     font-weight: 700;
+    color: #ffffff;
+  }
+
+  .divider {
+    width: 1px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 24px;
+    flex-shrink: 0;
+  }
+
+  /* Stats Section */
+  .stats-section {
+    display: flex;
+    gap: 32px;
+    flex-shrink: 0;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #a0aec0;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: rgba(255, 255, 255, 0.4);
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 200ms;
+    letter-spacing: 0.5px;
   }
 
-  .metric:hover {
-    color: rgba(255, 255, 255, 0.6);
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
   }
 
-  .metric.active {
-    color: #ff5c00;
-    background-color: rgba(255, 92, 0, 0.1);
-    border-bottom: 2px solid #ff5c00;
+  .stat-success {
+    color: #22c55e;
+  }
+
+  /* Spacer to push actions to the right */
+  .spacer {
+    flex: 1;
+    min-width: 32px;
   }
 
   /* Actions Section */
@@ -135,33 +285,28 @@ const { userRole, userId, organization } = Astro.props;
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-shrink: 0;
   }
 
-  .btn-new-order {
+  .btn-cta {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 10px 20px;
     background-color: #ff5c00;
-    color: white;
+    color: #ffffff;
     border: none;
     border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 200ms;
     cursor: pointer;
-    transition: all 200ms;
-    box-shadow: 0 2px 8px rgba(255, 92, 0, 0.3);
+    white-space: nowrap;
   }
 
-  .btn-new-order:hover {
+  .btn-cta:hover {
     background-color: #e05000;
-    box-shadow: 0 4px 12px rgba(255, 92, 0, 0.4);
-    transform: translateY(-1px);
-  }
-
-  .btn-new-order:active {
-    transform: translateY(0);
   }
 
   .icon-actions {
@@ -171,36 +316,189 @@ const { userRole, userId, organization } = Astro.props;
   }
 
   .icon-btn {
-    background: transparent;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.6);
-    transition: color 200ms;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: all 200ms;
   }
 
   .icon-btn:hover {
-    color: white;
-  }
-
-  .icon-btn .material-symbols-outlined {
-    font-size: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
   }
 
   .user-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff5c00, #e05000);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    width: 40px;
+    height: 40px;
+    background-color: #ff5c00;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 700;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+
+  /* Mobile Menu Button */
+  .mobile-menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .mobile-menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .menu-icon {
+    font-size: 24px;
+  }
+
+  /* Mobile Menu Dropdown */
+  .mobile-menu {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background-color: #1A202C;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 300ms ease;
+    z-index: 999;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #a0aec0;
+    transition: all 200ms;
+  }
+
+  .mobile-nav-item:hover {
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
+  }
+
+  .mobile-nav-item.active {
+    background-color: rgba(255, 92, 0, 0.15);
+    color: #ff5c00;
+    border-left: 3px solid #ff5c00;
+  }
+
+  .mobile-nav-icon {
+    font-size: 20px;
+  }
+
+  .mobile-nav-label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .mobile-menu-footer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms;
+  }
+
+  .mobile-logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .mobile-logout-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .stats-section {
+      display: none;
+    }
+
+    .desktop-only {
+      display: none !important;
+    }
+
+    .mobile-only {
+      display: flex !important;
+    }
+
+    .spacer {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .mobile-only {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-nav-container {
+      padding: 0 16px;
+    }
+
+    .btn-cta span:not(.material-symbols-outlined) {
+      display: none;
+    }
+
+    .btn-cta {
+      padding: 10px;
+    }
   }
 </style>

@@ -18,12 +18,11 @@ interface Props {
 const { userRole, userId, currentPage } = Astro.props;
 
 const navItems = [
-  { id: 'map', label: 'MAP', icon: 'map' },
-  { id: 'feed', label: 'FEED', icon: 'format_list_bulleted' },
-  { id: 'dispatch', label: 'DISPATCH', icon: 'local_shipping' },
-  { id: 'revenue', label: 'REVENUE', icon: 'payments' },
-  { id: 'fleet', label: 'FLEET', icon: 'directions_car' },
-  { id: 'settings', label: 'SETTINGS', icon: 'settings' },
+  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
+  { id: 'teams', label: 'Teams', icon: 'groups', href: '/app/teams' },
+  { id: 'projects', label: 'Projects', icon: 'folder', href: '/app/projects' },
+  { id: 'partsSearch', label: 'Parts Search', icon: 'search', href: '/app/parts/search' },
+  { id: 'ordersList', label: 'Orders', icon: 'list', href: '/app/orders' },
 ];
 ---
 
@@ -43,7 +42,7 @@ const navItems = [
   <nav class="nav-section">
     {navItems.map((item) => (
       <a
-        href={`/app/${item.id}`}
+        href={item.href}
         class={`nav-item ${currentPage === item.id ? 'active' : ''}`}
       >
         <span class="material-symbols-outlined nav-icon">{item.icon}</span>
@@ -68,6 +67,41 @@ const navItems = [
     <span class="status-text">OPTIMAL</span>
   </div>
 </aside>
+
+<script>
+  // Client-side logout using Better Auth's client-side signOut
+  document.getElementById('sidenav-logout-button')?.addEventListener('click', async function(e) {
+    e.preventDefault();
+
+    console.log('[StitchSideNav] Client-side logout initiated');
+
+    // Disable button to prevent double-click
+    const button = e.target;
+    button.disabled = true;
+    button.textContent = 'Logging out...';
+
+    try {
+      // Import and use Better Auth's client-side signOut
+      const { logout } = await import('../../lib/auth/auth-client');
+      console.log('[StitchSideNav] Calling Better Auth client-side signOut...');
+
+      await logout();
+      console.log('[StitchSideNav] Better Auth signOut completed successfully');
+
+      // Clear local storage
+      localStorage.clear();
+      sessionStorage.clear();
+      console.log('[StitchSideNav] Cleared storage');
+
+      // Redirect to login
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('[StitchSideNav] Error:', error);
+      // Fallback: just redirect
+      window.location.href = '/auth/login';
+    }
+  });
+</script>
 
 <style>
   .sidebar {
@@ -101,68 +135,58 @@ const navItems = [
   }
 
   .user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff5c00, #e05000);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    width: 48px;
+    height: 48px;
+    background-color: #ff5c00;
+    border-radius: 50%;
+    font-size: 16px;
     font-weight: 700;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .user-info {
-    display: flex;
-    flex-direction: column;
+    color: #ffffff;
   }
 
   .user-name {
     font-size: 14px;
-    font-weight: 700;
-    color: white;
-    letter-spacing: 0.02em;
+    font-weight: 600;
+    color: #ffffff;
   }
 
   .user-station {
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 0.05em;
-    margin-top: 2px;
+    font-size: 12px;
+    color: #a0aec0;
   }
 
-  /* Navigation */
+  /* Navigation Items */
   .nav-section {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex: 1;
   }
 
   .nav-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
+    gap: 12px;
+    padding: 12px 16px;
     border-radius: 8px;
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.5);
+    color: #a0aec0;
     transition: all 200ms;
-    border-left: 3px solid transparent;
+    cursor: pointer;
   }
 
   .nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 92, 0, 0.1);
+    color: #ff5c00;
   }
 
   .nav-item.active {
-    background-color: rgba(255, 92, 0, 0.1);
+    background-color: rgba(255, 92, 0, 0.15);
     color: #ff5c00;
-    border-left-color: #ff5c00;
+    border-left: 3px solid #ff5c00;
   }
 
   .nav-icon {
@@ -170,9 +194,19 @@ const navItems = [
   }
 
   .nav-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .logout-button {
+    margin-top: auto;
+    border: none;
+    background: none;
+    color: #a0aec0;
+  }
+
+  .logout-button:hover {
+    color: #ff5c00;
   }
 
   /* System Status */
@@ -180,80 +214,18 @@ const navItems = [
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: auto;
+    padding: 12px 16px;
   }
 
   .status-dot {
     width: 8px;
     height: 8px;
-    border-radius: 50%;
     background-color: #22c55e;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
-    }
-    50% {
-      opacity: 0.8;
-      box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
-    }
+    border-radius: 50%;
   }
 
   .status-text {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  /* Logout Button */
-  .logout-button {
-    color: rgba(255, 255, 255, 0.5);
-    border: none;
-    cursor: pointer !important;
-    transition: all 200ms;
-    border-left: 3px solid transparent;
-  }
-
-  .logout-button:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.7);
-    border-left-color: #ef4444;
-    cursor: pointer !important;
-  }
-
-  .logout-button:active {
-    transform: scale(0.98);
+    font-size: 12px;
+    color: #a0aec0;
   }
 </style>
-
-<script>
-  // Client-side logout
-  document.getElementById('sidenav-logout-button')?.addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    console.log('[Sidenav] Client-side logout initiated');
-
-    const button = e.target;
-    button.disabled = true;
-    button.style.opacity = '0.6';
-
-    try {
-      const { logout } = await await import('../../lib/auth/auth-client');
-      await logout();
-
-      localStorage.clear();
-      sessionStorage.clear();
-
-      window.location.href = '/auth/login';
-    } catch (error) {
-      console.error('[Sidenav] Logout error:', error);
-      window.location.href = '/auth/login';
-    }
-  });
-</script>

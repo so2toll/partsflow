@@ -1,0 +1,27 @@
+---
+/**
+ * Dispatch Management Content Component
+ *
+ * Admin dispatch interface for assigning orders to drivers.
+ *
+ * @component content-container/Admin/DispatchManagement
+ * @version 0.1.0
+ */
+
+import DispatchManagementComponent from '../../components/admin/DispatchManagementComponent.tsx';
+import type { DispatchManagementPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: DispatchManagementPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<DispatchManagementComponent
+  client:load
+  unassignedOrders={data.unassignedOrders || []}
+  availableDrivers={data.availableDrivers || []}
+  activeDeliveries={data.activeDeliveries || []}
+  stats={data.stats}
+/>

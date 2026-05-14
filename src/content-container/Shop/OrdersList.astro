@@ -1,0 +1,26 @@
+---
+/**
+ * Orders List Content Component
+ *
+ * Orders list with filters, search, and pagination.
+ *
+ * @component content-container/Shop/OrdersList
+ * @version 0.1.0
+ */
+
+import OrdersListComponent from '../../components/shop/OrdersListComponent.tsx';
+import type { OrdersListPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: OrdersListPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<OrdersListComponent
+  client:load
+  orders={data.orders || []}
+  total={data.total || 0}
+  organizationId={data.organizationId}
+/>

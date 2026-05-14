@@ -1,0 +1,27 @@
+---
+/**
+ * Parts Search Content Component
+ *
+ * Parts search interface with search input, filters, and results grid.
+ * Includes order creation modal.
+ *
+ * @component content-container/Shop/PartsSearch
+ * @version 0.1.0
+ */
+
+import PartsSearchComponent from '../../components/shop/PartsSearchComponent.tsx';
+import type { PartsSearchPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: PartsSearchPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<PartsSearchComponent
+  client:load
+  suppliers={data.suppliers}
+  organizationId={data.organizationId}
+  userId={data.userId}
+/>

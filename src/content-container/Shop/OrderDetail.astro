@@ -1,0 +1,26 @@
+---
+/**
+ * Order Detail Content Component
+ *
+ * Detailed order view with status timeline and driver info.
+ *
+ * @component content-container/Shop/OrderDetail
+ * @version 0.1.0
+ */
+
+import OrderDetailComponent from '../../components/shop/OrderDetailComponent.tsx';
+import type { OrderDetailPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: OrderDetailPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<OrderDetailComponent
+  client:load
+  order={data.order}
+  organizationId={data.organizationId}
+  userId={data.userId}
+/>
