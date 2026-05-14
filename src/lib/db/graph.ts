@@ -223,6 +223,7 @@ class SQLGenerator {
     let fromClause = "FROM nodes n1";
     let joinClauses: string[] = [];
     let whereClauses: string[] = [];
+    let whereClause = "";
 
     // Build SELECT clause
     if (parsed.returnFields.includes("*")) {
@@ -328,11 +329,48 @@ class SQLGenerator {
       }
     });
 
-    // Combine WHERE clauses
-    let whereClause = "";
+    // Process and combine WHERE clauses from WHERE clause
     if (parsed.whereConditions) {
-      whereClauses.push(...parsed.whereConditions);
+      parsed.whereConditions.forEach((condition) => {
+        // Transform Cypher property access to SQL json_extract
+        // Pattern: var.property = $param or var.property = 'value'
+        const propAccessRegex = /(\w+)\.(\w+)\s*=\s*(\$?\w+|"[^"]*"|'[^']*')/g;
+        let match;
+        let processedCondition = condition;
+
+        while ((match = propAccessRegex.exec(condition)) !== null) {
+          const [, varName, propName, value] = match;
+          const nodeIndex = parsed.match.findIndex((m) => m.nodeVar === varName || m.targetNode === varName);
+          const nodeNum = nodeIndex >= 0 ? nodeIndex + 1 : 1;
+
+          // Replace var.property with json_extract
+          const sqlPropAccess = `json_extract(n${nodeNum}.properties, '$.${propName}')`;
+
+          // Handle parameters
+          if (value.startsWith("$")) {
+            const paramName = value.slice(1);
+            processedCondition = processedCondition.replace(
+              `${varName}.${propName} = ${value}`,
+              `${sqlPropAccess} = ?`
+            );
+            queryParams.push(params[paramName]);
+          } else {
+            // Handle literal values (remove quotes)
+            const literalValue = value.startsWith("'") || value.startsWith('"')
+              ? value.slice(1, -1)
+              : value;
+            processedCondition = processedCondition.replace(
+              `${varName}.${propName} = ${value}`,
+              `${sqlPropAccess} = ?`
+            );
+            queryParams.push(literalValue);
+          }
+        }
+
+        whereClauses.push(processedCondition);
+      });
     }
+
     if (whereClauses.length > 0) {
       whereClause = "WHERE " + whereClauses.join(" AND ");
     }

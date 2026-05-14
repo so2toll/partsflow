@@ -35,14 +35,22 @@ if (!session) {
 // Get user info from session
 const user = session.user;
 const userId = user?.global_id || user?.id;
-const userRole = user?.role;
+const authRole = user?.role; // auth.db role (User or SuperAdmin)
 const organizationId = user?.organizationId;
 
 // ========================================================================
 // DATA FETCHING - Uses unified getPageData() function
 // ========================================================================
 
-const data = await getPageData(currentPage, userId, userRole, organizationId);
+const data = await getPageData(currentPage, userId, authRole, organizationId);
+
+// ========================================================================
+// ROLE RESOLUTION - Use app.db role for authorization
+// ========================================================================
+
+// For authorization, use the app.db role from data.user
+// For SuperAdmin, use auth.db role
+const userRole = data?.user?.role || authRole;
 
 // ========================================================================
 // ROLE VALIDATION
@@ -63,9 +71,26 @@ if (!RBAC_CONFIG[userRole][currentPage]) {
   return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
 }
 
+if (!userRole) {
+  console.log('No role found for user:', userId);
+  return Astro.redirect('/access-denied?reason=no_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole]) {
+  console.log('Invalid role:', userRole, 'for user:', userId);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
+if (!RBAC_CONFIG[userRole][currentPage]) {
+  console.log('Role', userRole, 'does not have access to page:', currentPage);
+  return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
+}
+
 // ========================================================================
 // RENDER RBAC COMPONENT
 // ========================================================================
+
+console.log("the current userRole is:", userRole, "id: ", userId, "data: ", data, "page: ",currentPage)
 ---
 <RBACComponent
   userRole={userRole}

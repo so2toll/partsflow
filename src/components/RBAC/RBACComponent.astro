@@ -28,7 +28,10 @@ try {
 
 // Check if using Stitch navigation (for margin calculations)
 const useStitchNav = TopNavComponent.name === 'StitchTopNav' || SideNavComponent.name === 'StitchSideNav';
-const hasSideNav = SideNavComponent.name !== 'Blank';
+// Check if sideNav is Blank (Blank component has name "Content")
+// More reliable: check if it's NOT one of the known navigation components
+const knownNavComponents = ['StitchSideNav', 'DriverSideNav', 'SideNav', 'AdminSideNav'];
+const hasSideNav = knownNavComponents.includes(SideNavComponent.name);
 ---
 <!DOCTYPE html>
 <html lang="en">

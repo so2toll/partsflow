@@ -26,6 +26,7 @@ import AppProfile4 from '../../content-container/App/Profile4.astro';
 import AppOperationsDashboard from '../../content-container/App/OperationsDashboard.astro';
 import AppOperationsDashboardOld from '../../content-container/App/OperationsDashboard_old.astro';
 
+
 // Content for Shop Pages (MotoFlow)
 import PartsSearch from '../../content-container/Shop/PartsSearch.astro';
 import OrdersList from '../../content-container/Shop/OrdersList.astro';
@@ -62,34 +63,34 @@ import InviteManagement from '../../content-container/Admin/InviteManagement.ast
 // rbacConfig.js
 export const RBAC_CONFIG = {
 
-  Admin: {
-      dashboard: {
-        topNav: Blank,
-        sideNav: AdminSideNav,
-        content: ConsoleContent,
-        footer: Footer,
-        title: "Admin Dashboard",
-        description: "Admin Dashboard",
-      },
-      apiKeys: {
-        topNav: Blank,
-        sideNav: SideNav,
-        content: AdminApiKeysContent,
-        footer: Footer,
-        title: "API Keys Management",
-        description: "Manage client API keys and credentials",
-      },
+  // Admin: {
+  //     dashboard: {
+  //       topNav: Blank,
+  //       sideNav: AdminSideNav,
+  //       content: ConsoleContent,
+  //       footer: Footer,
+  //       title: "Admin Dashboard",
+  //       description: "Admin Dashboard",
+  //     },
+  //     apiKeys: {
+  //       topNav: Blank,
+  //       sideNav: SideNav,
+  //       content: AdminApiKeysContent,
+  //       footer: Footer,
+  //       title: "API Keys Management",
+  //       description: "Manage client API keys and credentials",
+  //     },
   
-      console: {
-        topNav: Blank,
-        sideNav: SideNav,
-        content: ConsoleContent,
-        footer: Footer,
-        title: "Admin Console",
-        description: "Admin Console for Internal Staff",
+  //     console: {
+  //       topNav: Blank,
+  //       sideNav: SideNav,
+  //       content: ConsoleContent,
+  //       footer: Footer,
+  //       title: "Admin Console",
+  //       description: "Admin Console for Internal Staff",
    
-      },
-    },
+  //     },
+  //   },
     
    SuperAdmin: {
       dashboard: {
@@ -222,83 +223,83 @@ export const RBAC_CONFIG = {
 
 
     // Video AI Content Studio Roles
-    StudioAdmin: {
-      dashboard: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Studio Dashboard",
-        description: "Video AI Content Studio Dashboard",
-      },
-      teams: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Teams",
-        description: "Manage your studio teams",
-      },
-      projects: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Projects",
-        description: "Manage your studio projects",
-      },
-      // App pages
-      appDashboard: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppDashboard,
-        footer: Blank,
-        title: "Dashboard",
-        description: "Video AI Content Studio Dashboard",
-      },
-      appTeams: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppTeams,
-        footer: Blank,
-        title: "Teams",
-        description: "Manage your teams",
-      },
-      appProjects: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProjects,
-        footer: Blank,
-        title: "Projects",
-        description: "Manage your projects",
-      },
-      appProjectDetail: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProjectDetail,
-        footer: Blank,
-        title: "Project Details",
-        description: "View project details",
-      },
-      appProfile: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProfile,
-        footer: Blank,
-        title: "Profile",
-        description: "View your profile",
-      },
-      appProfile3: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProfile,
-        footer: Blank,
-        title: "Profile3 (Sample)",
-        description: "Sample profile page demonstrating copy-paste pattern",
-      },
-    },
+    // StudioAdmin: {
+    //   dashboard: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Studio Dashboard",
+    //     description: "Video AI Content Studio Dashboard",
+    //   },
+    //   teams: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Teams",
+    //     description: "Manage your studio teams",
+    //   },
+    //   projects: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Projects",
+    //     description: "Manage your studio projects",
+    //   },
+    //   // App pages
+    //   appDashboard: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppDashboard,
+    //     footer: Blank,
+    //     title: "Dashboard",
+    //     description: "Video AI Content Studio Dashboard",
+    //   },
+    //   appTeams: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppTeams,
+    //     footer: Blank,
+    //     title: "Teams",
+    //     description: "Manage your teams",
+    //   },
+    //   appProjects: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProjects,
+    //     footer: Blank,
+    //     title: "Projects",
+    //     description: "Manage your projects",
+    //   },
+    //   appProjectDetail: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProjectDetail,
+    //     footer: Blank,
+    //     title: "Project Details",
+    //     description: "View project details",
+    //   },
+    //   appProfile: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProfile,
+    //     footer: Blank,
+    //     title: "Profile",
+    //     description: "View your profile",
+    //   },
+    //   appProfile3: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProfile,
+    //     footer: Blank,
+    //     title: "Profile3 (Sample)",
+    //     description: "Sample profile page demonstrating copy-paste pattern",
+    //   },
+    // },
 
-    User: {
+    ShopOwner: {
       dashboard: {
         topNav: Blank,
         sideNav: Blank,
@@ -327,7 +328,7 @@ export const RBAC_CONFIG = {
       appDashboard: {
         topNav: StitchTopNav,
         sideNav: StitchSideNav,
-        content: AppDashboard,
+        content: AppOperationsDashboard,
         footer: Blank,
         title: "Dashboard",
         description: "Video AI Content Studio Dashboard",
@@ -393,8 +394,8 @@ export const RBAC_CONFIG = {
         sideNav: StitchSideNav,
         content: AppOperationsDashboard,
         footer: Blank,
-        title: "Operations Dashboard",
-        description: "MotoFlow Operations Control Room - Test Page",
+        title: "Dashboard",
+        description: "Manage your auto shop business",
       },
         appDashboardTestOld: {
         topNav: StitchTopNavOld,
@@ -431,101 +432,110 @@ export const RBAC_CONFIG = {
       },
     },
 
-    StudioViewer: {
-      dashboard: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Studio Dashboard",
-        description: "Video AI Content Studio Dashboard",
-      },
-      teams: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Teams",
-        description: "View teams",
-      },
-      projects: {
-        topNav: Blank,
-        sideNav: Blank,
-        content: Blank,
-        footer: Footer,
-        title: "Projects",
-        description: "View projects only",
-      },
-      // App pages
-      appDashboard: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppDashboard,
-        footer: Blank,
-        title: "Dashboard",
-        description: "Video AI Content Studio Dashboard",
-      },
-      appTeams: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppTeams,
-        footer: Blank,
-        title: "Teams",
-        description: "View your teams",
-      },
-      appProjects: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProjects,
-        footer: Blank,
-        title: "Projects",
-        description: "View your projects",
-      },
-      appProjectDetail: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProjectDetail,
-        footer: Blank,
-        title: "Project Details",
-        description: "View project details",
-      },
-      appProfile: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProfile,
-        footer: Blank,
-        title: "Profile",
-        description: "View your profile",
-      },
-      appProfile3: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppProfile,
-        footer: Blank,
-        title: "Profile3 (Sample)",
-        description: "Sample profile page demonstrating copy-paste pattern",
-      },
-      appDashboardTest: {
-        topNav: StitchTopNav,
-        sideNav: StitchSideNav,
-        content: AppOperationsDashboard,
-        footer: Blank,
-        title: "Operations Dashboard",
-        description: "MotoFlow Operations Control Room - Test Page",
-      },
-      appDashboardTestOld: {
-        topNav: StitchTopNavOld,
-        sideNav: StitchSideNavOld,
-        content: AppOperationsDashboardOld,
-        footer: Blank,
-        title: "Operations Dashboard",
-        description: "MotoFlow Operations Control Room - Test Page",
-      },
-    },
+    // StudioViewer: {
+    //   dashboard: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Studio Dashboard",
+    //     description: "Video AI Content Studio Dashboard",
+    //   },
+    //   teams: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Teams",
+    //     description: "View teams",
+    //   },
+    //   projects: {
+    //     topNav: Blank,
+    //     sideNav: Blank,
+    //     content: Blank,
+    //     footer: Footer,
+    //     title: "Projects",
+    //     description: "View projects only",
+    //   },
+    //   // App pages
+    //   appDashboard: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppDashboard,
+    //     footer: Blank,
+    //     title: "Dashboard",
+    //     description: "Video AI Content Studio Dashboard",
+    //   },
+    //   appTeams: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppTeams,
+    //     footer: Blank,
+    //     title: "Teams",
+    //     description: "View your teams",
+    //   },
+    //   appProjects: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProjects,
+    //     footer: Blank,
+    //     title: "Projects",
+    //     description: "View your projects",
+    //   },
+    //   appProjectDetail: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProjectDetail,
+    //     footer: Blank,
+    //     title: "Project Details",
+    //     description: "View project details",
+    //   },
+    //   appProfile: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProfile,
+    //     footer: Blank,
+    //     title: "Profile",
+    //     description: "View your profile",
+    //   },
+    //   appProfile3: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppProfile,
+    //     footer: Blank,
+    //     title: "Profile3 (Sample)",
+    //     description: "Sample profile page demonstrating copy-paste pattern",
+    //   },
+    //   appDashboardTest: {
+    //     topNav: StitchTopNav,
+    //     sideNav: StitchSideNav,
+    //     content: AppOperationsDashboard,
+    //     footer: Blank,
+    //     title: "Operations Dashboard",
+    //     description: "MotoFlow Operations Control Room - Test Page",
+    //   },
+    //   appDashboardTestOld: {
+    //     topNav: StitchTopNavOld,
+    //     sideNav: StitchSideNavOld,
+    //     content: AppOperationsDashboardOld,
+    //     footer: Blank,
+    //     title: "Operations Dashboard",
+    //     description: "MotoFlow Operations Control Room - Test Page",
+    //   },
+    // },
 
     // Driver Role - For delivery drivers
     Driver: {
-      // Driver Dashboard - Main view for drivers
+      // Main Dashboard - same URL as everyone else, role-specific content
+      appDashboardTest: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: DriverDashboard,
+        footer: Blank,
+        title: "Driver Dashboard",
+        description: "View and manage your deliveries",
+      },
+      // Legacy route for backwards compatibility - redirects to main dashboard
       driverDashboard: {
         topNav: StitchTopNav,
         sideNav: DriverSideNav,
@@ -544,6 +554,15 @@ export const RBAC_CONFIG = {
         description: "View your assigned deliveries",
       },
       // Driver Profile - Personal profile settings
+      appProfile: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: AppProfile,
+        footer: Blank,
+        title: "Profile",
+        description: "Manage your profile settings",
+      },
+      // Legacy route for backwards compatibility
       driverProfile: {
         topNav: StitchTopNav,
         sideNav: DriverSideNav,

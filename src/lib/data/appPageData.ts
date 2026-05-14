@@ -138,6 +138,9 @@ export async function getPageData(
     case 'adminDispatch':
       return getAdminDispatchPageData(isSuperAdmin, organizationId, userId);
 
+    case 'adminInvites':
+      return getAdminInvitesPageData(isSuperAdmin, organizationId, userId);
+
     default:
       console.warn(`[getPageData] Unknown page: ${currentPage}`);
       return data;
@@ -582,6 +585,29 @@ async function getPartsSearchPageData(
 ): Promise<PageData> {
   const data: PageData = {};
 
+  // Get user details for role resolution
+  if (userId) {
+    const userResults = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})
+      RETURN u
+      `,
+      { userId }
+    );
+
+    if (userResults.length > 0 && userResults[0].u) {
+      const userProps = userResults[0].u.properties;
+      data.user = {
+        id: userProps.id,
+        email: userProps.email,
+        name: userProps.name,
+        role: userProps.role,
+        organizationId: userProps.organizationId,
+        createdAt: userProps.createdAt,
+      };
+    }
+  }
+
   // Get suppliers for search results
   const suppliers = await supplierRepository.list();
   data.suppliers = suppliers;
@@ -605,6 +631,29 @@ async function getOrdersListPageData(
   userId?: string
 ): Promise<PageData> {
   const data: PageData = {};
+
+  // Get user details for role resolution
+  if (userId) {
+    const userResults = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})
+      RETURN u
+      `,
+      { userId }
+    );
+
+    if (userResults.length > 0 && userResults[0].u) {
+      const userProps = userResults[0].u.properties;
+      data.user = {
+        id: userProps.id,
+        email: userProps.email,
+        name: userProps.name,
+        role: userProps.role,
+        organizationId: userProps.organizationId,
+        createdAt: userProps.createdAt,
+      };
+    }
+  }
 
   if (organizationId) {
     // Get orders for this shop
@@ -635,6 +684,29 @@ async function getOrderDetailPageData(
   params?: Record<string, string>
 ): Promise<PageData> {
   const data: PageData = {};
+
+  // Get user details for role resolution
+  if (userId) {
+    const userResults = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})
+      RETURN u
+      `,
+      { userId }
+    );
+
+    if (userResults.length > 0 && userResults[0].u) {
+      const userProps = userResults[0].u.properties;
+      data.user = {
+        id: userProps.id,
+        email: userProps.email,
+        name: userProps.name,
+        role: userProps.role,
+        organizationId: userProps.organizationId,
+        createdAt: userProps.createdAt,
+      };
+    }
+  }
 
   // Get order by ID from params
   const orderId = params?.orderId;
@@ -799,6 +871,23 @@ async function getAdminDispatchPageData(
     activeDeliveries: activeOrders.orders.length,
     avgResponseTime: 0, // TODO: Calculate from actual data
   };
+
+  return data;
+}
+
+/**
+ * Admin Invites page data
+ */
+async function getAdminInvitesPageData(
+  isSuperAdmin: boolean,
+  organizationId?: string,
+  userId?: string
+): Promise<PageData> {
+  const data: PageData = {};
+
+  // For now, return empty data - the invites page fetches its own data server-side
+  // The InviteManagement component handles its own data fetching
+  data.userId = userId;
 
   return data;
 }

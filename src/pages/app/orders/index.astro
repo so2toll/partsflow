@@ -35,14 +35,24 @@ if (!session) {
 // Get user info from session
 const user = session.user;
 const userId = user?.global_id || user?.id;
-const userRole = user?.role;
+const authRole = user?.role; // auth.db role (User or SuperAdmin)
 const organizationId = user?.organizationId;
 
 // ========================================================================
 // DATA FETCHING - Uses unified getPageData() function
 // ========================================================================
 
-const data = await getPageData(currentPage, userId, userRole, organizationId);
+const data = await getPageData(currentPage, userId, authRole, organizationId);
+
+// ========================================================================
+// ROLE RESOLUTION - Use app.db role for authorization
+// ========================================================================
+
+// For authorization, use the app.db role from data.user
+// For SuperAdmin, use auth.db role
+const userRole = data?.user?.role || authRole;
+
+console.log("[orders] Auth role:", authRole, "App role:", data?.user?.role, "Using for RBAC:", userRole, "data:", data)
 
 // ========================================================================
 // ROLE VALIDATION

@@ -18,14 +18,37 @@ interface Props {
 
 const { userRole, userId, currentPage, organization } = Astro.props;
 
-// Navigation items (same as StitchSideNav)
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
-  { id: 'teams', label: 'Teams', icon: 'groups', href: '/app/teams' },
-  { id: 'projects', label: 'Projects', icon: 'folder', href: '/app/projects' },
-  { id: 'partsSearch', label: 'Parts Search', icon: 'search', href: '/app/parts/search' },
-  { id: 'ordersList', label: 'Orders', icon: 'list', href: '/app/orders' },
-];
+// Role-based navigation items (same as StitchSideNav)
+const getNavItems = (role: string | undefined) => {
+  // Driver role - minimal navigation
+  if (role === 'Driver') {
+    return [
+      { id: 'appDashboardTest', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
+      { id: 'appProfile', label: 'Profile', icon: 'person', href: '/app/profile' },
+    ];
+  }
+
+  // SuperAdmin role - full admin navigation
+  if (role === 'SuperAdmin') {
+    return [
+      { id: 'appDashboardTest', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
+      { id: 'adminInvites', label: 'Invites', icon: 'mail', href: '/app/admin/invites' },
+      { id: 'adminDispatch', label: 'Dispatch', icon: 'local_shipping', href: '/app/admin/dispatch' },
+      { id: 'appTeams', label: 'Teams', icon: 'groups', href: '/app/teams' },
+      { id: 'appProjects', label: 'Projects', icon: 'folder', href: '/app/projects' },
+    ];
+  }
+
+  // Shop Owner (User) role - shop operations navigation
+  return [
+    { id: 'appDashboardTest', label: 'Dashboard', icon: 'dashboard', href: '/app/dashboard' },
+    { id: 'partsSearch', label: 'Parts Search', icon: 'search', href: '/app/parts/search' },
+    { id: 'ordersList', label: 'Orders', icon: 'list', href: '/app/orders' },
+    { id: 'appProfile', label: 'Profile', icon: 'person', href: '/app/profile' },
+  ];
+};
+
+const navItems = getNavItems(userRole);
 
 // Role-based CTA button
 const getCtaButton = (role: string | undefined) => {
@@ -206,6 +229,7 @@ const ctaButton = getCtaButton(userRole);
   .top-nav-container {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 100%;
     padding: 0 24px;
     max-width: 100%;
