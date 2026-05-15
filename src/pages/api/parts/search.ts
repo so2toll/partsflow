@@ -8,7 +8,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { supplierRepository } from '../../../../lib/db/repositories';
+import { supplierRepository } from '../../../lib/db/repositories';
 
 export const prerender = false;
 

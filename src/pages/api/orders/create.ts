@@ -7,8 +7,8 @@
  */
 
 import type { APIRoute } from 'astro';
-import { getSession } from '../../../../lib/auth/session-adapter';
-import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
+import { getSession } from '../../../lib/auth/session-adapter';
+import { orderRepository } from '../../../lib/db/repositories/OrderRepository';
 
 export const prerender = false;
 

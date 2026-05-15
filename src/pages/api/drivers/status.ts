@@ -7,8 +7,8 @@
  */
 
 import type { APIRoute } from 'astro';
-import { getSession } from '../../../../lib/auth/session-adapter';
-import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
+import { getSession } from '../../../lib/auth/session-adapter';
+import { driverRepository } from '../../../lib/db/repositories/DriverRepository';
 
 export const prerender = false;
 
