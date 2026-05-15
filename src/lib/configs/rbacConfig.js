@@ -23,6 +23,7 @@ import AppProjectDetail from '../../content-container/App/ProjectDetail.astro';
 import AppProfile from '../../content-container/App/Profile.astro';
 import AppProfile2 from '../../content-container/App/Profile2.astro';
 import AppProfile4 from '../../content-container/App/Profile4.astro';
+import AppSettings from '../../content-container/App/Settings.astro';
 import AppOperationsDashboard from '../../content-container/App/OperationsDashboard.astro';
 import AppOperationsDashboardOld from '../../content-container/App/OperationsDashboard_old.astro';
 
@@ -389,6 +390,14 @@ export const RBAC_CONFIG = {
         title: "Profile4 (Practice)",
         description: "Practice page demonstrating feature workflow and RBAC view switching - User View",
       },
+      appSettings: {
+        topNav: StitchTopNav,
+        sideNav: StitchSideNav,
+        content: AppSettings,
+        footer: Blank,
+        title: "Settings",
+        description: "Manage your account settings",
+      },
       appDashboardTest: {
         topNav: StitchTopNav,
         sideNav: StitchSideNav,
@@ -561,6 +570,14 @@ export const RBAC_CONFIG = {
         footer: Blank,
         title: "Profile",
         description: "Manage your profile settings",
+      },
+      appSettings: {
+        topNav: StitchTopNav,
+        sideNav: DriverSideNav,
+        content: AppSettings,
+        footer: Blank,
+        title: "Settings",
+        description: "Manage your account settings",
       },
       // Legacy route for backwards compatibility
       driverProfile: {

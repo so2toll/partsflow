@@ -10,12 +10,13 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
+import { validateTransition } from '../../../../lib/order/orderStateMachine';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, params }) => {
+export const POST: APIRoute = async ({ request, cookies, params }) => {
   try {
-    const session = await getSession(request);
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -61,15 +62,32 @@ export const POST: APIRoute = async ({ request, params }) => {
       );
     }
 
-    if (order.status !== 'pending') {
+    // Validate state transition using state machine
+    const validation = validateTransition(order.status, 'dispatched');
+    if (!validation.valid) {
+      // Order is no longer available for dispatch (race condition)
+      if (order.status === 'dispatched') {
+        return new Response(
+          JSON.stringify({ error: 'Order already accepted by another driver' }),
+          { status: 409, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
       return new Response(
-        JSON.stringify({ error: 'Order not available' }),
+        JSON.stringify({ error: validation.error }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     // Dispatch order to driver
     const updatedOrder = await orderRepository.dispatch(orderId, driver.id);
+
+    // Verify the order was actually dispatched to this driver (race condition check)
+    if (!updatedOrder || updatedOrder.driverId !== driver.id || updatedOrder.status !== 'dispatched') {
+      return new Response(
+        JSON.stringify({ error: 'Order already accepted by another driver' }),
+        { status: 409, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Update driver status to on_delivery
     await driverRepository.updateStatus(driver.id, 'on_delivery');

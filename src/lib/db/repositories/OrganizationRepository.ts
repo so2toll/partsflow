@@ -192,9 +192,10 @@ export class OrganizationRepository {
       MATCH (o:Organization)
       RETURN o
       ORDER BY o.createdAt ${options.orderDir || "DESC"}
-      LIMIT ${limit}
-      SKIP ${offset}
-      `
+      LIMIT $limit
+      SKIP $offset
+      `,
+      { limit, offset }
     );
 
     let organizations = results
@@ -343,6 +344,25 @@ export class OrganizationRepository {
     }
 
     return this.mapNodeToOrganization(results[0].o);
+  }
+
+  /**
+   * Verify that a user is an active member of an organization
+   *
+   * @param userId User ID
+   * @param organizationId Organization ID
+   * @returns true if user is an active member, false otherwise
+   */
+  async isMember(userId: string, organizationId: string): Promise<boolean> {
+    const results = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})-[r:OWNS]->(o:Organization {id: $organizationId})
+      RETURN count(r) as memberCount
+      `,
+      { userId, organizationId }
+    );
+
+    return (results[0]?.memberCount || 0) > 0;
   }
 
   // ========================================================================

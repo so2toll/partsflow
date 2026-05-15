@@ -10,12 +10,13 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
+import { validateTransition } from '../../../../lib/order/orderStateMachine';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const session = await getSession(request);
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -55,9 +56,11 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    if (order.status !== 'pending') {
+    // Validate state transition using state machine
+    const validation = validateTransition(order.status, 'dispatched');
+    if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Order is not available for assignment' }),
+        JSON.stringify({ error: validation.error }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }

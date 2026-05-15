@@ -50,10 +50,44 @@ export default function DriverDashboardComponent({
   stats,
   userId,
 }: Props) {
+  // Debug logging
+  console.log('[DriverDashboardComponent] Props received:', {
+    driverId: driver?.id,
+    driverStatus: driver?.status,
+    currentDelivery: currentDelivery?.id,
+    availableOrdersCount: availableOrders?.length,
+    timestamp: new Date().toISOString()
+  });
+
   const [driverStatus, setDriverStatus] = useState(driver?.status || 'offline');
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(currentDelivery);
   const [orders, setOrders] = useState<Order[]>(availableOrders);
+
+  // Log when driver prop changes (page load/refresh)
+  useEffect(() => {
+    console.log('[DriverDashboardComponent] Driver prop changed:', {
+      driverId: driver?.id,
+      driverStatus: driver?.status,
+      localDriverStatus: driverStatus,
+      timestamp: new Date().toISOString()
+    });
+  }, [driver?.id, driver?.status]);
+
+  // Listen for status changes from sidebar (via BroadcastChannel)
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+
+    const channel = new BroadcastChannel('driver-status');
+    channel.onmessage = (event) => {
+      const { status } = event.data;
+      setDriverStatus(status);
+    };
+
+    return () => {
+      channel.close();
+    };
+  }, []);
 
   const toggleStatus = async () => {
     const newStatus = driverStatus === 'available' ? 'offline' : 'available';
@@ -68,6 +102,12 @@ export default function DriverDashboardComponent({
 
       if (response.ok) {
         setDriverStatus(newStatus);
+
+        // Notify other components via BroadcastChannel (client-side only)
+        if (typeof BroadcastChannel !== 'undefined') {
+          const channel = new BroadcastChannel('driver-status');
+          channel.postMessage({ status: newStatus });
+        }
       } else {
         alert('Failed to update status');
       }
@@ -167,41 +207,76 @@ export default function DriverDashboardComponent({
   return (
     <div className="min-h-screen bg-surface-100 pb-24">
       <div className="container mx-auto px-4 py-6 max-w-2xl">
-        {/* Status Toggle - Always visible */}
-        <Card className="mb-6">
-          <CardContent className="py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-headline-md font-semibold text-neutral-600 mb-1">
-                  Your Status
-                </h3>
-                <p className="text-body-md text-neutral-400">
-                  {driverStatus === 'available'
-                    ? 'You are available for deliveries'
-                    : driverStatus === 'on_delivery'
-                    ? 'Currently on a delivery'
-                    : 'You are offline'}
-                </p>
-              </div>
-              <button
-                onClick={toggleStatus}
-                disabled={updatingStatus || driverStatus === 'on_delivery'}
-                className={`relative w-20 h-10 rounded-full transition-colors ${
-                  driverStatus === 'available' ? 'bg-success-500' : 'bg-neutral-300'
-                } ${driverStatus === 'on_delivery' ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <div
-                  className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-transform ${
-                    driverStatus === 'available' ? 'left-11' : 'left-1'
-                  }`}
-                />
-                <span className="sr-only">
-                  {driverStatus === 'available' ? 'Available' : 'Offline'}
-                </span>
-              </button>
+        {/* Driver Profile Header with Stats */}
+        <div className="mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl">
+              <span className="material-symbols-outlined">directions_car</span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-neutral-700">Marcus D.</h2>
+              <p className="text-sm text-neutral-500">Baltimore Zone A</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${driverStatus === 'available' ? 'bg-success-500' : 'bg-neutral-400'}`} />
+              <span className="text-sm font-semibold text-success-600">
+                {driverStatus === 'available' ? 'Online' : driverStatus === 'offline' ? 'Offline' : 'On Delivery'}
+              </span>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white rounded-xl p-4 text-center border border-neutral-200 shadow-sm">
+              <p className="text-2xl font-bold text-success-600">${stats?.earningsToday.toFixed(0) || '0'}</p>
+              <p className="text-xs text-neutral-500 mt-1">Today's Earnings</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 text-center border border-neutral-200 shadow-sm">
+              <p className="text-2xl font-bold text-neutral-700">{stats?.completedToday || '0'}</p>
+              <p className="text-xs text-neutral-500 mt-1">Deliveries</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 text-center border border-neutral-200 shadow-sm">
+              <p className="text-2xl font-bold text-yellow-600">4.9★</p>
+              <p className="text-xs text-neutral-500 mt-1">Rating</p>
+            </div>
+          </div>
+
+          {/* Status Toggle */}
+          <Card className="mt-4">
+            <CardContent className="py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-headline-md font-semibold text-neutral-600 mb-1">
+                    Your Status
+                  </h3>
+                  <p className="text-body-md text-neutral-400">
+                    {driverStatus === 'available'
+                      ? 'You are available for deliveries'
+                      : driverStatus === 'on_delivery'
+                      ? 'Currently on a delivery'
+                      : 'You are offline'}
+                  </p>
+                </div>
+                <button
+                  onClick={toggleStatus}
+                  disabled={updatingStatus || driverStatus === 'on_delivery'}
+                  className={`relative w-20 h-10 rounded-full transition-colors ${
+                    driverStatus === 'available' ? 'bg-success-500' : 'bg-neutral-300'
+                  } ${driverStatus === 'on_delivery' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div
+                    className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-transform ${
+                      driverStatus === 'available' ? 'left-11' : 'left-1'
+                    }`}
+                  />
+                  <span className="sr-only">
+                    {driverStatus === 'available' ? 'Available' : 'Offline'}
+                  </span>
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Current Delivery */}
         {currentOrder && (
@@ -306,43 +381,86 @@ export default function DriverDashboardComponent({
         {driverStatus === 'available' && !currentOrder && orders.length > 0 && (
           <div className="mb-6">
             <h2 className="text-headline-lg font-bold text-neutral-600 mb-4">
-              Available Orders
+              Incoming Job
             </h2>
             <div className="space-y-4">
               {orders.map((order) => (
-                <Card key={order.id} className="border-2 border-primary-200">
+                <Card key={order.id} className="border-2 border-orange-500 bg-white">
                   <CardContent className="py-6">
+                    {/* Job Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <span
-                            className={`px-3 py-1 rounded-full text-label-md font-semibold ${getPriorityColor(
-                              order.priority
-                            )}`}
+                            className={`px-3 py-1 rounded-full text-label-md font-semibold ${
+                              order.priority === 'P0'
+                                ? 'bg-red-500 text-white'
+                                : order.priority === 'P1'
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-yellow-500 text-black'
+                            }`}
                           >
-                            {order.priority}
+                            {order.priority === 'P0' ? 'URGENT' : order.priority === 'P1' ? 'PRIORITY' : 'STANDARD'}
                           </span>
                           <span className="text-label-sm text-neutral-500">
                             ETA: {getEta(order)} min
                           </span>
                         </div>
-                        <h3 className="text-headline-md font-semibold text-neutral-600 mb-1">
+                        <h3 className="text-headline-md font-semibold text-neutral-700 mb-1">
                           {order.partName}
                         </h3>
-                        <p className="text-body-md text-neutral-400">
-                          {order.partNumber} • {order.supplierName}
-                        </p>
-                        <p className="text-body-md text-neutral-500 mt-2">
-                          📍 {formatAddress(order.deliveryAddress)}
+                        <p className="text-body-md text-neutral-500">
+                          {order.partNumber}
                         </p>
                       </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-success-600">${Math.floor(Math.random() * 20) + 15}</p>
+                        <p className="text-xs text-neutral-500">earnings</p>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => acceptOrder(order.id)}
-                      className="w-full btn btn-primary py-4 text-body-md"
-                    >
-                      Accept Delivery
-                    </button>
+
+                    {/* Pickup/Drop */}
+                    <div className="space-y-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                          <span className="text-blue-500 text-sm">📥</span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-500">Pickup</p>
+                          <p className="text-sm font-medium text-neutral-700">{order.supplierName}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                          <span className="text-green-500 text-sm">📍</span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-500">Drop</p>
+                          <p className="text-sm font-medium text-neutral-700">{formatAddress(order.deliveryAddress)}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Trip Duration */}
+                    <div className="text-right mb-4">
+                      <p className="text-xs text-neutral-500">~{getEta(order) * 2} min round trip</p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => acceptOrder(order.id)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-semibold transition-all"
+                      >
+                        Accept Job
+                      </button>
+                      <button
+                        onClick={() => setOrders(orders.filter((o) => o.id !== order.id))}
+                        className="bg-neutral-200 hover:bg-neutral-300 text-neutral-700 py-3 px-4 rounded-xl font-semibold transition-all"
+                      >
+                        Pass
+                      </button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -360,6 +478,9 @@ export default function DriverDashboardComponent({
               <p className="text-body-md text-neutral-400">
                 You&apos;re all caught up! We&apos;ll notify you when new orders come in.
               </p>
+              <p className="text-body-sm text-neutral-300 mt-4">
+                💡 Tip: Create a test order from the admin dispatch page
+              </p>
             </CardContent>
           </Card>
         )}
@@ -371,12 +492,33 @@ export default function DriverDashboardComponent({
               <p className="text-headline-md font-semibold text-neutral-500 mb-2">
                 You are offline
               </p>
-              <p className="text-body-md text-neutral-400 mb-6">
+              <p className="text-body-md text-neutral-400">
                 Toggle your status to available to receive orders
               </p>
             </CardContent>
           </Card>
         )}
+
+        {/* Recent Deliveries */}
+        <div className="mb-6">
+          <h2 className="text-headline-lg font-bold text-neutral-700 mb-4">Recent Deliveries</h2>
+          <div className="bg-white rounded-xl divide-y divide-neutral-200 border border-neutral-200">
+            <div className="px-5 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-neutral-700">Alternator – Bosch</p>
+                <p className="text-xs text-neutral-500">Precision Imports • 10:12 AM</p>
+              </div>
+              <p className="text-lg font-bold text-success-600">$22</p>
+            </div>
+            <div className="px-5 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-neutral-700">Battery – Optima Red</p>
+                <p className="text-xs text-neutral-500">Highlandtown Tire • 9:44 AM</p>
+              </div>
+              <p className="text-lg font-bold text-success-600">$18</p>
+            </div>
+          </div>
+        </div>
 
         {/* Today's Stats */}
         {stats && (

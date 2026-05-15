@@ -8,14 +8,15 @@
 
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth/session-adapter';
+import { validateTransition } from '../../../../lib/order/orderStateMachine';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, params }) => {
+export const POST: APIRoute = async ({ request, cookies, params }) => {
   try {
-    const session = await getSession(request);
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -36,20 +37,29 @@ export const POST: APIRoute = async ({ request, params }) => {
       );
     }
 
-    if (!status || !['picked_up', 'en_route', 'delivered', 'confirmed'].includes(status)) {
+    if (!status) {
       return new Response(
-        JSON.stringify({ error: 'Invalid status' }),
+        JSON.stringify({ error: 'Status is required' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get the order
+    // Get the order first to validate transition
     const order = await orderRepository.findById(orderId);
 
     if (!order) {
       return new Response(
         JSON.stringify({ error: 'Order not found' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate state transition using state machine
+    const validation = validateTransition(order.status, status);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 

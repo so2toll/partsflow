@@ -370,10 +370,10 @@ export class OrderRepository {
       ${whereClause}
       RETURN o
       ORDER BY o.createdAt DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const orders = results

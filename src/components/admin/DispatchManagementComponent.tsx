@@ -65,6 +65,7 @@ export default function DispatchManagementComponent({
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [autoAssigning, setAutoAssigning] = useState(false);
+  const [creatingTestOrder, setCreatingTestOrder] = useState(false);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -189,17 +190,61 @@ export default function DispatchManagementComponent({
     }
   };
 
+  const handleCreateTestOrder = async () => {
+    setCreatingTestOrder(true);
+
+    try {
+      const response = await fetch('/api/admin/orders/create-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partName: 'Brake Pads – Wagner ThermoQuiet',
+          partNumber: 'BP-WTQ-123',
+          supplierName: "O'Reilly – Catonsville",
+          supplierId: 'supplier_test_001',
+          deliveryAddress: 'Eastside Auto Repair, 123 Main St, Baltimore, MD 21224',
+          priority: 'P1',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Test order created! You can now assign it to a driver.');
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to create test order: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Create test order error:', error);
+      alert('Failed to create test order');
+    } finally {
+      setCreatingTestOrder(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-surface-100">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-headline-lg font-bold text-neutral-600 mb-2">
-            Dispatch Management
-          </h1>
-          <p className="text-body-md text-neutral-400">
-            Assign orders to drivers and monitor fleet operations
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h1 className="text-headline-lg font-bold text-neutral-600">
+                Dispatch Management
+              </h1>
+              <p className="text-body-md text-neutral-400">
+                Assign orders to drivers and monitor fleet operations
+              </p>
+            </div>
+            <button
+              onClick={handleCreateTestOrder}
+              disabled={creatingTestOrder}
+              className="btn btn-primary"
+            >
+              {creatingTestOrder ? 'Creating...' : 'Create Test Order'}
+            </button>
+          </div>
         </div>
 
         {/* Stats Bar */}
@@ -407,10 +452,18 @@ export default function DispatchManagementComponent({
 
       {/* Assignment Modal */}
       {showAssignModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          style={{ zIndex: 9999 }}
+        >
+          <Card
+            className="w-full"
+            style={{ backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
+          >
             <CardHeader>
-              <CardTitle>Assign Driver</CardTitle>
+              <CardTitle style={{ color: '#1a202c', fontSize: '20px', fontWeight: '600' }}>
+                Assign Driver
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -442,6 +495,7 @@ export default function DispatchManagementComponent({
                     value={selectedDriver}
                     onChange={(e) => setSelectedDriver(e.target.value)}
                     className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    style={{ backgroundColor: 'white', color: '#1a202c' }}
                   >
                     <option value="">Choose a driver...</option>
                     {availableDrivers.map((driver) => (

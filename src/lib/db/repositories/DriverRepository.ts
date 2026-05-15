@@ -280,10 +280,10 @@ export class DriverRepository {
       ${whereClause}
       RETURN d
       ORDER BY d.createdAt DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const drivers = results

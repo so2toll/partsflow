@@ -12,9 +12,9 @@ import { driverRepository } from '../../../lib/db/repositories/DriverRepository'
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const session = await getSession(request);
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -47,10 +47,21 @@ export const POST: APIRoute = async ({ request }) => {
     // Update driver status
     const updatedDriver = await driverRepository.updateStatus(driver.id, status);
 
+    // Verify the update by fetching again
+    const verification = await driverRepository.findById(driver.id);
+    console.log('[DriverStatus] Update verification:', {
+      driverId: driver.id,
+      requestedStatus: status,
+      updatedStatus: updatedDriver.status,
+      verifiedStatus: verification?.status,
+      match: updatedDriver.status === status && verification?.status === status
+    });
+
     return new Response(
       JSON.stringify({
         success: true,
         driver: updatedDriver,
+        verification: verification ? { status: verification.status } : null,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

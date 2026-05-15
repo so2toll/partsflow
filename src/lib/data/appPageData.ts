@@ -117,7 +117,15 @@ export async function getPageData(
     case 'appProfile4':
       return getProfile4PageData(isSuperAdmin, organizationId, userId);
 
+    case 'appSettings':
+      return getSettingsPageData(isSuperAdmin, organizationId, userId);
+
     case 'appDashboardTest':
+      // appDashboardTest is used for both SuperAdmin (OperationsDashboard) and Driver (DriverDashboard)
+      if (!isSuperAdmin) {
+        // Non-SuperAdmin users (Driver, ShopOwner, etc.) use driver dashboard
+        return getDriverDashboardPageData(isSuperAdmin, organizationId, userId);
+      }
       return getDashboardTestPageData(isSuperAdmin, organizationId, userId);
 
     case 'appDashboardTestOld':
@@ -440,6 +448,45 @@ async function getProfile4PageData(
 }
 
 /**
+ * Settings page data
+ */
+async function getSettingsPageData(
+  isSuperAdmin: boolean,
+  organizationId?: string,
+  userId?: string
+): Promise<PageData> {
+  const data: PageData = {};
+
+  // Get user details
+  if (userId) {
+    const userResults = await graph.query<any>(
+      `
+      MATCH (u:User {id: $userId})
+      RETURN u
+      `,
+      { userId }
+    );
+
+    if (userResults.length > 0 && userResults[0].u) {
+      const userProps = userResults[0].u.properties;
+      data.user = {
+        id: userProps.id,
+        email: userProps.email,
+        name: userProps.name,
+        role: userProps.role,
+        organizationId: userProps.organizationId,
+        createdAt: userProps.createdAt,
+      };
+    }
+  }
+
+  data.userId = userId;
+  data.organizationId = organizationId;
+
+  return data;
+}
+
+/**
  * Project detail page data
  * Called separately with projectId
  */
@@ -743,8 +790,34 @@ async function getDriverDashboardPageData(
     return data;
   }
 
+  // Get user details for RBAC
+  const userResults = await graph.query<any>(
+    `
+    MATCH (u:User {id: $userId})
+    RETURN u
+    `,
+    { userId }
+  );
+
+  if (userResults.length > 0 && userResults[0].u) {
+    const userProps = userResults[0].u.properties;
+    data.user = {
+      id: userProps.id,
+      email: userProps.email,
+      name: userProps.name,
+      role: userProps.role,
+      organizationId: userProps.organizationId,
+    };
+  }
+
   // Get driver record for this user
   const driver = await driverRepository.findByUserId(userId);
+  console.log('[AppPageData] Fetched driver for dashboard:', {
+    userId,
+    driverId: driver?.id,
+    driverStatus: driver?.status,
+    timestamp: new Date().toISOString()
+  });
   data.driver = driver;
 
   // Get current delivery (if any)
@@ -815,9 +888,32 @@ async function getAdminDispatchPageData(
   const unassignedOrders = await orderRepository.findPending();
   data.unassignedOrders = unassignedOrders;
 
-  // Get available drivers
+  // Get available drivers and enrich with user names
   const availableDrivers = await driverRepository.findAvailable();
-  data.availableDrivers = availableDrivers;
+
+  // Fetch user names for each driver
+  const driversWithNames = await Promise.all(
+    availableDrivers.map(async (driver) => {
+      const userResults = await graph.query<any>(
+        `
+        MATCH (u:User {id: $userId})
+        RETURN u
+        `,
+        { userId: driver.userId }
+      );
+
+      const userName = userResults.length > 0 && userResults[0].u
+        ? userResults[0].u.properties.name
+        : `Driver ${driver.id.slice(0, 8)}`;
+
+      return {
+        ...driver,
+        name: userName,
+      };
+    })
+  );
+
+  data.availableDrivers = driversWithNames;
 
   // Get active deliveries
   const activeOrders = await orderRepository.list({

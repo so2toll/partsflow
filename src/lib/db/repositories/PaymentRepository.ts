@@ -168,10 +168,10 @@ export class PaymentRepository {
       MATCH (u:User {id: $userId})-[:MADE_PAYMENT]->(p:PaymentEvent)
       RETURN p
       ORDER BY p.createdAt DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      { userId }
+      { userId, limit, offset }
     );
 
     const payments = results

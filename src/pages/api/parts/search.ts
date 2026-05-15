@@ -8,6 +8,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { getSession } from '../../../lib/auth/session-adapter';
 import { supplierRepository } from '../../../lib/db/repositories';
 
 export const prerender = false;
@@ -112,7 +113,16 @@ const getEta = (distance: number) => {
   return Math.floor(distance * 5) + 5; // 5-80 minutes
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  // Validate session
+  const session = await getSession(request, cookies);
+  if (!session?.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { query, category, brand } = body;
