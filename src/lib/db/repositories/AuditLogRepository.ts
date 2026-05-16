@@ -176,10 +176,10 @@ export class AuditLogRepository {
       WHERE ${whereClause}
       RETURN a
       ORDER BY a.timestamp DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const logs = results.map((result) => this.mapQueryResultToAuditLog(result.a));
@@ -241,10 +241,10 @@ export class AuditLogRepository {
       WHERE ${whereClause}
       RETURN a
       ORDER BY a.timestamp DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const logs = results.map((result) => this.mapQueryResultToAuditLog(result.a));
@@ -306,10 +306,10 @@ export class AuditLogRepository {
       WHERE ${whereClause}
       RETURN a
       ORDER BY a.timestamp DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const logs = results.map((result) => this.mapQueryResultToAuditLog(result.a));
@@ -371,10 +371,10 @@ export class AuditLogRepository {
       WHERE ${whereClause}
       RETURN a
       ORDER BY a.timestamp DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      params
+      { ...params, limit, offset }
     );
 
     const logs = results.map((result) => this.mapQueryResultToAuditLog(result.a));

@@ -1,0 +1,111 @@
+---
+/**
+ * Settings Content Component
+ *
+ * User settings and preferences page.
+ *
+ * @component content-container/App/Settings
+ */
+
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+  data: any;
+  userRole: string;
+  userId: string;
+}
+
+const { data, userRole, userId } = Astro.props;
+---
+
+<Layout title="Settings">
+  <div class="settings-content p-6">
+    <div class="max-w-2xl">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-headline-lg font-bold text-neutral-600 mb-2">
+          Settings
+        </h1>
+        <p class="text-body-md text-neutral-400">
+          Manage your account settings and preferences
+        </p>
+      </div>
+
+      <!-- Settings Sections -->
+      <div class="space-y-6">
+        <!-- Profile Information -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-neutral-200">
+            <h2 class="text-headline-md font-semibold text-neutral-600">
+              Profile Information
+            </h2>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label class="block text-label-sm text-neutral-500 mb-2">
+                Name
+              </label>
+              <p class="text-body-md text-neutral-700">
+                {data.user?.name || 'Not set'}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-label-sm text-neutral-500 mb-2">
+                Email
+              </label>
+              <p class="text-body-md text-neutral-700">
+                {data.user?.email || 'Not set'}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-label-sm text-neutral-500 mb-2">
+                Role
+              </label>
+              <p class="text-body-md text-neutral-700">
+                {data.user?.role || 'Not set'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Preferences -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-neutral-200">
+            <h2 class="text-headline-md font-semibold text-neutral-600">
+              Notifications
+            </h2>
+          </div>
+          <div class="p-6">
+            <p class="text-body-md text-neutral-400">
+              Notification preferences coming soon...
+            </p>
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-neutral-200">
+            <h2 class="text-headline-md font-semibold text-neutral-600">
+              Security
+            </h2>
+          </div>
+          <div class="p-6">
+            <p class="text-body-md text-neutral-400">
+              Password management and security settings coming soon...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Page Styles */
+  .settings-content {
+    min-height: calc(100vh - 64px);
+    background-color: #f9f9f9;
+  }
+</style>

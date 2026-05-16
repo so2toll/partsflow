@@ -178,10 +178,10 @@ export class TeamRepository {
       MATCH (org:Organization {id: $organizationId})-[:HAS_TEAM]->(t:Team)
       RETURN t
       ORDER BY t.name ASC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      { organizationId }
+      { organizationId, limit, offset }
     );
 
     const teams = results
@@ -247,9 +247,10 @@ export class TeamRepository {
       MATCH (t:Team)
       RETURN t
       ORDER BY t.createdAt ${options.orderDir || "DESC"}
-      LIMIT ${limit}
-      SKIP ${offset}
-      `
+      LIMIT $limit
+      SKIP $offset
+      `,
+      { limit, offset }
     );
 
     const teams = results

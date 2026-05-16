@@ -1,0 +1,27 @@
+---
+/**
+ * ShopOwner Dashboard Content Component
+ *
+ * Dashboard for ShopOwners with Active Orders summary widget and Parts Search.
+ *
+ * @component content-container/Shop/ShopOwnerDashboard
+ * @version 0.1.0
+ */
+
+import ShopOwnerDashboardComponent from '../../components/shop/ShopOwnerDashboardComponent.tsx';
+import type { ShopOwnerDashboardPageData } from '../../lib/data/appPageData';
+
+interface Props {
+  data: ShopOwnerDashboardPageData;
+}
+
+const { data } = Astro.props;
+---
+
+<ShopOwnerDashboardComponent
+  client:load
+  suppliers={data.suppliers}
+  organizationId={data.organizationId}
+  userId={data.userId}
+  orderStats={data.orderStats}
+/>

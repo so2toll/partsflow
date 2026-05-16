@@ -16,12 +16,23 @@ interface Props {
 }
 
 const { data } = Astro.props;
+
+// Debug logging
+console.log('[DriverDashboard.astro] Server-side data:', {
+  driverId: data.driver?.id,
+  driverStatus: data.driver?.status,
+  activeDeliveriesCount: data.activeDeliveries?.length || 0,
+  availableOrdersCount: data.availableOrders?.length,
+  stats: data.stats,
+  userId: data.userId,
+  timestamp: new Date().toISOString()
+});
 ---
 
 <DriverDashboardComponent
   client:load
   driver={data.driver}
-  currentDelivery={data.currentDelivery}
+  activeDeliveries={data.activeDeliveries || []}
   availableOrders={data.availableOrders || []}
   stats={data.stats}
   userId={data.userId}

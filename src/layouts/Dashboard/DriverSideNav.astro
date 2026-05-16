@@ -306,13 +306,15 @@ const navItems = [
 </style>
 
 <script>
-  // Status toggle
+  // Status toggle - persists to database and syncs via BroadcastChannel
   const toggleBtn = document.getElementById('status-toggle-btn');
   const driverStatus = document.getElementById('driver-status');
 
-  toggleBtn?.addEventListener('click', function() {
+  toggleBtn?.addEventListener('click', async function() {
     const isAvailable = toggleBtn.classList.contains('available');
+    const newStatus = isAvailable ? 'offline' : 'available';
 
+    // Update UI immediately for better UX
     if (isAvailable) {
       toggleBtn.classList.remove('available');
       toggleBtn.classList.add('offline');
@@ -331,8 +333,78 @@ const navItems = [
       }
     }
 
-    // TODO: Send status update to server
+    // Call API to persist to database
+    try {
+      console.log('[DriverSidenav] Calling API to update status:', { newStatus, timestamp: new Date().toISOString() });
+      const response = await fetch('/api/drivers/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        console.error('[DriverSidenav] Failed to update status:', { status: response.status, statusText: response.statusText });
+        // Revert UI on failure
+        if (isAvailable) {
+          toggleBtn.classList.add('available');
+          toggleBtn.classList.remove('offline');
+          toggleBtn.querySelector('.toggle-label').textContent = 'AVAILABLE';
+          if (driverStatus) {
+            driverStatus.textContent = 'AVAILABLE';
+            driverStatus.classList.remove('offline');
+          }
+        } else {
+          toggleBtn.classList.add('offline');
+          toggleBtn.classList.remove('available');
+          toggleBtn.querySelector('.toggle-label').textContent = 'OFFLINE';
+          if (driverStatus) {
+            driverStatus.textContent = 'OFFLINE';
+            driverStatus.classList.add('offline');
+          }
+        }
+        alert('Failed to update status. Please try again.');
+        return;
+      }
+
+      const result = await response.json();
+      console.log('[DriverSidenav] Status update successful:', {
+        result,
+        timestamp: new Date().toISOString()
+      });
+
+      // Sync across tabs using BroadcastChannel (client-side only)
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('driver-status');
+        channel.postMessage({ status: newStatus });
+      }
+    } catch (error) {
+      console.error('[DriverSidenav] Status update error:', error);
+      alert('Failed to update status. Please try again.');
+    }
   });
+
+  // Listen for status changes from other tabs/components
+  if (typeof BroadcastChannel !== 'undefined') {
+    const channel = new BroadcastChannel('driver-status');
+    channel.onmessage = (event) => {
+      const { status } = event.data;
+      if (toggleBtn && driverStatus) {
+        if (status === 'offline') {
+          toggleBtn.classList.remove('available');
+          toggleBtn.classList.add('offline');
+          toggleBtn.querySelector('.toggle-label').textContent = 'OFFLINE';
+          driverStatus.textContent = 'OFFLINE';
+          driverStatus.classList.add('offline');
+        } else {
+          toggleBtn.classList.add('available');
+          toggleBtn.classList.remove('offline');
+          toggleBtn.querySelector('.toggle-label').textContent = 'AVAILABLE';
+          driverStatus.textContent = 'AVAILABLE';
+          driverStatus.classList.remove('offline');
+        }
+      }
+    };
+  }
 
   // Client-side logout
   document.getElementById('sidenav-logout-button')?.addEventListener('click', async function(e) {
@@ -347,9 +419,6 @@ const navItems = [
     try {
       const { logout } = await await import('../../lib/auth/auth-client');
       await logout();
-
-      localStorage.clear();
-      sessionStorage.clear();
 
       window.location.href = '/auth/login';
     } catch (error) {

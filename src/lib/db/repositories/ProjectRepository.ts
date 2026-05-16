@@ -232,10 +232,10 @@ export class ProjectRepository {
       MATCH (org:Organization {id: $organizationId})-[:HAS_PROJECT]->(p:Project)
       RETURN p
       ORDER BY p.createdAt DESC
-      LIMIT ${limit}
-      SKIP ${offset}
+      LIMIT $limit
+      SKIP $offset
       `,
-      { organizationId }
+      { organizationId, limit, offset }
     );
 
     const projects = results
@@ -277,9 +277,10 @@ export class ProjectRepository {
       MATCH (p:Project)
       RETURN p
       ORDER BY p.createdAt ${options.orderDir || "DESC"}
-      LIMIT ${limit}
-      SKIP ${offset}
-      `
+      LIMIT $limit
+      SKIP $offset
+      `,
+      { limit, offset }
     );
 
     const projects = results
@@ -915,9 +916,9 @@ export class ProjectRepository {
        WHERE p.organizationId = $organizationId AND p.videoStatus = $status
        RETURN p
        ORDER BY p.updatedAt DESC
-       SKIP ${offset}
-       LIMIT ${limit}`,
-      { organizationId, status }
+       SKIP $offset
+       LIMIT $limit`,
+      { organizationId, status, offset, limit }
     );
 
     const countResult = await graph.query<{ count: number }>(

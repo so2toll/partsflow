@@ -130,6 +130,33 @@ export default function PartsSearchComponent({ suppliers, organizationId, userId
         </p>
       </div>
 
+      {/* Search Helper Card */}
+      <Card className="mb-6 bg-info-50 border-info-200">
+        <CardContent className="py-4">
+          <div className="flex items-start gap-3">
+            <div className="text-info-500 mt-0.5">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-label-md font-semibold text-info-700 mb-1">
+                Parts Search Tips
+              </h3>
+              <ul className="text-body-sm text-info-600 space-y-1">
+                <li>• <strong>Part names:</strong> brake, alternator, water pump, starter, radiator, fuel pump, shocks</li>
+                <li>• <strong>Part numbers:</strong> BB-1234, ALT-5678, WP-9012, STR-3456, RAD-7890, etc.</li>
+                <li>• <strong>Brands:</strong> Bosch, Denso, Airtex, Raybestos, Delphi, Monroe</li>
+                <li>• <strong>Categories:</strong> Brakes, Electrical, Cooling System, Fuel System, Suspension</li>
+              </ul>
+              <p className="text-body-sm text-info-600 mt-2">
+                <strong>After searching:</strong> Click "Order for Delivery" to create an order → Admins will see it in Dispatch → Drivers can accept and deliver
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Search Form */}
       <Card className="mb-8">
         <CardContent className="pt-6">
@@ -271,7 +298,7 @@ export default function PartsSearchComponent({ suppliers, organizationId, userId
       {/* Order Confirmation Modal */}
       {showOrderModal && selectedPart && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <Card className="max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <CardTitle>Confirm Order</CardTitle>
             </CardHeader>

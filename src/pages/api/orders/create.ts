@@ -9,13 +9,14 @@
 import type { APIRoute } from 'astro';
 import { getSession } from '../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../lib/db/repositories/OrderRepository';
+import { organizationRepository } from '../../../lib/db/repositories/OrganizationRepository';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Get session
-    const session = await getSession(request, new Request(request.headers).headers ? new Headers(request.headers) : new Headers());
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -35,6 +36,15 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
+    // Verify user is an active member of this organization
+    const isMember = await organizationRepository.isMember(userId, organizationId);
+    if (!isMember) {
+      return new Response(
+        JSON.stringify({ error: 'You are not a member of this organization' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const body = await request.json();
     const {
       partId,
@@ -45,7 +55,24 @@ export const POST: APIRoute = async ({ request }) => {
       price,
       priority,
       deliveryAddress,
+      shopId,  // Captured to prevent cross-org orders
+      organizationId: bodyOrgId,  // Captured to prevent cross-org orders
     } = body;
+
+    // Prevent cross-organization order creation
+    if (shopId && shopId !== organizationId) {
+      return new Response(
+        JSON.stringify({ error: 'Cannot create orders for a different organization' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (bodyOrgId && bodyOrgId !== organizationId) {
+      return new Response(
+        JSON.stringify({ error: 'Cannot create orders for a different organization' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Validate required fields
     if (!partNumber || !partName || !supplierId || !supplierName || !price || !priority || !deliveryAddress) {

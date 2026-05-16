@@ -1,13 +1,10 @@
 ---
 /**
- * App Profile Page
+ * App Settings Page
  *
- * Standard page template following the support/index.astro pattern:
- * 1. Get session
- * 2. Set currentPage
- * 3. Fetch data via unified getPageData()
- * 4. Validate role access
- * 5. Render RBACComponent
+ * User settings page with profile information and preferences.
+ *
+ * @component pages/app/settings
  */
 
 import { getSession } from "../../lib/auth/session-adapter";
@@ -18,12 +15,12 @@ import { getPageData } from "../../lib/data/appPageData";
 import { graph } from "../../lib/db/graph";
 
 // ========================================================================
-// PAGE CONFIGURATION - Only this changes per page!
+// PAGE CONFIGURATION
 // ========================================================================
-const currentPage = 'appProfile';
+const currentPage = 'appSettings';
 
 // ========================================================================
-// STANDARD PAGE LOGIC - Copy-paste for all app pages
+// STANDARD PAGE LOGIC
 // ========================================================================
 
 // Get session
@@ -37,10 +34,9 @@ if (!session) {
 const initialUser = session.user;
 
 // Always look up user from database to get the correct ULID and role
-// (Better Auth IDs don't match database ULID IDs, so we use email as the key)
 let user = initialUser;
 if (initialUser?.email) {
-  console.log(`[Profile] Looking up user by email ${initialUser.email} in database`);
+  console.log(`[Settings] Looking up user by email ${initialUser.email} in database`);
   const userResults = await graph.query<any>(
     `
     MATCH (u:User {email: $email})
@@ -58,28 +54,24 @@ if (initialUser?.email) {
       role: userProps.role,
       organizationId: userProps.organizationId,
     };
-    console.log(`[Profile] Found user in database: ${user.id}, role: ${user.role}, org: ${user.organizationId}`);
-  } else {
-    console.log(`[Profile] User not found in database for email ${initialUser.email}`);
+    console.log(`[Settings] Found user in database: ${user.id}, role: ${user.role}`);
   }
 }
 
 const userId = user?.id;
-const authRole = user?.role; // auth.db role (User or SuperAdmin)
+const authRole = user?.role;
 const organizationId = user?.organizationId;
 
 // ========================================================================
-// DATA FETCHING - Uses unified getPageData() function
+// DATA FETCHING
 // ========================================================================
 
 const data = await getPageData(currentPage, userId, authRole, organizationId);
 
 // ========================================================================
-// ROLE RESOLUTION - Use app.db role for authorization
+// ROLE RESOLUTION
 // ========================================================================
 
-// For authorization, use the app.db role from data.user
-// For SuperAdmin, use auth.db role
 const userRole = data?.user?.role || authRole;
 
 // ========================================================================
@@ -100,6 +92,8 @@ if (!RBAC_CONFIG[userRole][currentPage]) {
   console.log('Role', userRole, 'does not have access to page:', currentPage);
   return Astro.redirect('/access-denied?reason=invalid_role&page=' + currentPage);
 }
+
+console.log("Auth role:", authRole, "App role:", data?.user?.role, "Using for RBAC:", userRole, "page:", currentPage)
 
 // ========================================================================
 // RENDER RBAC COMPONENT

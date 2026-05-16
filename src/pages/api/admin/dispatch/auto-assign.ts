@@ -10,12 +10,14 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
+import { validateTransition } from '../../../../lib/order/orderStateMachine';
+import { broadcastOrderStatus, broadcastDriverStatus } from '../../../../lib/sse/sseManager';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const session = await getSession(request);
+    const session = await getSession(request, cookies);
 
     if (!session?.user) {
       return new Response(
@@ -55,9 +57,11 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    if (order.status !== 'pending') {
+    // Validate state transition using state machine
+    const validation = validateTransition(order.status, 'dispatched');
+    if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Order is not available for assignment' }),
+        JSON.stringify({ error: validation.error }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -81,6 +85,18 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Update driver status to on_delivery
     await driverRepository.updateStatus(selectedDriver.id, 'on_delivery');
+
+    // Broadcast order status change
+    broadcastOrderStatus(orderId, 'dispatched', {
+      partName: updatedOrder.partName,
+      partNumber: updatedOrder.partNumber,
+      driverId: selectedDriver.id,
+    });
+
+    // Broadcast driver status change
+    broadcastDriverStatus(selectedDriver.id, 'on_delivery', {
+      userId: selectedDriver.userId,
+    });
 
     return new Response(
       JSON.stringify({

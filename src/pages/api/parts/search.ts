@@ -8,6 +8,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { getSession } from '../../../lib/auth/session-adapter';
 import { supplierRepository } from '../../../lib/db/repositories';
 
 export const prerender = false;
@@ -112,7 +113,16 @@ const getEta = (distance: number) => {
   return Math.floor(distance * 5) + 5; // 5-80 minutes
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  // Validate session
+  const session = await getSession(request, cookies);
+  if (!session?.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { query, category, brand } = body;
@@ -120,14 +130,16 @@ export const POST: APIRoute = async ({ request }) => {
     // Get suppliers from database
     const suppliers = await supplierRepository.findActive();
 
-    if (suppliers.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: 'No suppliers available. Please seed suppliers first.',
-        }),
-        { status: 503, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    // Use mock suppliers if none exist in database
+    const mockSuppliers = [
+      { id: 'supplier_mock_001', displayName: "O'Reilly – Catonsville" },
+      { id: 'supplier_mock_002', displayName: 'AutoZone – Baltimore' },
+      { id: 'supplier_mock_003', displayName: 'NAPA – Glen Burnie' },
+    ];
+
+    const allSuppliers = suppliers.length > 0 ? suppliers : mockSuppliers;
+
+    console.log('[PartsSearch] Using suppliers:', allSuppliers.length, 'suppliers available');
 
     // Filter parts based on query
     let results = MOCK_PARTS;
@@ -152,7 +164,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Enrich results with supplier info
     const enrichedResults = results.map((part) => {
-      const supplier = suppliers[Math.floor(Math.random() * suppliers.length)];
+      const supplier = allSuppliers[Math.floor(Math.random() * allSuppliers.length)];
       const distance = getDistance();
       const availability = getAvailability();
 

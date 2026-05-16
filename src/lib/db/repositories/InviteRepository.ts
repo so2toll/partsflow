@@ -215,9 +215,10 @@ export class InviteRepository {
       MATCH (i:Invite)
       RETURN i
       ORDER BY i.createdAt ${options.orderDir || "DESC"}
-      LIMIT ${limit}
-      SKIP ${offset}
-      `
+      LIMIT $limit
+      SKIP $offset
+      `,
+      { limit, offset }
     );
 
     let invites = results
