@@ -130,14 +130,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Get suppliers from database
     const suppliers = await supplierRepository.findActive();
 
-    if (suppliers.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: 'No suppliers available. Please seed suppliers first.',
-        }),
-        { status: 503, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    // Use mock suppliers if none exist in database
+    const mockSuppliers = [
+      { id: 'supplier_mock_001', displayName: "O'Reilly – Catonsville" },
+      { id: 'supplier_mock_002', displayName: 'AutoZone – Baltimore' },
+      { id: 'supplier_mock_003', displayName: 'NAPA – Glen Burnie' },
+    ];
+
+    const allSuppliers = suppliers.length > 0 ? suppliers : mockSuppliers;
+
+    console.log('[PartsSearch] Using suppliers:', allSuppliers.length, 'suppliers available');
 
     // Filter parts based on query
     let results = MOCK_PARTS;
@@ -162,7 +164,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Enrich results with supplier info
     const enrichedResults = results.map((part) => {
-      const supplier = suppliers[Math.floor(Math.random() * suppliers.length)];
+      const supplier = allSuppliers[Math.floor(Math.random() * allSuppliers.length)];
       const distance = getDistance();
       const availability = getAvailability();
 

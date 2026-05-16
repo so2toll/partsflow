@@ -89,13 +89,21 @@ export const POST: APIRoute = async ({ request, cookies, params }) => {
       );
     }
 
-    // Update driver status to on_delivery
-    await driverRepository.updateStatus(driver.id, 'on_delivery');
+    // Don't change driver status - allow bulk pickups
+    // Driver stays 'available' and can accept multiple orders
+
+    console.log('[OrderAccept] Driver accepted order:', {
+      orderId,
+      driverId: driver.id,
+      orderStatus: updatedOrder.status,
+      driverStatus: driver.status
+    });
 
     return new Response(
       JSON.stringify({
         success: true,
         order: updatedOrder,
+        driver,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

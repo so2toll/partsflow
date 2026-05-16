@@ -11,6 +11,7 @@ import type { APIRoute } from 'astro';
 import { getSession } from '../../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { organizationRepository } from '../../../../lib/db/repositories/OrganizationRepository';
+import { broadcastNewOrder } from '../../../../lib/sse/sseManager';
 
 export const prerender = false;
 
@@ -77,6 +78,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       supplierName,
       partsCostCents: Math.floor(Math.random() * 10000) + 2000, // Random cost between $20-$120
     });
+
+    // Broadcast new order to all connected dispatch clients
+    broadcastNewOrder(order);
 
     return new Response(
       JSON.stringify({

@@ -37,7 +37,7 @@ interface Stats {
 
 interface Props {
   driver: Driver | null;
-  currentDelivery: Order | null;
+  activeDeliveries: Order[];
   availableOrders: Order[];
   stats: Stats | null;
   userId: string;
@@ -45,7 +45,7 @@ interface Props {
 
 export default function DriverDashboardComponent({
   driver,
-  currentDelivery,
+  activeDeliveries: initialActiveDeliveries,
   availableOrders,
   stats,
   userId,
@@ -54,15 +54,15 @@ export default function DriverDashboardComponent({
   console.log('[DriverDashboardComponent] Props received:', {
     driverId: driver?.id,
     driverStatus: driver?.status,
-    currentDelivery: currentDelivery?.id,
+    activeDeliveriesCount: initialActiveDeliveries?.length || 0,
     availableOrdersCount: availableOrders?.length,
     timestamp: new Date().toISOString()
   });
 
   const [driverStatus, setDriverStatus] = useState(driver?.status || 'offline');
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(currentDelivery);
   const [orders, setOrders] = useState<Order[]>(availableOrders);
+  const [activeDeliveries, setActiveDeliveries] = useState<Order[]>(initialActiveDeliveries || []);
 
   // Log when driver prop changes (page load/refresh)
   useEffect(() => {
@@ -90,6 +90,14 @@ export default function DriverDashboardComponent({
   }, []);
 
   const toggleStatus = async () => {
+    // Check if driver has active deliveries before going offline
+    if (driverStatus === 'available' && activeDeliveries.length > 0) {
+      const confirmed = confirm(
+        `You have ${activeDeliveries.length} active delivery(ies). Are you sure you want to go offline? Complete your deliveries first.`
+      );
+      if (!confirmed) return;
+    }
+
     const newStatus = driverStatus === 'available' ? 'offline' : 'available';
     setUpdatingStatus(true);
 
@@ -128,11 +136,14 @@ export default function DriverDashboardComponent({
 
       if (response.ok) {
         const data = await response.json();
-        setCurrentOrder(data.order);
+        console.log('[DriverDashboard] Order accepted:', data.order);
+        // Add to active deliveries instead of replacing
+        setActiveDeliveries([...activeDeliveries, data.order]);
         setOrders(orders.filter((o) => o.id !== orderId));
-        setDriverStatus('on_delivery');
+        // Don't change driver status - allow bulk pickups
       } else {
-        alert('Failed to accept order');
+        const errorData = await response.json();
+        alert(`Failed to accept order: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Accept order error:', error);
@@ -140,11 +151,9 @@ export default function DriverDashboardComponent({
     }
   };
 
-  const updateOrderStatus = async (newStatus: string) => {
-    if (!currentOrder) return;
-
+  const updateOrderStatus = async (newStatus: string, orderId: string) => {
     try {
-      const response = await fetch(`/api/orders/${currentOrder.id}/status`, {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -152,17 +161,22 @@ export default function DriverDashboardComponent({
 
       if (response.ok) {
         const data = await response.json();
-        setCurrentOrder(data.order);
+        console.log('[DriverDashboard] Order status updated:', data.order);
 
-        // If delivered, clear current order and set status to available
+        // Update the delivery in activeDeliveries
+        setActiveDeliveries(activeDeliveries.map(d =>
+          d.id === orderId ? data.order : d
+        ));
+
+        // If delivered, remove from active deliveries
         if (newStatus === 'delivered') {
-          setCurrentOrder(null);
-          setDriverStatus('available');
-          // Refresh stats
+          setActiveDeliveries(activeDeliveries.filter(d => d.id !== orderId));
+          // Refresh to get updated stats
           window.location.reload();
         }
       } else {
-        alert('Failed to update order status');
+        const errorData = await response.json();
+        alert(`Failed to update order status: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Status update error:', error);
@@ -183,6 +197,13 @@ export default function DriverDashboardComponent({
       default:
         return 'bg-neutral-400 text-white';
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    return status
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   const formatAddress = (address: string) => {
@@ -251,18 +272,16 @@ export default function DriverDashboardComponent({
                   </h3>
                   <p className="text-body-md text-neutral-400">
                     {driverStatus === 'available'
-                      ? 'You are available for deliveries'
-                      : driverStatus === 'on_delivery'
-                      ? 'Currently on a delivery'
+                      ? `You are available for deliveries${activeDeliveries.length > 0 ? ` (${activeDeliveries.length} active)` : ''}`
                       : 'You are offline'}
                   </p>
                 </div>
                 <button
                   onClick={toggleStatus}
-                  disabled={updatingStatus || driverStatus === 'on_delivery'}
+                  disabled={updatingStatus}
                   className={`relative w-20 h-10 rounded-full transition-colors ${
                     driverStatus === 'available' ? 'bg-success-500' : 'bg-neutral-300'
-                  } ${driverStatus === 'on_delivery' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  }`}
                 >
                   <div
                     className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-transform ${
@@ -278,110 +297,124 @@ export default function DriverDashboardComponent({
           </Card>
         </div>
 
-        {/* Current Delivery */}
-        {currentOrder && (
-          <Card className="mb-6 border-2 border-primary-500">
-            <CardHeader className="bg-primary-50">
-              <CardTitle>Current Delivery</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Order Details */}
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-headline-md font-semibold text-neutral-600">
-                        {currentOrder.partName}
-                      </h3>
-                      <p className="text-body-md text-neutral-400">
-                        {currentOrder.partNumber} • {currentOrder.supplierName}
-                      </p>
+        {/* Active Deliveries */}
+        {activeDeliveries.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-headline-lg font-bold text-neutral-600 mb-4">
+              Active Deliveries ({activeDeliveries.length})
+            </h2>
+            <div className="space-y-4">
+              {activeDeliveries.map((delivery) => (
+                <Card key={delivery.id} className="border-2 border-primary-500 bg-white">
+                  <CardContent className="py-6">
+                    {/* Order Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-headline-md font-semibold text-neutral-600 mb-1">
+                          {delivery.partName}
+                        </h3>
+                        <p className="text-body-md text-neutral-400">
+                          {delivery.partNumber} • {delivery.supplierName}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-label-md font-semibold ${getPriorityColor(
+                          delivery.priority
+                        )}`}
+                      >
+                        {delivery.priority}
+                      </span>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-label-md font-semibold ${getPriorityColor(
-                        currentOrder.priority
-                      )}`}
-                    >
-                      {currentOrder.priority}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Addresses */}
-                <div className="space-y-4">
-                  <div className="border-l-4 border-info-500 pl-4 py-2 bg-info-50 rounded-r">
-                    <p className="text-label-sm text-neutral-500 mb-1">Pickup Location</p>
-                    <p className="text-body-md font-medium text-neutral-600">
-                      {currentOrder.supplierName}
-                    </p>
-                  </div>
+                    {/* Delivery Details */}
+                    <div className="space-y-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                          <span className="text-blue-500 text-sm">📥</span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-500">Pickup</p>
+                          <p className="text-sm font-medium text-neutral-700">{delivery.supplierName}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                          <span className="text-green-500 text-sm">📍</span>
+                        </div>
+                        <div>
+                          <p className="text-xs text-neutral-500">Drop</p>
+                          <p className="text-sm font-medium text-neutral-700">{formatAddress(delivery.deliveryAddress)}</p>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="border-l-4 border-success-500 pl-4 py-2 bg-success-50 rounded-r">
-                    <p className="text-label-sm text-neutral-500 mb-1">Delivery Address</p>
-                    <p className="text-body-md font-medium text-neutral-600">
-                      {formatAddress(currentOrder.deliveryAddress)}
-                    </p>
-                    <a
-                      href={`https://maps.google.com/?daddr=${encodeURIComponent(
-                        currentOrder.deliveryAddress
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-primary-500 hover:text-primary-600 mt-2"
-                    >
-                      📍 Navigate
-                    </a>
-                  </div>
-                </div>
+                    {/* Status Updates */}
+                    <div className="mb-3">
+                      <p className="text-label-sm text-neutral-500 mb-2">
+                        Update Status: <span className="font-semibold text-primary-600">{getStatusLabel(delivery.status)}</span>
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {delivery.status === 'dispatched' && (
+                          <button
+                            onClick={() => updateOrderStatus('picked_up', delivery.id)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Picked Up
+                          </button>
+                        )}
+                        {delivery.status === 'picked_up' && (
+                          <button
+                            onClick={() => updateOrderStatus('en_route', delivery.id)}
+                            className="bg-primary-500 hover:bg-primary-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            En Route
+                          </button>
+                        )}
+                        {(delivery.status === 'en_route' || delivery.status === 'picked_up') && (
+                          <button
+                            onClick={() => updateOrderStatus('delivered', delivery.id)}
+                            className="bg-success-500 hover:bg-success-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Delivered
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                {/* Status Updates */}
-                <div>
-                  <p className="text-label-sm text-neutral-500 mb-3">Update Status</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {currentOrder.status === 'dispatched' && (
-                      <button
-                        onClick={() => updateOrderStatus('picked_up')}
-                        className="btn btn-primary py-4 text-body-md"
+                    {/* ETA and Navigate */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-center bg-warning-50 px-4 py-2 rounded">
+                        <p className="text-xs text-neutral-500">ETA</p>
+                        <p className="text-lg font-bold text-warning-700">{getEta(delivery)} min</p>
+                      </div>
+                      <a
+                        href={`https://maps.google.com/?daddr=${encodeURIComponent(
+                          delivery.deliveryAddress
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary-500 hover:text-primary-600 text-sm font-medium"
                       >
-                        📦 Picked Up
-                      </button>
-                    )}
-                    {currentOrder.status === 'picked_up' && (
-                      <button
-                        onClick={() => updateOrderStatus('en_route')}
-                        className="btn btn-primary py-4 text-body-md"
-                      >
-                        🚗 En Route
-                      </button>
-                    )}
-                    {(currentOrder.status === 'en_route' || currentOrder.status === 'picked_up') && (
-                      <button
-                        onClick={() => updateOrderStatus('delivered')}
-                        className="btn btn-success py-4 text-body-md bg-success-500 hover:bg-success-600"
-                      >
-                        ✅ Delivered
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* ETA */}
-                <div className="text-center py-3 bg-warning-50 rounded">
-                  <p className="text-label-sm text-neutral-500 mb-1">ETA</p>
-                  <p className="text-headline-md font-bold text-warning-700">
-                    {getEta(currentOrder)} min
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                        📍 Navigate
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Available Orders Queue */}
-        {driverStatus === 'available' && !currentOrder && orders.length > 0 && (
+        {driverStatus === 'available' && orders.length > 0 && (
           <div className="mb-6">
             <h2 className="text-headline-lg font-bold text-neutral-600 mb-4">
-              Incoming Job
+              Incoming Jobs
+              {activeDeliveries.length > 0 && (
+                <span className="text-body-md text-neutral-500 font-normal ml-2">
+                  ({activeDeliveries.length} active delivery{activeDeliveries.length > 1 ? 'ies' : ''})
+                </span>
+              )}
             </h2>
             <div className="space-y-4">
               {orders.map((order) => (
@@ -469,7 +502,7 @@ export default function DriverDashboardComponent({
         )}
 
         {/* No Orders */}
-        {driverStatus === 'available' && !currentOrder && orders.length === 0 && (
+        {driverStatus === 'available' && activeDeliveries.length === 0 && orders.length === 0 && (
           <Card className="mb-6">
             <CardContent className="py-12 text-center">
               <p className="text-headline-md font-semibold text-neutral-500 mb-2">
@@ -486,7 +519,7 @@ export default function DriverDashboardComponent({
         )}
 
         {/* Offline Message */}
-        {driverStatus === 'offline' && !currentOrder && (
+        {driverStatus === 'offline' && activeDeliveries.length === 0 && (
           <Card className="mb-6">
             <CardContent className="py-12 text-center">
               <p className="text-headline-md font-semibold text-neutral-500 mb-2">
@@ -564,15 +597,12 @@ export default function DriverDashboardComponent({
             <span className="text-body-md font-medium text-neutral-600">
               {driverStatus === 'available' ? 'Available' : 'Offline'}
             </span>
+            {activeDeliveries.length > 0 && (
+              <span className="text-body-sm text-neutral-500">
+                ({activeDeliveries.length} active)
+              </span>
+            )}
           </div>
-          {currentOrder && (
-            <button
-              onClick={() => updateOrderStatus('delivered')}
-              className="btn btn-success bg-success-500 hover:bg-success-600"
-            >
-              Mark Delivered
-            </button>
-          )}
         </div>
       </div>
     </div>

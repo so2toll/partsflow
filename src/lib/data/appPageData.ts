@@ -58,6 +58,18 @@ export interface DriverDashboardPageData extends PageData {
   userId: string;
 }
 
+export interface ShopOwnerDashboardPageData extends PageData {
+  suppliers: any[];
+  userId: string;
+  organizationId: string;
+  orderStats: {
+    enRoute: number;
+    deliveredToday: number;
+    pending: number;
+    totalThisMonth: number;
+  };
+}
+
 export interface DispatchManagementPageData extends PageData {
   unassignedOrders: any[];
   availableDrivers: any[];
@@ -121,9 +133,15 @@ export async function getPageData(
       return getSettingsPageData(isSuperAdmin, organizationId, userId);
 
     case 'appDashboardTest':
-      // appDashboardTest is used for both SuperAdmin (OperationsDashboard) and Driver (DriverDashboard)
+      // appDashboardTest is used for:
+      // - SuperAdmin: OperationsDashboard
+      // - ShopOwner: ShopOwnerDashboard (Parts Search + Active Orders widget)
+      // - Driver: DriverDashboard
+      if (userRole === 'ShopOwner') {
+        return getShopOwnerDashboardPageData(isSuperAdmin, organizationId, userId);
+      }
       if (!isSuperAdmin) {
-        // Non-SuperAdmin users (Driver, ShopOwner, etc.) use driver dashboard
+        // Non-SuperAdmin, non-ShopOwner users (Driver, etc.) use driver dashboard
         return getDriverDashboardPageData(isSuperAdmin, organizationId, userId);
       }
       return getDashboardTestPageData(isSuperAdmin, organizationId, userId);
@@ -820,19 +838,42 @@ async function getDriverDashboardPageData(
   });
   data.driver = driver;
 
-  // Get current delivery (if any)
+  // Get active deliveries (dispatched, picked_up, en_route)
   if (driver) {
-    const activeDeliveries = await orderRepository.list({
+    // Get all active orders for this driver
+    const dispatchedOrders = await orderRepository.list({
       driverId: driver.id,
       status: 'dispatched' as any,
-      limit: 1,
+      limit: 50,
     });
 
-    if (activeDeliveries.orders.length > 0) {
-      data.currentDelivery = activeDeliveries.orders[0];
-    } else {
-      data.currentDelivery = null;
-    }
+    const pickedUpOrders = await orderRepository.list({
+      driverId: driver.id,
+      status: 'picked_up' as any,
+      limit: 50,
+    });
+
+    const enRouteOrders = await orderRepository.list({
+      driverId: driver.id,
+      status: 'en_route' as any,
+      limit: 50,
+    });
+
+    // Combine all active deliveries
+    const allActiveDeliveries = [
+      ...dispatchedOrders.orders,
+      ...pickedUpOrders.orders,
+      ...enRouteOrders.orders,
+    ];
+
+    console.log('[AppPageData] Active deliveries:', {
+      dispatched: dispatchedOrders.orders.length,
+      pickedUp: pickedUpOrders.orders.length,
+      enRoute: enRouteOrders.orders.length,
+      total: allActiveDeliveries.length
+    });
+
+    data.activeDeliveries = allActiveDeliveries;
 
     // Get available orders if driver is available
     if (driver.status === 'available') {
@@ -864,12 +905,113 @@ async function getDriverDashboardPageData(
       averageTime: 0, // TODO: Calculate from actual data
     };
   } else {
-    data.currentDelivery = null;
+    data.activeDeliveries = [];
     data.availableOrders = [];
     data.stats = null;
   }
 
   data.userId = userId;
+
+  return data;
+}
+
+/**
+ * ShopOwner Dashboard page data
+ */
+async function getShopOwnerDashboardPageData(
+  isSuperAdmin: boolean,
+  organizationId?: string,
+  userId?: string
+): Promise<PageData> {
+  const data: PageData = {};
+
+  if (!userId || !organizationId) {
+    return data;
+  }
+
+  // Get user details for RBAC
+  const userResults = await graph.query<any>(
+    `
+    MATCH (u:User {id: $userId})
+    RETURN u
+    `,
+    { userId }
+  );
+
+  if (userResults.length > 0 && userResults[0].u) {
+    const userProps = userResults[0].u.properties;
+    data.user = {
+      id: userProps.id,
+      email: userProps.email,
+      name: userProps.name,
+      role: userProps.role,
+      organizationId: userProps.organizationId,
+    };
+  }
+
+  // Get suppliers for parts search
+  let suppliers: any = [];
+  try {
+    const allSuppliers = await supplierRepository.findAll();
+    suppliers = allSuppliers.filter((s: any) => s.isActive);
+    console.log('[ShopOwnerDashboard] Found suppliers:', suppliers.length);
+  } catch (error) {
+    console.error('[ShopOwnerDashboard] Error fetching suppliers:', error);
+  }
+  data.suppliers = suppliers;
+
+  // Calculate order statistics for this shop
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  // Get all orders for this shop
+  console.log('[ShopOwnerDashboard] Fetching orders for shop:', organizationId);
+  let allOrders: any = { orders: [] };
+
+  try {
+    allOrders = await orderRepository.list({
+      shopId: organizationId,
+      limit: 1000,
+    });
+    console.log('[ShopOwnerDashboard] Orders fetched:', allOrders.orders.length);
+  } catch (error) {
+    console.error('[ShopOwnerDashboard] Error fetching orders:', error);
+  }
+
+  // Calculate stats (with default values to prevent errors)
+  const orders = allOrders.orders || [];
+
+  const enRouteOrders = orders.filter(
+    (o: any) => ['dispatched', 'picked_up', 'en_route'].includes(o.status)
+  );
+
+  const pendingOrders = orders.filter(
+    (o: any) => o.status === 'pending'
+  );
+
+  const deliveredTodayOrders = orders.filter(
+    (o: any) => o.status === 'delivered' && o.deliveredAt && new Date(o.deliveredAt) >= todayStart
+  );
+
+  const totalMonthOrders = orders.filter(
+    (o: any) => o.createdAt && new Date(o.createdAt) >= monthStart
+  );
+
+  data.orderStats = {
+    enRoute: enRouteOrders.length,
+    deliveredToday: deliveredTodayOrders.length,
+    pending: pendingOrders.length,
+    totalThisMonth: totalMonthOrders.length,
+  };
+
+  data.userId = userId;
+  data.organizationId = organizationId;
+
+  console.log('[ShopOwnerDashboard] Order stats:', data.orderStats);
 
   return data;
 }
@@ -891,6 +1033,11 @@ async function getAdminDispatchPageData(
   // Get available drivers and enrich with user names
   const availableDrivers = await driverRepository.findAvailable();
 
+  console.log('[Dispatch] Found available drivers:', {
+    count: availableDrivers.length,
+    drivers: availableDrivers.map(d => ({ id: d.id, userId: d.userId, status: d.status }))
+  });
+
   // Fetch user names for each driver
   const driversWithNames = await Promise.all(
     availableDrivers.map(async (driver) => {
@@ -906,12 +1053,24 @@ async function getAdminDispatchPageData(
         ? userResults[0].u.properties.name
         : `Driver ${driver.id.slice(0, 8)}`;
 
+      console.log('[Dispatch] Driver name lookup:', {
+        driverId: driver.id,
+        userId: driver.userId,
+        userName,
+        found: userResults.length > 0
+      });
+
       return {
         ...driver,
         name: userName,
       };
     })
   );
+
+  console.log('[Dispatch] Final drivers with names:', {
+    count: driversWithNames.length,
+    drivers: driversWithNames.map(d => ({ id: d.id, name: d.name }))
+  });
 
   data.availableDrivers = driversWithNames;
 

@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { useDriverStatusSSE, useOrderStatusSSE, useNewOrdersSSE } from '../../lib/hooks/useSSE';
 
 interface Order {
   id: string;
@@ -66,6 +67,31 @@ export default function DispatchManagementComponent({
   const [assigning, setAssigning] = useState(false);
   const [autoAssigning, setAutoAssigning] = useState(false);
   const [creatingTestOrder, setCreatingTestOrder] = useState(false);
+
+  // SSE connections for real-time updates
+  useDriverStatusSSE((message) => {
+    if (message.type === 'drivers_update') {
+      console.log('[Dispatch] Driver status update:', message.data);
+      // Refresh to get latest driver data
+      window.location.reload();
+    }
+  });
+
+  useOrderStatusSSE((message) => {
+    if (message.type === 'orders_update') {
+      console.log('[Dispatch] Order status update:', message.data);
+      // Refresh to get latest order data
+      window.location.reload();
+    }
+  });
+
+  useNewOrdersSSE((message) => {
+    if (message.type === 'new_orders') {
+      console.log('[Dispatch] New orders:', message.data);
+      // Refresh to get latest order data
+      window.location.reload();
+    }
+  });
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

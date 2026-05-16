@@ -30,6 +30,7 @@ import AppOperationsDashboardOld from '../../content-container/App/OperationsDas
 
 // Content for Shop Pages (MotoFlow)
 import PartsSearch from '../../content-container/Shop/PartsSearch.astro';
+import ShopOwnerDashboard from '../../content-container/Shop/ShopOwnerDashboard.astro';
 import OrdersList from '../../content-container/Shop/OrdersList.astro';
 import OrderDetail from '../../content-container/Shop/OrderDetail.astro';
 
@@ -401,10 +402,10 @@ export const RBAC_CONFIG = {
       appDashboardTest: {
         topNav: StitchTopNav,
         sideNav: StitchSideNav,
-        content: AppOperationsDashboard,
+        content: ShopOwnerDashboard,
         footer: Blank,
         title: "Dashboard",
-        description: "Manage your auto shop business",
+        description: "Order parts and track your deliveries",
       },
         appDashboardTestOld: {
         topNav: StitchTopNavOld,

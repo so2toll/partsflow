@@ -11,6 +11,7 @@ import { getSession } from '../../../../lib/auth/session-adapter';
 import { validateTransition } from '../../../../lib/order/orderStateMachine';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
+import { broadcastOrderStatus } from '../../../../lib/sse/sseManager';
 
 export const prerender = false;
 
@@ -75,6 +76,13 @@ export const POST: APIRoute = async ({ request, cookies, params }) => {
 
     // Update order status
     const updatedOrder = await orderRepository.updateStatus(orderId, status);
+
+    // Broadcast order status change to all connected dispatch clients
+    broadcastOrderStatus(orderId, status, {
+      partName: updatedOrder.partName,
+      partNumber: updatedOrder.partNumber,
+      driverId: driver.id,
+    });
 
     // If delivered, set driver back to available
     if (status === 'delivered') {

@@ -21,7 +21,7 @@ const { data } = Astro.props;
 console.log('[DriverDashboard.astro] Server-side data:', {
   driverId: data.driver?.id,
   driverStatus: data.driver?.status,
-  currentDelivery: data.currentDelivery?.id,
+  activeDeliveriesCount: data.activeDeliveries?.length || 0,
   availableOrdersCount: data.availableOrders?.length,
   stats: data.stats,
   userId: data.userId,
@@ -32,7 +32,7 @@ console.log('[DriverDashboard.astro] Server-side data:', {
 <DriverDashboardComponent
   client:load
   driver={data.driver}
-  currentDelivery={data.currentDelivery}
+  activeDeliveries={data.activeDeliveries || []}
   availableOrders={data.availableOrders || []}
   stats={data.stats}
   userId={data.userId}

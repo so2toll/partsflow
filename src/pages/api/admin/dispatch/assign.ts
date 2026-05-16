@@ -11,6 +11,7 @@ import { getSession } from '../../../../lib/auth/session-adapter';
 import { orderRepository } from '../../../../lib/db/repositories/OrderRepository';
 import { driverRepository } from '../../../../lib/db/repositories/DriverRepository';
 import { validateTransition } from '../../../../lib/order/orderStateMachine';
+import { broadcastOrderStatus, broadcastDriverStatus } from '../../../../lib/sse/sseManager';
 
 export const prerender = false;
 
@@ -87,6 +88,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Update driver status to on_delivery
     await driverRepository.updateStatus(driverId, 'on_delivery');
+
+    // Broadcast order status change
+    broadcastOrderStatus(orderId, 'dispatched', {
+      partName: updatedOrder.partName,
+      partNumber: updatedOrder.partNumber,
+      driverId: driverId,
+    });
+
+    // Broadcast driver status change
+    broadcastDriverStatus(driverId, 'on_delivery', {
+      userId: driver.userId,
+    });
 
     return new Response(
       JSON.stringify({
