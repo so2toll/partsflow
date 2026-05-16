@@ -28,8 +28,20 @@ const { invites, total } = await inviteRepository.list({
   orderDir: "DESC",
 });
 
-// Generate URLs for each invite
-const baseUrl = import.meta.env.PUBLIC_APP_URL || "http://localhost:3000";
+// Generate URLs for each invite using the actual request URL
+const requestUrl = new URL(Astro.url);
+let baseUrl = requestUrl.origin;
+
+// Replace IPv6 loopback with localhost for better local development UX
+if (baseUrl.includes('[::1]') || baseUrl.includes('[::]')) {
+  const port = requestUrl.port || '3000';
+  baseUrl = `http://localhost:${port}`;
+}
+// Also handle 127.0.0.1 with non-standard port
+else if (baseUrl.includes('127.0.0.1') && requestUrl.port && requestUrl.port !== '3000') {
+  baseUrl = `http://localhost:${requestUrl.port}`;
+}
+
 const invitesWithUrls = invites.map((invite) => ({
   ...invite,
   url: `${baseUrl}/onboard?token=${invite.token}`,
