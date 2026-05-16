@@ -65,8 +65,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       expiresInDays: expiresInDays || 7,
     });
 
-    // Generate the full invite URL
-    const baseUrl = import.meta.env.PUBLIC_APP_URL || "http://localhost:3000";
+    // Generate the full invite URL using the request's origin
+    const url = new URL(request.url);
+    const baseUrl = url.origin;
     const inviteUrl = `${baseUrl}/onboard?token=${invite.token}`;
 
     console.log(`[Invites] Created invite ${invite.id} with token ${invite.token}`);

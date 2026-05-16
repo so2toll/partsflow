@@ -116,6 +116,21 @@ export default function DriverDashboardComponent({
           const channel = new BroadcastChannel('driver-status');
           channel.postMessage({ status: newStatus });
         }
+
+        // If driver just went available, fetch pending orders immediately
+        if (newStatus === 'available') {
+          console.log('[DriverDashboard] Driver is now available, fetching pending orders...');
+          try {
+            const ordersResponse = await fetch('/api/orders/pending');
+            if (ordersResponse.ok) {
+              const data = await ordersResponse.json();
+              console.log('[DriverDashboard] Fetched pending orders:', data.orders?.length || 0);
+              setOrders(data.orders || []);
+            }
+          } catch (error) {
+            console.error('[DriverDashboard] Error fetching pending orders:', error);
+          }
+        }
       } else {
         alert('Failed to update status');
       }
