@@ -107,7 +107,7 @@ export class ShopRepository {
   } = {}): Promise<{ shops: Shop[]; total: number }> {
     const { organizations, total } = await organizationRepository.list({
       ...options,
-      type: 'shop',
+      orgType: 'shop',
     });
 
     return { shops: organizations, total };
@@ -122,7 +122,7 @@ export class ShopRepository {
    */
   async update(
     id: string,
-    data: Partial<Omit<Shop, "id" | "type" | "createdAt" | "updatedAt">>
+    data: Partial<Omit<Shop, "id" | "orgType" | "createdAt" | "updatedAt">>
   ): Promise<Shop> {
     return organizationRepository.update(id, data);
   }
@@ -165,7 +165,7 @@ export class ShopRepository {
   async findByUserId(userId: string): Promise<Shop | null> {
     const org = await organizationRepository.findByUserId(userId);
 
-    if (org && org.type !== 'shop') {
+    if (org && org.orgType !== 'shop') {
       return null;
     }
 

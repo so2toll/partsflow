@@ -25,13 +25,29 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     const userId = session.user?.global_id || session.user?.id;
+    const userRole = session.user?.role;
     const body = await request.json();
     const { status } = body;
 
-    if (!status || !['offline', 'available', 'on_delivery', 'suspended'].includes(status)) {
+    // Statuses a driver can set themselves
+    const DRIVER_ALLOWED_STATUSES = ['available', 'offline'];
+    // Statuses only admins can set (or system-set automatically)
+    const ADMIN_ONLY_STATUSES = ['suspended', 'pending_verification'];
+    // All valid statuses
+    const ALL_STATUSES = [...DRIVER_ALLOWED_STATUSES, ...ADMIN_ONLY_STATUSES, 'on_delivery'];
+
+    if (!status || !ALL_STATUSES.includes(status)) {
       return new Response(
         JSON.stringify({ error: 'Invalid status' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if this is a restricted status that only admins can set
+    if (ADMIN_ONLY_STATUSES.includes(status) && userRole !== 'SuperAdmin') {
+      return new Response(
+        JSON.stringify({ error: `Only administrators can set status to '${status}'` }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
